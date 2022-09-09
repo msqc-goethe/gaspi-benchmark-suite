@@ -1,0 +1,3 @@
+$gaspirun -N /scratch/fuchs/aglippert/zhuz/gaspi/gaspi-benchmark/programs/gaspi-benchmark/build/gaspi-benchmark −maxruns=1
+/scratch/fuchs/aglippert/zhuz/gaspi/gaspi-benchmark/programs/gaspi-benchmark/build/gaspi-benchmark: error while loading shared libraries: libGPI2.so.0: cannot open shared object file: No such file or directory
+srun: error: node27-004: task 0: Exited with exit code 127

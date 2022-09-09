@@ -1,0 +1,8 @@
+Running with OpenSHMEM,rank 0 world size is 1
+Running on 1 processors (PowerofTwo)
+Total Main table size = 2^21 = 2097152 words
+PE Main table size = 2^1067856245 = 2097152 words/PE
+Default number of updates (RECOMMENDED) = 8388608	and actually done = 8388608
+Real time used = 1.921737 seconds
+0.004365118 Billion(10^9) Updates    per second [GUP/s]
+0.004365118 Billion(10^9) Updates/PE per second [GUP/s]

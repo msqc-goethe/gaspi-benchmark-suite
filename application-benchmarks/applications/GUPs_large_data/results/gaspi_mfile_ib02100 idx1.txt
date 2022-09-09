@@ -1,0 +1,11 @@
+Running with GASPI,rank 0 world size is 2
+Scale Size: 100
+Running on 2 processors (PowerofTwo)
+Total Main table size = 2^22 = 4194304 words
+PE Main table size = 2^-88 = 2097152 words/PE
+Default number of updates (RECOMMENDED) = 16777216	and actually done = 16776800
+Real time used = 20.359325 seconds
+0.000824056 Billion(10^9) Updates    per second [GUP/s]
+0.000412028 Billion(10^9) Updates/PE per second [GUP/s]
+
+Finished Program

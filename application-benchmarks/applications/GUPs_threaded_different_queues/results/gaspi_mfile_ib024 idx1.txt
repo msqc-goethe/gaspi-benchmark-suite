@@ -1,0 +1,10 @@
+Running with GASPI,rank 0 world size is 2
+Running with Open MP, thread count: 4
+Running on 2 processors
+Total Main table size = 2^22 = 4194304 words
+PE Main table size = (2^22)/2  = 2097152 words/PE MAX
+Default number of updates (RECOMMENDED) = 16777216	and actually done = 16777216
+Real time used = 9.342017 seconds
+0.001795888 Billion(10^9) Updates    per second [GUP/s]
+0.000897944 Billion(10^9) Updates/PE per second [GUP/s]
+Running with GASPI,rank 1 world size is 2

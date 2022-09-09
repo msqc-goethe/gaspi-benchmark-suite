@@ -1,0 +1,48 @@
+Program Start
+Running with OpenMP, thread count: 1
+Running with GASPI, world size is 1
+Using Prefetching
+
+	Verification run, using constant seed for RNG
+HPCS SSCA #1 Bioinformatics Sequence Alignment Executable Specification:
+Running...
+Using seed 2613174141
+
+Scalable Data Generator - genScalData() beginning execution...
+Inserting sequence ACDEFG*IDENTICAL*HIKLMN in location 38
+Inserting sequence ACDEFG*MISQRMATCHES*HIKLMN in location 185
+Inserting sequence ACDEFG*STARTGAPMIDSTEND*HIKLMN in location 65
+Inserting sequence MNLKIH*IDENTICAL*GFEDCA in location 175
+Inserting sequence MNLKIH*MISRQMATCHES*GFEDCA in location 48
+Inserting sequence MNLKIH*STARTMIDSTGAPEND*GFEDCA in location 183
+
+	Elapsed time: 0 hour(s), 0 minute(s), 0 second(s), 1 milliseconds,  564 micro second(s).
+
+   Length of main sequence in codons: 335
+  Length of match sequence in codons: 335
+  Weight for exactly matching codons: 5
+           Weight for similar codons: 4
+        Weight for dissimilar codons: -3
+              Penalty to start a gap: 5
+     Penalty for each codon in a gap: 2
+
+Begining Kernel 1 execution.
+
+	Elapsed time: 0 hour(s), 0 minute(s), 3 second(s), 486 milliseconds,  171 micro second(s).
+
+Begining Kernel 2 execution.
+
+	Elapsed time: 0 hour(s), 0 minute(s), 0 second(s), 174 milliseconds,  490 micro second(s).
+
+Found 2 acceptable alignments with scores from 54 to 53.
+
+Starting   Amino     Codon           Ending
+position   acids     bases           position
+
+verifyAlignment 0, succeeded; score 54:
+    191  *MISQRMATCHES*  tgaatgataagccagaggatggcgacgtgccacgagagctga      204
+     54  *MISRQMATCHES*  tgaatgataagcaggcagatggcgacgtgccacgagagctga       67
+
+verifyAlignment 1, succeeded; score 53:
+     71  *STARTGAPMIDST---END*  tgaagcacggcgaggacgggggcgccgatgatagacagcacg---------gagaacgactga       88
+    189  *START---MIDSTGAPEND*  tgaagcacggcgaggacg---------atgatagacagcacgggggcgccggagaacgactga      206

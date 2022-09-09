@@ -1,0 +1,60 @@
+Program Start
+Running with OpenMP, thread count: 1
+Program Start
+Running with OpenMP, thread count: 1
+Program Start
+Running with OpenMP, thread count: 1
+Program Start
+Running with OpenMP, thread count: 1
+Program Start
+Running with OpenMP, thread count: 1
+Running with GASPI, world size is 5
+Using Prefetching
+
+	Verification run, using constant seed for RNG
+HPCS SSCA #1 Bioinformatics Sequence Alignment Executable Specification:
+Running...
+Using seed 2613174141
+
+Scalable Data Generator - genScalData() beginning execution...
+Inserting sequence ACDEFG*IDENTICAL*HIKLMN in location 22
+Inserting sequence ACDEFG*MISQRMATCHES*HIKLMN in location 34
+Inserting sequence ACDEFG*STARTGAPMIDSTEND*HIKLMN in location 45
+Inserting sequence MNLKIH*IDENTICAL*GFEDCA in location 68
+Inserting sequence MNLKIH*MISRQMATCHES*GFEDCA in location 10
+Inserting sequence MNLKIH*STARTMIDSTGAPEND*GFEDCA in location 20
+
+	Elapsed time: 0 hour(s), 0 minute(s), 0 second(s), 11 milliseconds,  943 micro second(s).
+
+   Length of main sequence in codons: 110
+  Length of match sequence in codons: 110
+  Weight for exactly matching codons: 5
+           Weight for similar codons: 4
+        Weight for dissimilar codons: -3
+              Penalty to start a gap: 5
+     Penalty for each codon in a gap: 2
+
+Begining Kernel 1 execution.
+
+	Elapsed time: 0 hour(s), 0 minute(s), 0 second(s), 314 milliseconds,  715 micro second(s).
+
+Begining Kernel 2 execution.
+
+	Elapsed time: 0 hour(s), 0 minute(s), 0 second(s), 103 milliseconds,  590 micro second(s).
+
+Found 3 acceptable alignments with scores from 45 to 32.
+
+Starting   Amino     Codon           Ending
+position   acids     bases           position
+
+verifyAlignment 0, succeeded; score 45:
+     39  G*MISQACDEFG*STARTGAPMIDST---END*  gggtgaatgataagccaggcgtgcgacgagttcgggtgaagcacggcgaggacgggggcgccgatgatagacagcacg---------gagaacgactga       68
+     15  H*MISMNLKIH-*START---MIDSTGAPEND*  cactgaatgataagcatgaacctgaagatacac---tgaagcacggcgaggacg---------atgatagacagcacgggggcgccggagaacgactga       43
+
+verifyAlignment 1, succeeded; score 44:
+     51  *STARTGAPMIDST  tgaagcacggcgaggacgggggcgccgatgatagacagcacg       64
+     26  *START---MIDST  tgaagcacggcgaggacg---------atgatagacagcacg       36
+
+verifyAlignment 2, succeeded; score 32:
+     28  *IDENTAC  tgaatagacgagaacacggcgtgc       35
+     74  *IDENTIC  tgaatagacgagaacacgatatgc       81

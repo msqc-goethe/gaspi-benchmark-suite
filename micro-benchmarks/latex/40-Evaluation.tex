@@ -1,0 +1,1040 @@
+\newcommand{\ubenchmaxtransfer}{16777220}
+
+
+\chapter{Evaluation}
+
+In this chapter the previously discussed benchmarks are executed on a test system and the performance is evaluated. The test system consists of two nodes that contain the following hardware:
+\begin{itemize}
+	\item CPU: 1x Intel Xeon Silver 4110
+	\item RAM: 32\,GB DDR4
+	\item Operating System: CentOS 7
+	\item Network:
+	\begin{itemize}
+		\item 1\,GBit/s Ethernet
+		\item 10\,GBit/s Ethernet
+		\item \acs{IPoIB} on InfiniBand QDR
+		\item InfiniBand QDR
+	\end{itemize}
+\end{itemize}
+
+The nodes are connected in a back-to-back fashion. Network connectivity is provided without an intermediate switch on the 10\,GBit/s and InfiniBand link. Consequently, one of the testing nodes runs the InfiniBand Subnet Manager \code{opensm}. The benchmarks are run with an \ac{IPoIB} stack enabled and also without the socket intermediate layer. The \ac{GPI}-2 library can be compiled to use native InfiniBand without a TCP/IP stack.
+
+\section{Ping Pong}
+
+The first benchmark to run is the ping pong microbenchmark. The results of the achieved bandwidth are shown in \autoref{img:eval:ping-pong}. It is not surprising that the transfer efficiency is low for small block sizes. The 1\,GBit/s connection reaches its maximum throughput for approximately 500\,kB blocks where a transfer speed of 112\,MB/s is measured. The highest throughput for the TCP/IP-based links is achieved on the 10\,GBit/s connection. Superior performance can be observed for the true InfiniBand connection without a TCP/IP stack. The InfiniBand connection exceeds the 10\,GbE network by a rough factor of three in bandwidth. For obtaining maximal throughput, a block size of at lease 1\,MB is required on the InfiniBand interconnect.
+
+\newcommand{\plotpingpong}{gbs_ubench_ping_pong.tikz}
+\begin{filecontents}{\plotpingpong}
+\newcommand{\csv}{gbs_ubench_ping_pong.csv}
+\newcommand{\csvgi}{result-gi/\csv}
+\newcommand{\csvte}{result-te/\csv}
+\newcommand{\csvipoib}{result-ipoib/\csv}
+\newcommand{\csvib}{result-ib/\csv}
+
+\begin{tikzpicture}
+\begin{axis}[
+	axis x line=bottom,
+    axis y line=left,
+    xlabel=Transfer Size (Bytes),
+	ylabel=Bandwidth (MB/s),
+	grid style={line width=.1pt, draw=gray!10},
+   	major grid style={line width=.2pt,draw=gray!50},
+    xmode=log,
+    xmin=1, xmax=\ubenchmaxtransfer,
+    ymin=0,
+    xticklabel=\engticksilabel{exp(\tick)},
+    yticklabel={\nprounddigits{0}\numprint{\tick}},
+    grid=both,
+    legend pos=north west,
+]
+
+\addplot[mark=x,blue] table [x=bytes, y=Mbytessec, col sep=comma] {\csvgi};
+\addlegendentry{1\,GBit/s Ethernet}
+
+\addplot[mark=o,red] table [x=bytes, y=Mbytessec, col sep=comma] {\csvte};
+\addlegendentry{10\,GBit/s Ethernet}
+
+\addplot[mark=diamond*,brown] table [x=bytes, y=Mbytessec, col sep=comma] {\csvipoib};
+\addlegendentry{IPoIB}
+
+\addplot[mark=triangle*,green] table [x=bytes, y=Mbytessec, col sep=comma] {\csvib};
+\addlegendentry{InfiniBand}
+\end{axis}
+\end{tikzpicture}
+\end{filecontents}
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=\textwidth , height=6cm]{\plotpingpong}
+\caption{Evaluation of the performance for the ping pong benchmark.}
+\label{img:eval:ping-pong}
+\end{figure}
+
+
+\section{Put Benchmarks}
+\subsection{Unidirectional Put}
+
+In \autoref{img:eval:put-udir} the results for the unidirectional put benchmarks are displayed. The graphs are similar to the ping pong benchmark in \autoref{img:eval:ping-pong} since the same communication routines are measured. It shall be noted that the Ethernet-based connections operate at their physical limit of 1\,GBit/s or 10\,GBit/s, respectively. The InfiniBand network operates at a line rate of 40\,GBit/s but the resulting bandwidth of approximately 25\,GBit/s is significantly lower. The product summary of the used InfiniBand card 
+specifies the maximum unidirectional throughput as 3400\,MB/s which is close to the measured values in \autoref{img:eval:put-udir} \cite{ib-card}.
+
+\newcommand{\plotputsingleudir}{gbs_ubench_put_single_udir.tikz}
+\begin{filecontents}{\plotputsingleudir}
+\newcommand{\csv}{gbs_ubench_put_single_udir.csv}
+\newcommand{\csvgi}{result-gi/\csv}
+\newcommand{\csvte}{result-te/\csv}
+\newcommand{\csvipoib}{result-ipoib/\csv}
+\newcommand{\csvib}{result-ib/\csv}
+\begin{tikzpicture}
+\begin{axis}[
+	axis x line=bottom,
+    axis y line=left,
+    xlabel=Transfer Size (Bytes),
+	ylabel=Bandwidth (MB/s),
+	grid style={line width=.1pt, draw=gray!10},
+   	major grid style={line width=.2pt,draw=gray!50},
+    xmode=log,
+    xmin=1, xmax=\ubenchmaxtransfer,
+    ymin=0,
+    xticklabel=\engticksilabel{exp(\tick)},
+    yticklabel={\nprounddigits{0}\numprint{\tick}},
+    grid=both,
+    legend pos=north west,
+]
+
+\addplot[mark=x,blue] table [x=bytes, y=Mbytessec, col sep=comma] {\csvgi};
+\addlegendentry{1\,GBit/s Ethernet}
+
+\addplot[mark=o,red] table [x=bytes, y=Mbytessec, col sep=comma] {\csvte};
+\addlegendentry{10\,GBit/s Ethernet}
+
+\addplot[mark=diamond*,brown] table [x=bytes, y=Mbytessec, col sep=comma] {\csvipoib};
+\addlegendentry{IPoIB}
+
+\addplot[mark=triangle*,green] table [x=bytes, y=Mbytessec, col sep=comma] {\csvib};
+\addlegendentry{InfiniBand}
+\end{axis}
+\end{tikzpicture}
+\end{filecontents}
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=\textwidth , height=6cm]{\plotputsingleudir}
+\caption{Evaluation of the performance for the unidirectional put benchmark.}
+\label{img:eval:put-udir}
+\end{figure}
+
+
+\subsection{Bidirectional Put}
+
+In \autoref{img:eval:put-bdir} the results for the bidirectional put benchmark are shown. Even though the distribution of the performance of the different network interfaces is identical to previous benchmarks, the absolute measured bandwidth is lower. Furthermore, a optimal transfer size may be found for the InfiniBand interconnect -- its origin is unclear. In comparison to the unidirectional put benchmark in \autoref{img:eval:put-udir}, only about 60\,\% of the performance is achieved. All underlying network interfaces are designed for full duplex mode exclusively. The origin of the performance decrease must therefore involve the software communication library. A plausible explanation is that \ac{GPI}-2 seems to use only one thread for library functions. If concurrent operations are executed on one node, no true parallelism is achieved in the \ac{GPI}-2 library and hence the performance is diminished. 
+
+
+\newcommand{\plotputsinglebdir}{gbs_ubench_put_single_bdir.tikz}
+\begin{filecontents}{\plotputsinglebdir}
+\newcommand{\csv}{gbs_ubench_put_single_bdir.csv}
+\newcommand{\csvgi}{result-gi/\csv}
+\newcommand{\csvte}{result-te/\csv}
+\newcommand{\csvipoib}{result-ipoib/\csv}
+\newcommand{\csvib}{result-ib/\csv}
+
+\begin{tikzpicture}
+\begin{axis}[
+	axis x line=bottom,
+    axis y line=left,
+    xlabel=Transfer Size (Bytes),
+	ylabel=Bandwidth (MB/s),
+	grid style={line width=.1pt, draw=gray!10},
+   	major grid style={line width=.2pt,draw=gray!50},
+    xmode=log,
+    xmin=1, xmax=\ubenchmaxtransfer,
+    ymin=0,
+    xticklabel=\engticksilabel{exp(\tick)},
+    yticklabel={\nprounddigits{0}\numprint{\tick}},
+    grid=both,
+    legend pos=north west,
+]
+
+\addplot[mark=x,blue] table [x=bytes, y=Mbytessec, col sep=comma] {\csvgi};
+\addlegendentry{1\,GBit/s Ethernet}
+
+\addplot[mark=o,red] table [x=bytes, y=Mbytessec, col sep=comma] {\csvte};
+\addlegendentry{10\,GBit/s Ethernet}
+
+\addplot[mark=diamond*,brown] table [x=bytes, y=Mbytessec, col sep=comma] {\csvipoib};
+\addlegendentry{IPoIB}
+
+\addplot[mark=triangle*,green] table [x=bytes, y=Mbytessec, col sep=comma] {\csvib};
+\addlegendentry{InfiniBand}
+\end{axis}
+\end{tikzpicture}
+\end{filecontents}
+
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=\textwidth , height=6cm]{\plotputsinglebdir}
+\caption{Evaluation of the performance for the bidirectional put benchmark.}
+\label{img:eval:put-bdir}
+\end{figure}
+
+\section{Get Benchmarks}
+
+\subsection{Unidirectional Get}
+
+The results of the measurement for the unidirectional get benchmarks are shown in \autoref{img:eval:get-udir}. They are highly comparable to the results gathered in the unidirectional put benchmark in \autoref{img:eval:put-udir}. When investigating the raw data small discrepancies may be observed: The put benchmark performs slightly better for smaller block sizes than the get benchmark. Otherwise maximum performance is achieved on all links except for the \ac{IPoIB} connection. As observed in all previous bandwidth-related benchmark, the \ac{IPoIB} network underperforms heavily, since it operates on the same physical link as the InfiniBand connection.
+
+\newcommand{\plotgetsingleudir}{gbs_ubench_get_single_udir.tikz}
+\begin{filecontents}{\plotgetsingleudir}
+\newcommand{\csv}{gbs_ubench_get_single_udir.csv}
+\newcommand{\csvgi}{result-gi/\csv}
+\newcommand{\csvte}{result-te/\csv}
+\newcommand{\csvipoib}{result-ipoib/\csv}
+\newcommand{\csvib}{result-ib/\csv}
+
+\begin{tikzpicture}
+\begin{axis}[
+	axis x line=bottom,
+    axis y line=left,
+    xlabel=Transfer Size (Bytes),
+	ylabel=Bandwidth (MB/s),
+	grid style={line width=.1pt, draw=gray!10},
+   	major grid style={line width=.2pt,draw=gray!50},
+    xmode=log,
+    xmin=1, xmax=\ubenchmaxtransfer,
+    ymin=0,
+    xticklabel=\engticksilabel{exp(\tick)},
+    yticklabel={\nprounddigits{0}\numprint{\tick}},
+    grid=both,
+    legend pos=north west,
+]
+
+\addplot[mark=x,blue] table [x=bytes, y=Mbytessec, col sep=comma] {\csvgi};
+\addlegendentry{1\,GBit/s Ethernet}
+
+\addplot[mark=o,red] table [x=bytes, y=Mbytessec, col sep=comma] {\csvte};
+\addlegendentry{10\,GBit/s Ethernet}
+
+\addplot[mark=diamond*,brown] table [x=bytes, y=Mbytessec, col sep=comma] {\csvipoib};
+\addlegendentry{IPoIB}
+
+\addplot[mark=triangle*,green] table [x=bytes, y=Mbytessec, col sep=comma] {\csvib};
+\addlegendentry{InfiniBand}
+\end{axis}
+\end{tikzpicture}
+\end{filecontents}
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=\textwidth , height=6cm]{\plotgetsingleudir}
+\caption{Evaluation of the performance for the unidirectional get benchmark.}
+\label{img:eval:get-udir}
+\end{figure}
+
+\subsection{Bidirectional Get}
+
+The bidirectional get benchmark is evaluated in \autoref{img:eval:get-bdir}. Similar results compared to the corresponding put benchmark from \autoref{img:eval:put-bdir} are obtained. Even for the 1\,GBit/s connection only half of the theoretical bandwidth is measured. This was not the case with the bidirectional put benchmark.  The lack of \ac{CPU} resources in the concurrent library function that was assumed to be a performance-diminishing factor in the put benchmark can therefore not be the only explanation of the reduced performance. The true root cause of the performance degradation still needs to be determined. It is stated that the support of Ethernet devices in \ac{GPI}-2 is meant for debugging and development purposes with less focus on performance \cite{gpi-2-github}. Therefore, scrutinizing the Ethernet-based results too much does not seem adequate. However, the general trend of the performance loss especially in comparison to the bidirectional put benchmark should be investigated further.
+
+
+\newcommand{\plotgetsinglebdir}{gbs_ubench_get_single_bdir.tikz}
+\begin{filecontents}{\plotgetsinglebdir}
+
+\newcommand{\csv}{gbs_ubench_get_single_bdir.csv}
+\newcommand{\csvgi}{result-gi/\csv}
+\newcommand{\csvte}{result-te/\csv}
+\newcommand{\csvipoib}{result-ipoib/\csv}
+\newcommand{\csvib}{result-ib/\csv}
+
+\begin{tikzpicture}
+\begin{axis}[
+	axis x line=bottom,
+    axis y line=left,
+    xlabel=Transfer Size (Bytes),
+	ylabel=Bandwidth (MB/s),
+	grid style={line width=.1pt, draw=gray!10},
+   	major grid style={line width=.2pt,draw=gray!50},
+    xmode=log,
+    xmin=1, xmax=\ubenchmaxtransfer,
+    ymin=0,
+    xticklabel=\engticksilabel{exp(\tick)},
+    yticklabel={\nprounddigits{0}\numprint{\tick}},
+    grid=both,
+    legend pos=north west,
+]
+
+\addplot[mark=x,blue] table [x=bytes, y=Mbytessec, col sep=comma] {\csvgi};
+\addlegendentry{1\,GBit/s Ethernet}
+
+\addplot[mark=o,red] table [x=bytes, y=Mbytessec, col sep=comma] {\csvte};
+\addlegendentry{10\,GBit/s Ethernet}
+
+\addplot[mark=diamond*,brown] table [x=bytes, y=Mbytessec, col sep=comma] {\csvipoib};
+\addlegendentry{IPoIB}
+
+\addplot[mark=triangle*,green] table [x=bytes, y=Mbytessec, col sep=comma] {\csvib};
+\addlegendentry{InfiniBand}
+\end{axis}
+\end{tikzpicture}
+\end{filecontents}
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=\textwidth , height=6cm]{\plotgetsinglebdir}
+\caption{Evaluation of the performance for the bidirectional get benchmark.}
+\label{img:eval:get-bdir}
+\end{figure}
+
+
+\section{Allreduce Collective}
+\label{sec:eval:allreduce}
+
+In \autoref{img:eval:allreduce-sum} the allreduce benchmark with the sum operation is benchmarked on the available network interfaces. In contrast to previous benchmarks, the allreduce benchmark measures the number of operations per second and not the achieved bandwidth. The first observation is that the InfiniBand connection provides a tremendous amount of performance in comparison to the other interconnection networks: It allows the execution of about six times more operations than the Ethernet-based networks. Furthermore, it can be observed that the \ac{IPoIB} connection outperforms both Ethernet interfaces which was not observed in previous benchmarks. The reason for this is the lower latency on the InfiniBand link and also on the \ac{IPoIB} link in comparison to the Ethernet connections. Since the amount of data to be transferred among the nodes is relatively small, the latency of the respective connection is of significant importance.
+
+\newcommand{\plotallreducesum}{gbs_ubench_allreduce_sum.tikz}
+\begin{filecontents}{\plotallreducesum}
+
+\newcommand{\csv}{gbs_ubench_allreduce_sum.csv}
+\newcommand{\csvgi}{result-gi/\csv}
+\newcommand{\csvte}{result-te/\csv}
+\newcommand{\csvipoib}{result-ipoib/\csv}
+\newcommand{\csvib}{result-ib/\csv}
+
+\begin{tikzpicture}
+
+\begin{axis}[
+	axis x line=bottom,
+    axis y line=left,
+    xlabel=Transfer Size (Bytes),
+	ylabel=kOps (1/s),
+	grid style={line width=.1pt, draw=gray!10},
+   	major grid style={line width=.2pt,draw=gray!50},
+    xmode=log,
+    xmin=3, xmax=1024,
+    xticklabel=\engticksilabel{exp(\tick)},
+    yticklabel={\nprounddigits{0}\numprint{\tick}},
+    grid=both,
+    legend style={at={(0.03,0.7)},anchor=west},
+]
+
+\addplot[mark=x,blue, y filter/.code={\pgfmathparse{\pgfmathresult*1e-3}\pgfmathresult}] table [x=bytes, y=Opssec, col sep=comma] {\csvgi};
+\addlegendentry{1\,GBit/s Ethernet}
+
+\addplot[mark=o,red, y filter/.code={\pgfmathparse{\pgfmathresult*1e-3}\pgfmathresult}] table [x=bytes, y=Opssec, col sep=comma] {\csvte};
+\addlegendentry{10\,GBit/s Ethernet}
+
+\addplot[mark=diamond*, brown, y filter/.code={\pgfmathparse{\pgfmathresult*1e-3}\pgfmathresult}] table [x=bytes, y=Opssec, col sep=comma] {\csvipoib};
+\addlegendentry{IPoIB}
+
+\addplot[mark=triangle*,green, y filter/.code={\pgfmathparse{\pgfmathresult*1e-3}\pgfmathresult}] table [x=bytes, y=Opssec, col sep=comma] {\csvib};
+\addlegendentry{InfiniBand}
+\end{axis}
+\end{tikzpicture}
+\end{filecontents}
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=\textwidth , height=6cm]{\plotallreducesum}
+\caption{Evaluation of the performance for the allreduce sum benchmark.}
+\label{img:eval:allreduce-sum}
+\end{figure}
+
+
+Next, the execution speed of the different predefined operations for the allreduce benchmark is evaluated. Since InfiniBand was determined to be the leading interconnect in \autoref{img:eval:allreduce-sum} the following measurements in \autoref{img:eval:allreduce-types} are done with InfiniBand. It does not come as a surprise that all three operations achieve near identical performance in \autoref{img:eval:allreduce-types}. It can also be observed that the execution speed does not vary much with the number of elements that are processed. The maximum number of elements that can be reduced with the function are limited by the library, therefore the given transfer size is low in comparison to the bandwidth-related benchmarks.
+
+\newcommand{\plotallreducecomp}{gbs_ubench_allreduce_comp.tikz}
+\begin{filecontents}{\plotallreducecomp}
+
+\newcommand{\dir}{result-ib}
+\newcommand{\csvsum}{\dir /gbs_ubench_allreduce_sum.csv}
+\newcommand{\csvmin}{\dir /gbs_ubench_allreduce_min.csv}
+\newcommand{\csvmax}{\dir /gbs_ubench_allreduce_max.csv}
+
+\begin{tikzpicture}
+\begin{axis}[
+	axis x line=bottom,
+    axis y line=left,
+    xlabel=Transfer Size (Bytes),
+	ylabel=kOps (1/s),
+	grid style={line width=.1pt, draw=gray!10},
+   	major grid style={line width=.2pt,draw=gray!50},
+    xmode=log,
+    xmin=1, xmax=1024,
+    xticklabel=\engticksilabel{exp(\tick)},
+    yticklabel={\nprounddigits{0}\numprint{\tick}},
+    grid=both,
+    legend pos=north west,
+]
+
+\addplot[mark=x,blue,y filter/.code={\pgfmathparse{\pgfmathresult*1e-3}\pgfmathresult}] table [x=bytes, y=Opssec, col sep=comma] {\csvsum};
+\addlegendentry{Sum}
+
+\addplot[mark=o,red,y filter/.code={\pgfmathparse{\pgfmathresult*1e-3}\pgfmathresult}] table [x=bytes, y=Opssec, col sep=comma] {\csvmin};
+\addlegendentry{Min}
+
+\addplot[mark=triangle*,green,y filter/.code={\pgfmathparse{\pgfmathresult*1e-3}\pgfmathresult}] table [x=bytes, y=Opssec, col sep=comma] {\csvmax};
+\addlegendentry{Max}
+\end{axis}
+\end{tikzpicture}
+\end{filecontents}
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=\textwidth , height=6cm]{\plotallreducecomp}
+\caption{Evaluation of the performance for the different allreduce benchmarks using InfiniBand.}
+\label{img:eval:allreduce-types}
+\end{figure}
+
+\section{Barrier Collective}
+
+The most important collective operation is the barrier function that synchronized all ranks of a group. The barrier benchmark does not rely on a transfer size, as explained in \secref{ssec:impl:barrier}. The number of operations per second is measured and the results are shown in \autoref{img:eval:barrier} as a bar plot. Similarly to the allreduce benchmark in \secref{sec:eval:allreduce} this benchmark relies heavily on the latency of the interconnection network. It is therefore understandable that InfiniBand and \ac{IPoIB} outperform the Ethernet-based connections. Comparing 10\,GbE and InfiniBand, a speed-up of a factor of six can be observed.
+
+
+\newcommand{\plotbarrier}{gbs_ubench_barrier.tikz}
+\begin{filecontents}{\plotbarrier}
+
+\pgfplotstableread[col sep=comma,]{result-merged/gbs_ubench_barrier.csv}\datatable
+\begin{tikzpicture}
+\begin{axis}[
+    ybar,
+    bar width=1cm,
+    ymin = 0,
+    xtick=data,
+    ymajorgrids=true,
+    xticklabels from table={\datatable}{network},
+	yticklabel={\nprounddigits{0}\numprint{\tick}},
+    ylabel={kOps (1/s)}]
+    \addplot [y filter/.code={\pgfmathparse{#1*1e-3}\pgfmathresult}, NavyBlue!20!black,fill=NavyBlue!80!white] table [x expr=\coordindex, y={Opssec}]{\datatable};
+\end{axis}
+\end{tikzpicture}
+\end{filecontents}
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=\textwidth , height=6cm]{\plotbarrier}
+\caption{Evaluation of the number of operations per second for the barrier collective benchmark.}
+\label{img:eval:barrier}
+\end{figure}
+
+\section{Atomics}
+
+\subsection{Fetch and Add}
+
+The results of the \emph{fetch and add} benchmarks are shown in the bar plot of \autoref{img:eval:faa}. Apart from the scale of the values, the distribution of the performance is nearly identical to the barrier benchmark in \autoref{img:eval:barrier}. If the number of elements to be transferred is low, the latency of the connection is more critical and therefore there exists the observed discrepancy between the InfiniBand-based links and the Ethernet connections.
+
+
+\newcommand{\plotfetchadd}{gbs_ubench_atomic_fetch_add_single.tikz}
+\begin{filecontents}{\plotfetchadd}
+
+\pgfplotstableread[col sep=comma,]{result-merged/gbs_ubench_atomic_fetch_add_single.csv}\datatable
+\begin{tikzpicture}
+\begin{axis}[
+    ybar,
+    bar width=1cm,
+    ymin = 0,
+    xtick=data,
+    ymajorgrids=true,
+    xticklabels from table={\datatable}{network},
+	yticklabel={\nprounddigits{0}\numprint{\tick}},
+    ylabel={kOps (1/s)}]
+    \addplot [y filter/.code={\pgfmathparse{#1*1e-3}\pgfmathresult}, NavyBlue!20!black,fill=NavyBlue!80!white] table [x expr=\coordindex, y={Opssec}]{\datatable};
+\end{axis}
+\end{tikzpicture}
+\end{filecontents}
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=\textwidth , height=6cm]{\plotfetchadd}
+\caption{Evaluation of the number of operations per second for the single \emph{fetch and add} atomic benchmark.}
+\label{img:eval:faa}
+\end{figure}
+
+\subsection{Compare and Swap}
+
+The \emph{compare and swap} atomic operation is benchmarked in \autoref{img:eval:cas}. Since the complexity of the function is comparable to the \emph{fetch and add} operation, it is natural that the performance is similar as well. When looking at the raw data it can be noticed that the \emph{compare and swap} operation in \autoref{img:eval:cas} achieves slightly more performance than the \emph{fetch and add} operation in \autoref{img:eval:faa}.
+
+
+\newcommand{\plotcompareswap}{gbs_ubench_atomic_compare_swap_single.tikz}
+\begin{filecontents}{\plotcompareswap}
+
+\pgfplotstableread[col sep=comma,]{result-merged/gbs_ubench_atomic_compare_swap_single.csv}\datatable
+\begin{tikzpicture}
+\begin{axis}[
+    ybar,
+    bar width=1cm,
+    ymin = 0,
+    xtick=data,
+    ymajorgrids=true,
+    xticklabels from table={\datatable}{network},
+    yticklabel={\nprounddigits{0}\numprint{\tick}},
+    ylabel={kOps (1/s)}]
+    \addplot [y filter/.code={\pgfmathparse{#1*1e-3}\pgfmathresult}, NavyBlue!20!black,fill=NavyBlue!80!white] table [x expr=\coordindex, y={Opssec}]{\datatable};
+\end{axis}
+\end{tikzpicture}
+\end{filecontents}
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=\textwidth , height=6cm]{\plotcompareswap}
+\caption{Evaluation of the number of operations per second for the single \emph{compare and swap} atomic benchmark.}
+\label{img:eval:cas}
+\end{figure}
+
+\section{Notification Rate}
+
+The notification rate is measured in \autoref{img:eval:noti}. Since discrepancies were observed earlier when comparing unidirectional and bidirectional operations, the notification rate is also evaluated separately for both transmission modes. In general, the distribution of the performance among the different interfaces is as expected with InfiniBand exceeding the performance of all other networks. Surprisingly, the 1\,GbE connection has a slightly higher notification rate than the 10\,GbE connection. An investigation into the variance of the measurement yielded that the execution latency of the benchmark may vary by as much as 100\,\%. Therefore, the values obtained for the Ethernet connection and the \ac{IPoIB} link may be regarded as identical.
+
+
+\newcommand{\plotnoti}{gbs_ubench_noti_single.tikz}
+\begin{filecontents}{\plotnoti}
+
+\pgfplotstableread[col sep=comma,]{result-merged/gbs_ubench_noti_single_udir.csv}\datatableudir
+\pgfplotstableread[col sep=comma,]{result-merged/gbs_ubench_noti_single_bdir.csv}\datatablebdir
+\begin{tikzpicture}
+\begin{axis}[
+    ybar,
+    bar width=1cm,
+    ymin = 0,
+    xmin=-0.5,
+    xmax=3.5,
+    xtick=data,
+    ymajorgrids=true,
+    legend pos=north west,
+    xticklabels from table={\datatableudir}{network},
+    yticklabel={\nprounddigits{0}\numprint{\tick}},
+    ylabel={kOps (1/s)}]
+    \addplot [y filter/.code={\pgfmathparse{\pgfmathresult*1e-3}\pgfmathresult}, NavyBlue!20!black,fill=NavyBlue!80!white] table [x expr=\coordindex, y={Opssec}]{\datatableudir};
+   \addplot [y filter/.code={\pgfmathparse{\pgfmathresult*1e-3}\pgfmathresult}, OliveGreen!20!black,fill=OliveGreen!80!white] table [x expr=\coordindex, y={Opssec}]{\datatablebdir};
+    \legend{Unidirectional, Bidirectional};
+\end{axis}
+\end{tikzpicture}
+\end{filecontents}
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=\textwidth , height=6cm]{\plotnoti}
+\caption{Evaluation of the number of operations per second for the single notification rate benchmark.}
+\label{img:eval:noti}
+\end{figure}
+
+Another observation is that the bidirectional benchmarks again yields lower results as the unidirectional measurements. This is significantly more severe for the Ethernet link, while both InfiniBand connections suffer a lesser performance degradation.
+
+
+\section{True One-Sided Exchange}
+
+\subsection{Transfer with Put}
+
+The true one-sided exchange benchmark measures if the \ac{RMA} operations truly do not interfere with the computations on the remote side. The results when using the \emph{put} primitive are shown in \autoref{img:eval:true-onesided:put}. These results need to be compared to \autoref{img:eval:put-udir} where the unidirectional put bandwidth is measured. It can be seen that the results are nearly identical which supports the claim that \ac{GPI}-2 supports a true one-sided communication. This does not mean that no \ac{CPU} work is required at the remote end to accomplish the data transfer, only that this work does not interfere directly with the user application. If \ac{GPI}-2 uses a separate thread for handling internal management of the transfers, this computational load is only measurable when the application performs multithreaded \ac{CPU}-intensive work load.
+
+
+\newcommand{\plottrueput}{gbs_ubench_put_true_exchange.tikz}
+\begin{filecontents}{\plottrueput}
+
+\newcommand{\csv}{gbs_ubench_put_true_exchange.csv}
+\newcommand{\csvgi}{result-gi/\csv}
+\newcommand{\csvte}{result-te/\csv}
+\newcommand{\csvipoib}{result-ipoib/\csv}
+\newcommand{\csvib}{result-ib/\csv}
+
+\begin{tikzpicture}
+
+\begin{axis}[
+	axis x line=bottom,
+    axis y line=left,
+    xlabel=Transfer Size (Bytes),
+	ylabel=Bandwidth (MB/s),
+	grid style={line width=.1pt, draw=gray!10},
+   	major grid style={line width=.2pt,draw=gray!50},
+    xmode=log,
+    xmin=1, xmax=\ubenchmaxtransfer,
+    ymin=0,
+    xticklabel=\engticksilabel{exp(\tick)},
+    yticklabel={\nprounddigits{0}\numprint{\tick}},
+    grid=both,
+    legend pos=north west,
+]
+
+\addplot[mark=x,blue] table [x=bytes, y=Mbytessec, col sep=comma] {\csvgi};
+\addlegendentry{1\,GBit/s Ethernet}
+
+\addplot[mark=o,red] table [x=bytes, y=Mbytessec, col sep=comma] {\csvte};
+\addlegendentry{10\,GBit/s Ethernet}
+
+\addplot[mark=diamond*,brown] table [x=bytes, y=Mbytessec, col sep=comma] {\csvipoib};
+\addlegendentry{IPoIB}
+
+\addplot[mark=triangle*,green] table [x=bytes, y=Mbytessec, col sep=comma] {\csvib};
+\addlegendentry{InfiniBand}
+\end{axis}
+\end{tikzpicture}
+\end{filecontents}
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=\textwidth , height=6cm]{\plottrueput}
+\caption{Evaluation of the performance of the true one-sided put exchange benchmark.}
+\label{img:eval:true-onesided:put}
+\end{figure}
+
+
+\subsection{Transfer with Get}
+
+The results for the true one-sided exchange using the \emph{get} primitive are shown in \autoref{img:eval:true-onesided:get}. They are comparable to the unidirectional get benchmark that was evaluated in \autoref{img:eval:get-udir}. It can be seen that all interfaces operate at their maximum throughput that was measured before and that no performance degradation is observable. 
+
+\newcommand{\plottrueget}{gbs_ubench_get_true_exchange.tikz}
+\begin{filecontents}{\plottrueget}
+
+\newcommand{\csv}{gbs_ubench_get_true_exchange.csv}
+\newcommand{\csvgi}{result-gi/\csv}
+\newcommand{\csvte}{result-te/\csv}
+\newcommand{\csvipoib}{result-ipoib/\csv}
+\newcommand{\csvib}{result-ib/\csv}
+
+\begin{tikzpicture}
+\begin{axis}[
+	axis x line=bottom,
+    axis y line=left,
+    xlabel=Transfer Size (Bytes),
+	ylabel=Bandwidth (MB/s),
+	grid style={line width=.1pt, draw=gray!10},
+   	major grid style={line width=.2pt,draw=gray!50},
+    xmode=log,
+    xmin=1, xmax=\ubenchmaxtransfer,
+    ymin=0,
+    xticklabel=\engticksilabel{exp(\tick)},
+    yticklabel={\nprounddigits{0}\numprint{\tick}},
+    grid=both,
+    legend pos=north west,
+]
+
+\addplot[mark=x,blue] table [x=bytes, y=Mbytessec, col sep=comma] {\csvgi};
+\addlegendentry{1\,GBit/s Ethernet}
+
+\addplot[mark=o,red] table [x=bytes, y=Mbytessec, col sep=comma] {\csvte};
+\addlegendentry{10\,GBit/s Ethernet}
+
+\addplot[mark=diamond*,brown] table [x=bytes, y=Mbytessec, col sep=comma] {\csvipoib};
+\addlegendentry{IPoIB}
+
+\addplot[mark=triangle*,green] table [x=bytes, y=Mbytessec, col sep=comma] {\csvib};
+\addlegendentry{InfiniBand}
+\end{axis}
+\end{tikzpicture}
+\end{filecontents}
+
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=\textwidth , height=6cm]{\plottrueget}
+\caption{Evaluation of the performance of the true one-sided get exchange benchmark.}
+\label{img:eval:true-onesided:get}
+\end{figure}
+
+\section{Two-Sided Ping Pong}
+
+The last microbenchmark to be evaluated concerns the two-sided passive communication previously introduced in \secref{ssec:background:gaspi:two-sided} and \secref{ssec:impl:ubench:two-sided}. The results are shown in \autoref{img:eval:two-sided}. In comparison to other bandwidth-related benchmarks the low transfer size shall be noted. The maximum transfers size is dictated by the implementation of the library. For reference, \autoref{img:eval:two-sided} also contains the InfiniBand data in \ac{RMA} ping pong mode that was previously shown in \autoref{img:eval:ping-pong}. It can be seen that the performance is identical, therefore with two-sided communication no performance is lost or gained under ideal circumstances. However, since the transfer size is limited for two-sided communication, this transmission scheme is only useful for the use cases outlined in \secref{ssec:background:gaspi:two-sided}.
+
+\newcommand{\plottwosided}{gbs_ubench_twosided_ping_pong.tikz}
+\begin{filecontents}{\plottwosided}
+
+\newcommand{\csv}{gbs_ubench_twosided_ping_pong.csv}
+\newcommand{\csvgi}{result-gi/\csv}
+\newcommand{\csvte}{result-te/\csv}
+\newcommand{\csvipoib}{result-ipoib/\csv}
+\newcommand{\csvib}{result-ib/\csv}
+\newcommand{\csvibnormal}{result-ib/gbs_ubench_ping_pong.csv}
+
+\begin{tikzpicture}
+
+\begin{axis}[
+	axis x line=bottom,
+    axis y line=left,
+    xlabel=Transfer Size (Bytes),
+	ylabel=Bandwidth (MB/s),
+	grid style={line width=.1pt, draw=gray!10},
+   	major grid style={line width=.2pt,draw=gray!50},
+    xmode=log,
+    xmin=1, xmax=65540,
+    ymin=0,
+    xticklabel=\engticksilabel{exp(\tick)},
+    yticklabel={\nprounddigits{0}\numprint{\tick}},
+    grid=both,
+    legend pos=north west,
+]
+
+\addplot[mark=x,blue] table [x=bytes, y=Mbytessec, col sep=comma] {\csvgi};
+\addlegendentry{1\,GBit/s Ethernet}
+
+\addplot[mark=o,red] table [x=bytes, y=Mbytessec, col sep=comma] {\csvte};
+\addlegendentry{10\,GBit/s Ethernet}
+
+\addplot[mark=diamond*,brown] table [x=bytes, y=Mbytessec, col sep=comma] {\csvipoib};
+\addlegendentry{IPoIB}
+
+\addplot[mark=triangle*,green] table [x=bytes, y=Mbytessec, col sep=comma] {\csvib};
+\addlegendentry{InfiniBand}
+
+\addplot[mark=*,orange] table [x=bytes, y=Mbytessec, col sep=comma] {\csvibnormal};
+\addlegendentry{IB RMA Ping Pong}
+
+\end{axis}
+\end{tikzpicture}
+\end{filecontents}
+
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=\textwidth , height=6cm]{\plottwosided}
+\caption{Evaluation of the performance of the two-sided ping pong benchmark.}
+\label{img:eval:two-sided}
+\end{figure}
+
+\section{Application Grid Benchmark with Halo Exchange}
+
+The application benchmark for computing the heat dissipation on a two\--di\-men\-si\-o\-nal grid is evaluated in \autoref{img:eval:grid-time}. Since the benchmark is neither bandwidth-orientated nor aims at achieving a high number of operations per second, the raw execution latency is visualized. The displayed times represent the latency that is required to calculate one iteration on a grid with the given size and a defined number of threads. It was chosen to benchmark with eight threads since the available \ac{CPU} incorporates eight true individual cores plus Hyperthreading. 
+
+
+\newcommand{\plotgrid}{gbs_abench_grid_stencil.tikz}
+\begin{filecontents}{\plotgrid}
+
+\newcommand{\csv}{gbs_abench_grid_stencil.csv}
+\newcommand{\csvgi}{result-gi/\csv}
+\newcommand{\csvte}{result-te/\csv}
+\newcommand{\csvipoib}{result-ipoib/\csv}
+\newcommand{\csvib}{result-ib/\csv}
+
+\begin{tikzpicture}
+\begin{axis}[
+	axis x line=bottom,
+    axis y line=left,
+	xlabel=Grid Size,
+	ylabel=Average time (\textmu s),
+	grid style={line width=.1pt, draw=gray!10},
+   	major grid style={line width=.2pt,draw=gray!50},
+    xmode=log,
+    ymode=log,
+    xmin=1e1,
+    xmax=2050,
+    yticklabel={\FPeval{\result}{round(exp(\tick),0)}\numprint{\result}},
+    xticklabel={\FPeval{\result}{round(exp(\tick),0)}\numprint{\result}},
+    grid=both,
+    legend pos=north west,
+    log ticks with fixed point,
+]
+
+\addplot[mark=x,blue] table [x=gridSize, y=tavgusec, col sep=comma] {\csvgi};
+\addlegendentry{1\,GBit/s Ethernet}
+
+\addplot[mark=o,red] table [x=gridSize, y=tavgusec, col sep=comma] {\csvte};
+\addlegendentry{10\,GBit/s Ethernet}
+
+\addplot[mark=diamond*,brown] table [x=gridSize, y=tavgusec, col sep=comma] {\csvipoib};
+\addlegendentry{IPoIB}
+
+\addplot[mark=triangle*,green] table [x=gridSize, y=tavgusec, col sep=comma] {\csvib};
+\addlegendentry{InfiniBand}
+\end{axis}
+\end{tikzpicture}
+\end{filecontents}
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=\textwidth , height=6cm]{\plotgrid}
+\caption{Evaluation of the execution time of the grid benchmark with 8 threads.}
+\label{img:eval:grid-time}
+\end{figure}
+
+From the data depicted in \autoref{img:eval:grid-time} it is evident that the task is bound by the execution speed of the \ac{CPU} or by the shared memory bandwidth: For small grids the interconnect chosen has a significant impact on the execution latency. The InfiniBand interconnect achieves results several factors faster than the other network types. As the grids become larger, the amount of computational work increases in one iteration making the impact of exchanging the halo data less and less severe. It can be observed that the execution latency of all interconnects converge for larger grid sizes. 
+
+
+\section{Comparison of \acs{GASPI} to \acs{MPI}}
+
+In this section the results of the developed \ac{GBS} benchmark for \ac{GASPI} applications are compared to the  \ac{OMB} benchmark for \ac{MPI}. Both benchmark suites are run for the same set of network interfaces and use identical transfer sizes. The used \ac{MPI} version is Open MPI 1.10.7 compiled for CentOS 7.
+
+\subsection{Put Performance}
+
+The put benchmark compares the performance of the \ac{OMB} benchmark \code{osu\_\allowbreak put\_\allowbreak bw} with the single unidirectional put benchmark of \ac{GBS}. By default, \ac{OMB} uses passive target communication. The results are shown in \autoref{img:eval:comp:put-udir}. For the sake of comprehensibility, only the results for the InfiniBand and the 10\,GBit/s Ethernet interconnect are depicted. It can be observed that both communication libraries have a similar performance for small and large transfer sizes. The maximum transfer throughput is reached in both benchmarks. Using \ac{OMB} with \ac{MPI}, however, produces a steeper slope causing the maximum performance to be reached earlier for smaller transfer sizes than with \ac{GASPI}. This phenomenon is observable for both types of interconnection networks.
+
+\newcommand{\plotputudircomp}{put_udir_comp.tikz}
+\begin{filecontents}{\plotputudircomp}
+
+\newcommand{\csvombib}{result-omb/osu-ib-osu_put_bw.csv}
+\newcommand{\csvombte}{result-omb/osu-te-osu_put_bw.csv}
+\newcommand{\csvgaspiib}{result-ib/gbs_ubench_put_single_udir.csv}
+\newcommand{\csvgaspite}{result-te/gbs_ubench_put_single_udir.csv}
+
+\begin{tikzpicture}
+\begin{axis}[
+	axis x line=bottom,
+    axis y line=left,
+    xlabel=Transfer Size (Bytes),
+	ylabel=Bandwidth (MB/s),
+	grid style={line width=.1pt, draw=gray!10},
+   	major grid style={line width=.2pt,draw=gray!50},
+    xmode=log,
+    xmin=1, xmax=\ubenchmaxtransfer,
+    ymin=0,
+    xticklabel=\engticksilabel{exp(\tick)},
+    yticklabel={\nprounddigits{0}\numprint{\tick}},
+    grid=both,
+    legend pos=north west,
+]
+
+\addplot[mark=x,blue] table [x=bytes, y=Mbytessec, col sep=comma] {\csvgaspiib};
+\addlegendentry{GBS IB}
+
+\addplot[mark=o,red] table [x=bytes, y=Mbytessec, col sep=comma] {\csvgaspite};
+\addlegendentry{GBS 10\,GbE}
+
+\addplot[mark=triangle*,brown] table [x=Size, y=BandwidthMBs, col sep=comma] {\csvombib};
+\addlegendentry{OMB IB}
+
+\addplot[mark=diamond*,green] table [x=Size, y=BandwidthMBs, col sep=comma] {\csvombte};
+\addlegendentry{OMB 10\,GbE}
+\end{axis}
+\end{tikzpicture}
+\end{filecontents}
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=\textwidth , height=6cm]{\plotputudircomp}
+\caption{Comparison of the unidirectional put performance with \ac{GBS} and \ac{OMB} using InfiniBand and 10\,GBit/s Ethernet.}
+\label{img:eval:comp:put-udir}
+\end{figure}
+
+
+
+\subsection{Get Performance}
+
+The same measurements as for the previously presented put benchmark are repeated for the get benchmark. The corresponding microbenchmark routine from the \ac{OMB} library is \code{osu\_get\_bw}. In the \ac{GBS} library the single unidirectional get benchmark is chosen. The results are displayed in \autoref{img:eval:comp:get-udir}. In principle the same observations like in \autoref{img:eval:comp:put-udir} for the put benchmark exist: The maximum transfer efficiency is eventually reached but the \ac{OMB} benchmark using \ac{MPI} reaches the saturation point significantly higher, regardless of the interconnect. This makes \ac{MPI} the more efficient communication scheme -- at least when Open MPI is used in comparison to the open source version of \ac{GPI}-2 with respect to the individual benchmark parameters.
+
+\newcommand{\plotgetudircomp}{get_udir_comp.tikz}
+\begin{filecontents}{\plotgetudircomp}
+
+\newcommand{\csvombib}{result-omb/osu-ib-osu_get_bw.csv}
+\newcommand{\csvombte}{result-omb/osu-te-osu_get_bw.csv}
+\newcommand{\csvgaspiib}{result-ib/gbs_ubench_get_single_udir.csv}
+\newcommand{\csvgaspite}{result-te/gbs_ubench_get_single_udir.csv}
+
+\begin{tikzpicture}
+\begin{axis}[
+	axis x line=bottom,
+    axis y line=left,
+    xlabel=Transfer Size (Bytes),
+	ylabel=Bandwidth (MB/s),
+	grid style={line width=.1pt, draw=gray!10},
+   	major grid style={line width=.2pt,draw=gray!50},
+    xmode=log,
+    xmin=1, xmax=\ubenchmaxtransfer,
+    ymin=0,
+    xticklabel=\engticksilabel{exp(\tick)},
+    yticklabel={\nprounddigits{0}\numprint{\tick}},
+    grid=both,
+    legend pos=north west,
+]
+
+\addplot[mark=x,blue] table [x=bytes, y=Mbytessec, col sep=comma] {\csvgaspiib};
+\addlegendentry{GBS IB}
+
+\addplot[mark=o,red] table [x=bytes, y=Mbytessec, col sep=comma] {\csvgaspite};
+\addlegendentry{GBS 10\,GbE}
+
+\addplot[mark=triangle*,brown] table [x=Size, y=BandwidthMBs, col sep=comma] {\csvombib};
+\addlegendentry{OMB IB}
+
+\addplot[mark=diamond*,green] table [x=Size, y=BandwidthMBs, col sep=comma] {\csvombte};
+\addlegendentry{OMB 10\,GbE}
+\end{axis}
+\end{tikzpicture}
+\end{filecontents}
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=\textwidth , height=6cm]{\plotgetudircomp}
+\caption{Comparison of the unidirectional get performance with \ac{GBS} and \ac{OMB} using InfiniBand and 10\,GBit/s Ethernet.}
+\label{img:eval:comp:get-udir}
+\end{figure}
+
+
+\section{Comparison of \acs{GBS} to \acs{GPI}-2 Microbenchmarks}
+
+Since the implementation of \ac{GPI}-2 comes with a series of microbenchmarks it seems natural to compare this set of microbenchmarks to the \ac{GBS} results. The \ac{GPI}-2 benchmarks are written in a very minimalistic way with no surrounding benchmarking environment. For measuring time, the processor instruction \code{rdtsc} is used. However, this is done in an unsafe fashion, yielding incorrect results: By only issuing the \code{rtdsc} instruction it is not ensured that this operation and subsequent operations are executed in order when running the program on a state-of-the-art out-of-order machine. Furthermore, problems will arise if the program is run on multi-socket systems and re-scheduled on another package by the operating system. Fortunately, the testing system contains only one single package and the processor supports a synchronized \code{tsc} value over all cores, which cannot be taken for granted. Fluctuations in time measurement may also arise due to dynamic frequency changes in the processor since \code{rdtsc} essentially measures a number of clock cycles that is not constant over time.
+
+The \ac{GPI}-2 microbenchmarks are structured in a way that the put and get bandwidth are only measured in an aggregated fashion. This means that single data transfers are not performed. Instead, multiple blocks of data are scheduled to be transferred. After scheduling the \ac{RMA} operations, the respective queue is flushed and the time is measured. No notifications are exchanged, making the measurement single-ended. The number of aggregated transfers is hard-coded to \numprint{1000}. This does not produce errors since the maximum queue size on the testing system is \numprint{1024}. Instead of determining the average timing value, the median is calculated which causes outlying values to be silently discarded. Each measurement is repeated 10 times.
+
+In order to re-evaluate the data in the \ac{GBS} suite, the \ac{GPI}-2 put benchmark is ported to a \ac{GBS} microbenchmark. Like with all microbenchmarks of the developed suite, the timing results are reported as arithmetic average and the time is measured with the common clock explained in \secref{ssec:impl:microbenchmark-execution-scheme}.
+
+
+
+\subsection{Transfer Performance}
+
+First, the three benchmark suites \ac{OMB}, \ac{GBS} and \ac{GPI}-2 are executed with their respective default parameters and the put bandwidth is obtained. The result is shown in \autoref{img:eval:comp:gbs-gpi-mpi:put-ib}. Three very different behaviors may be observed: The \ac{GPI} benchmark has a very steep slope and reaches its maximum throughput very early. This maximum throughput is, however, lower than the results of \ac{GBS} and \ac{OMB}. The \ac{OMB} graph is not as steep as the \ac{GPI} graph but also is near its maximum performance at around 8\,kB block size. The \ac{GBS} curve rises significantly slower and reaches peak performance only for large transfer sizes of at least 500\,kB. 
+
+
+\newcommand{\plotputcompmpi}{put_udir_comp_mpi.tikz}
+\begin{filecontents}{\plotputcompmpi}
+
+\newcommand{\csvgpiib}{result-gpi/gpi-ib-put.csv}
+\newcommand{\csvombib}{result-omb/osu-ib-osu_put_bw.csv}
+\newcommand{\csvgbsib}{result-ib/gbs_ubench_put_single_udir.csv}
+
+\begin{tikzpicture}
+
+\begin{axis}[
+	axis x line=bottom,
+    axis y line=left,
+    xlabel=Transfer Size (Bytes),
+	ylabel=Bandwidth (MB/s),
+	grid style={line width=.1pt, draw=gray!10},
+   	major grid style={line width=.2pt,draw=gray!50},
+    xmode=log,
+    xmin=1, xmax=8388610,
+    ymin=0,
+    xticklabel=\engticksilabel{exp(\tick)},
+    yticklabel={\nprounddigits{0}\numprint{\tick}},
+    grid=both,
+    legend pos=north west,
+]
+
+\addplot[mark=x,blue] table [x=bytes, y=bw, col sep=comma] {\csvgpiib};
+\addlegendentry{GPI}
+
+\addplot[mark=o,red] table [x=bytes, y=Mbytessec, col sep=comma] {\csvgbsib};
+\addlegendentry{GBS}
+
+\addplot[mark=triangle*,green] table [x=Size, y=BandwidthMBs, col sep=comma] {\csvombib};
+\addlegendentry{OMB}
+\end{axis}
+\end{tikzpicture}
+\end{filecontents}
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=\textwidth , height=6cm]{\plotputcompmpi}
+\caption{Comparison of the unidirectional put performance with \acs{GBS}, \acs{GPI} and \acs{OMB} (InfiniBand).}
+\label{img:eval:comp:gbs-gpi-mpi:put-ib}
+\end{figure}
+
+\subsection{Dependency on the Block Aggregation}
+
+In the previously shown comparison in \autoref{img:eval:comp:gbs-gpi-mpi:put-ib} three benchmarks with different time measurement and parameters were executed. Apart from the fact that the time measurement for \ac{GPI} is obviously broken, the aggregation mode also differs over all benchmarks: 
+\begin{itemize}
+	\item \ac{GPI}-2 aggregates \numprint{1000} block transfers of the given size.
+	\item \ac{OMB} aggregates \numprint{64} block transfers.
+	\item \ac{GBS} does not aggregate transfers.
+\end{itemize}
+
+To evaluate the dependence of transfer aggregation on the total throughput, the \ac{GPI} put benchmark is re-created in the \ac{GBS} suite. In this implementation the measurement function is corrected and the averaging of values is changed. In the measurement of \autoref{img:eval:comp:gbs-gpi-mpi:aggregate} the number of aggregated transfers is varied and the achieved bandwidth is retrieved. It can clearly be seen that large transfer sizes benefit the achieved throughput tremendously: A gain of several orders of magnitude is observed with an increasing number of aggregate transfers. The performance boost is saturated with 64 aggregated transfers at most. Increasing the aggregation level beyond this point does not steepen the bandwidth graph further.
+
+
+
+\newcommand{\plotaggregate}{aggregate.tikz}
+\begin{filecontents}{\plotaggregate}
+
+\newcommand{\dir}{result-aggregate/ib}
+\newcommand{\csvaggsoloa}{\dir/agg-1/gbs_ubench_put_solo_single_udir.csv}
+\newcommand{\csvaggsolob}{\dir/agg-2/gbs_ubench_put_solo_single_udir.csv}
+\newcommand{\csvaggsoloc}{\dir/agg-8/gbs_ubench_put_solo_single_udir.csv}
+\newcommand{\csvaggsolod}{\dir/agg-64/gbs_ubench_put_solo_single_udir.csv}
+\newcommand{\csvaggsoloe}{\dir/agg-128/gbs_ubench_put_solo_single_udir.csv}
+\newcommand{\csvaggsolof}{\dir/agg-512/gbs_ubench_put_solo_single_udir.csv}
+\newcommand{\csvaggsolog}{\dir/agg-1000/gbs_ubench_put_solo_single_udir.csv}
+
+\begin{tikzpicture}
+\begin{axis}[
+	axis x line=bottom,
+    axis y line=left,
+    xlabel=Transfer Size (Bytes),
+	ylabel=Bandwidth (MB/s),
+	grid style={line width=.1pt, draw=gray!10},
+   	major grid style={line width=.2pt,draw=gray!50},
+    xmode=log,
+    xmin=1, xmax=8388610,
+    ymin=0,
+    xticklabel=\engticksilabel{exp(\tick)},
+    yticklabel={\nprounddigits{0}\numprint{\tick}},
+    grid=both,
+    legend pos=north west,
+]
+
+\addplot[mark=x,blue] table [x=bytes, y=Mbytessec, col sep=comma] {\csvaggsoloa};
+\addlegendentry{$a$=\numprint{1}}
+
+\addplot[mark=o,red] table [x=bytes, y=Mbytessec, col sep=comma] {\csvaggsolob};
+\addlegendentry{$a$=\numprint{2}}
+
+\addplot[mark=triangle*,green] table [x=bytes, y=Mbytessec, col sep=comma] {\csvaggsoloc};
+\addlegendentry{$a$=\numprint{8}}
+
+\addplot[mark=diamond*,brown] table [x=bytes, y=Mbytessec, col sep=comma] {\csvaggsolod};
+\addlegendentry{$a$=\numprint{64}}
+
+\addplot[mark=square*,orange] table [x=bytes, y=Mbytessec, col sep=comma] {\csvaggsoloe};
+\addlegendentry{$a$=\numprint{128}}
+
+\addplot[mark=*,yellow] table [x=bytes, y=Mbytessec, col sep=comma] {\csvaggsolof};
+\addlegendentry{$a$=\numprint{512}}
+
+\addplot[mark=pentagon*,violet] table [x=bytes, y=Mbytessec, col sep=comma] {\csvaggsolog};
+\addlegendentry{$a$=\numprint{1000}}
+\end{axis}
+\end{tikzpicture}
+\end{filecontents}
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=\textwidth , height=6cm]{\plotaggregate}
+\caption{Variation of the aggregate size $a$ when using the re-created version of the \acs{GPI}-2 put benchmark (InfiniBand).}
+\label{img:eval:comp:gbs-gpi-mpi:aggregate}
+\end{figure}
+
+After investigating the obtainable improvements with aggregating transfers all results are put together. In \autoref{img:eval:comp:gbs-gpi-mpi:selection} the overview of all relevant similar benchmarks is compiled. The most important observation is how huge the difference between non-aggregated and aggregated benchmarks is. Furthermore, it can be seen that benchmarks without notifications or completions achieve slightly better performance. Since the time measurement of the \ac{GPI}-2 benchmark is not properly implemented, the results of this benchmark deviate slightly from the reproduced \ac{GBS} equivalent benchmark. The \ac{OMB} benchmark clearly excels for low transfer sizes. A step in the performance can be observed from 4\,kB to 8\,kB blocks. Since the used interconnect is InfiniBand, different transfer techniques for moving data exist in the \ac{MPI} library: In \emph{eager} mode, small blocks of data are sent to the remote site regardless of the remote state. This two-copy scheme avoids time-consuming synchronization latency and is thus efficient for small transfer sizes. When transferring larger blocks the library may choose to use the \emph{rendezvous} mode instead where a true \ac{RMA} access is executed \cite{mpi-eager}. The threshold for switching the transfer mode can be modified via the \ac{MPI} launch parameters. The default settings appear to be adequate in \autoref{img:eval:comp:gbs-gpi-mpi:selection}.
+
+\newcommand{\plotaggregatecomp}{aggregate-comp.tikz}
+\begin{filecontents}{\plotaggregatecomp}
+
+\newcommand{\csvaggsoloib}{result-aggregate/ib/agg-64/gbs_ubench_put_solo_single_udir.csv}
+\newcommand{\csvputnotiib}{result-aggregate/ib/agg-64/gbs_ubench_put_aggregate_single_udir.csv}
+\newcommand{\csvgbsib}{result-ib/gbs_ubench_put_single_udir.csv}
+\newcommand{\csvombib}{result-omb/osu-ib-osu_put_bw.csv}
+\newcommand{\csvgpiib}{result-gpi/gpi-ib-put.csv}
+
+\begin{tikzpicture}
+\begin{axis}[
+	axis x line=bottom,
+    axis y line=left,
+    xlabel=Transfer Size (Bytes),
+	ylabel=Bandwidth (MB/s),
+	grid style={line width=.1pt, draw=gray!10},
+   	major grid style={line width=.2pt,draw=gray!50},
+    xmode=log,
+    xmin=2e-1, xmax=8388610,
+    ymin=0,
+    xticklabel=\engticksilabel{exp(\tick)},
+    yticklabel={\nprounddigits{0}\numprint{\tick}},
+    grid=both,
+    legend pos=north west,
+]
+
+\addplot[mark=x,blue] table [x=bytes, y=Mbytessec, col sep=comma] {\csvaggsoloib};
+\addlegendentry{GBS w/o noti, $a$=\numprint{64}}
+
+\addplot[mark=o,red] table [x=bytes, y=Mbytessec, col sep=comma] {\csvputnotiib};
+\addlegendentry{GBS w/ noti, $a$=\numprint{64}}
+
+\addplot[mark=triangle*,green] table [x=bytes, y=Mbytessec, col sep=comma] {\csvgbsib};
+\addlegendentry{GBS w/ noti, no agg.}
+
+\addplot[mark=diamond*,brown] table [x=Size, y=BandwidthMBs, col sep=comma] {\csvombib};
+\addlegendentry{OMB, $a$=\numprint{64}}
+
+\addplot[mark=square*,orange] table [x=bytes, y=bw, col sep=comma] {\csvgpiib};
+\addlegendentry{GPI w/o noti, $a$=\numprint{1000}}
+\end{axis}
+\end{tikzpicture}
+\end{filecontents}
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=\textwidth , height=6cm]{\plotaggregatecomp}
+\caption{Selection of similar put benchmarks for comparison of \ac{GASPI} with \ac{MPI} with matched aggregation mode and notification (InfiniBand).}
+\label{img:eval:comp:gbs-gpi-mpi:selection}
+\end{figure}

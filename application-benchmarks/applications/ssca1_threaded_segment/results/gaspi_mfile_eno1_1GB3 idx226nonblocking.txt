@@ -1,0 +1,84 @@
+Program Start
+Running with OpenMP, thread count: 1
+Program Start
+Running with OpenMP, thread count: 1
+Program Start
+Running with OpenMP, thread count: 1
+Running with GASPI, world size is 3
+Using Prefetching
+
+	Verification run, using constant seed for RNG
+HPCS SSCA #1 Bioinformatics Sequence Alignment Executable Specification:
+Running...
+Using seed 2613174141
+
+Scalable Data Generator - genScalData() beginning execution...
+Inserting sequence ACDEFG*IDENTICAL*HIKLMN in location 4277
+Inserting sequence ACDEFG*MISQRMATCHES*HIKLMN in location 7585
+Inserting sequence ACDEFG*STARTGAPMIDSTEND*HIKLMN in location 491
+Inserting sequence MNLKIH*IDENTICAL*GFEDCA in location 5378
+Inserting sequence MNLKIH*MISRQMATCHES*GFEDCA in location 695
+Inserting sequence MNLKIH*STARTMIDSTGAPEND*GFEDCA in location 3779
+
+	Elapsed time: 0 hour(s), 0 minute(s), 0 second(s), 7 milliseconds,  23 micro second(s).
+
+   Length of main sequence in codons: 8271
+  Length of match sequence in codons: 8271
+  Weight for exactly matching codons: 5
+           Weight for similar codons: 4
+        Weight for dissimilar codons: -3
+              Penalty to start a gap: 5
+     Penalty for each codon in a gap: 2
+
+Begining Kernel 1 execution.
+
+	Elapsed time: 0 hour(s), 32 minute(s), 6 second(s), 355 milliseconds,  195 micro second(s).
+
+Begining Kernel 2 execution.
+
+	Elapsed time: 0 hour(s), 0 minute(s), 0 second(s), 551 milliseconds,  557 micro second(s).
+
+Found 55 acceptable alignments with scores from 55 to 21.
+
+Starting   Amino     Codon           Ending
+position   acids     bases           position
+
+verifyAlignment 0, succeeded; score 55:
+   4283  *IDENTICAL*  tgaatagacgagaacacgatatgcgcgctgtga     4293
+   5384  *IDENTICAL*  tgaatagacgagaacacgatatgcgcgctgtga     5394
+
+verifyAlignment 1, succeeded; score 54:
+   7591  *MISQRMATCHES*  tgaatgataagccagaggatggcgacgtgccacgagagctga     7604
+    701  *MISRQMATCHES*  tgaatgataagcaggcagatggcgacgtgccacgagagctga      714
+
+verifyAlignment 2, succeeded; score 34:
+   5427  FVQQRATSLSG  ttcgttcaacagagggctacttctttaagtggg     5437
+   1712  FVRQRATRLSG  ttcgtgcgccagcgtgcgacaaggcttagtggg     1722
+
+verifyAlignment 3, succeeded; score 30:
+   4085  PPLRPL-AQT*EA-VR  ccaccccttagacctttg---gcgcaaacatgagaagcg---gtacgt     4098
+   7697  PPLRPLGAQ--EATVR  ccacctttgagacccctgggcgcacaa------gaagctacggtacga     7710
+
+verifyAlignment 4, succeeded; score 26:
+   4870  RDASAIV  agggatgcgtccgccatagtc     4876
+   3560  RDASAWV  cgtgatgcgtccgcctgggtc     3566
+
+verifyAlignment 5, succeeded; score 26:
+   4224  RLEVGH  aggttggaggtgggacat     4229
+   5596  RLEVGH  agacttgaggtaggtcat     5601
+
+verifyAlignment 6, succeeded; score 25:
+    497  *STAR  tgaagcacggcgagg      501
+   3785  *STAR  tgaagcacggcgagg     3789
+
+verifyAlignment 7, succeeded; score 25:
+   2990  *LKRRSSIG  tagcttaagcgcaggtcttcaataggg     2998
+   8132  *LKRRS-IG  taactaaaacgtcgatcg---attgga     8139
+
+verifyAlignment 8, succeeded; score 25:
+   3812  THKPGRRPR*ENTV  actcacaagccaggaaggcggccgaggtaggaaaacacagta     3825
+   4167  TEKPG*RLR*PHTV  acggaaaagccaggttagcgcctaaggtagccgcatacggtg     4180
+
+verifyAlignment 9, succeeded; score 24:
+   1313  SQREPA*TL  agtcaacgagaaccagcgtaaactctg     1321
+   2579  SQREPI*RL  tctcaaagagagccgatctaacggcta     2587

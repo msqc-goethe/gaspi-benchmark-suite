@@ -1,0 +1,37 @@
+Program Start
+Running with OpenMP, thread count: 8
+Running with GASPI, world size is 1
+Using Prefetching
+
+	Verification run, using constant seed for RNG
+HPCS SSCA #1 Bioinformatics Sequence Alignment Executable Specification:
+Running...
+Using seed 2613174141
+
+Scalable Data Generator - genScalData() beginning execution...
+Inserting sequence ACDEFG*IDENTICAL*HIKLMN in location 1878
+Inserting sequence ACDEFG*MISQRMATCHES*HIKLMN in location 328
+Inserting sequence ACDEFG*STARTGAPMIDSTEND*HIKLMN in location 1750
+Inserting sequence MNLKIH*IDENTICAL*GFEDCA in location 1122
+Inserting sequence MNLKIH*MISRQMATCHES*GFEDCA in location 466
+Inserting sequence MNLKIH*STARTMIDSTGAPEND*GFEDCA in location 1182
+
+	Elapsed time: 0 hour(s), 0 minute(s), 0 second(s), 1 milliseconds,  618 micro second(s).
+
+   Length of main sequence in codons: 2127
+  Length of match sequence in codons: 2127
+  Weight for exactly matching codons: 5
+           Weight for similar codons: 4
+        Weight for dissimilar codons: -3
+              Penalty to start a gap: 5
+     Penalty for each codon in a gap: 2
+
+Begining Kernel 1 execution.
+
+	Elapsed time: 0 hour(s), 3 minute(s), 10 second(s), 241 milliseconds,  694 micro second(s).
+
+Begining Kernel 2 execution.
+
+	Elapsed time: 0 hour(s), 0 minute(s), 0 second(s), 27 milliseconds,  723 micro second(s).
+
+Found no acceptable alignments.

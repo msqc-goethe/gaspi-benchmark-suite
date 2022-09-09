@@ -1,0 +1,80 @@
+Program Start
+Running with OpenMP, thread count: 1
+Running with GASPI, world size is 1
+Using Prefetching
+
+	Verification run, using constant seed for RNG
+HPCS SSCA #1 Bioinformatics Sequence Alignment Executable Specification:
+Running...
+Using seed 2613174141
+
+Scalable Data Generator - genScalData() beginning execution...
+Inserting sequence ACDEFG*IDENTICAL*HIKLMN in location 4277
+Inserting sequence ACDEFG*MISQRMATCHES*HIKLMN in location 7585
+Inserting sequence ACDEFG*STARTGAPMIDSTEND*HIKLMN in location 491
+Inserting sequence MNLKIH*IDENTICAL*GFEDCA in location 3114
+Inserting sequence MNLKIH*MISRQMATCHES*GFEDCA in location 5113
+Inserting sequence MNLKIH*STARTMIDSTGAPEND*GFEDCA in location 8119
+
+	Elapsed time: 0 hour(s), 0 minute(s), 0 second(s), 0 milliseconds,  642 micro second(s).
+
+   Length of main sequence in codons: 8271
+  Length of match sequence in codons: 8271
+  Weight for exactly matching codons: 5
+           Weight for similar codons: 4
+        Weight for dissimilar codons: -3
+              Penalty to start a gap: 5
+     Penalty for each codon in a gap: 2
+
+Begining Kernel 1 execution.
+
+	Elapsed time: 0 hour(s), 9 minute(s), 0 second(s), 286 milliseconds,  24 micro second(s).
+
+Begining Kernel 2 execution.
+
+	Elapsed time: 0 hour(s), 0 minute(s), 0 second(s), 22 milliseconds,  451 micro second(s).
+
+Found 54 acceptable alignments with scores from 55 to 21.
+
+Starting   Amino     Codon           Ending
+position   acids     bases           position
+
+verifyAlignment 0, succeeded; score 55:
+   4283  *IDENTICAL*  tgaatagacgagaacacgatatgcgcgctgtga     4293
+   3120  *IDENTICAL*  tgaatagacgagaacacgatatgcgcgctgtga     3130
+
+verifyAlignment 1, succeeded; score 54:
+   7591  *MISQRMATCHES*  tgaatgataagccagaggatggcgacgtgccacgagagctga     7604
+   5119  *MISRQMATCHES*  tgaatgataagcaggcagatggcgacgtgccacgagagctga     5132
+
+verifyAlignment 2, succeeded; score 53:
+    497  *STARTGAPMIDST---END*  tgaagcacggcgaggacgggggcgccgatgatagacagcacg---------gagaacgactga      514
+   8125  *START---MIDSTGAPEND*  tgaagcacggcgaggacg---------atgatagacagcacgggggcgccggagaacgactga     8142
+
+verifyAlignment 3, succeeded; score 26:
+   4508  SLRC*A  agtctgaggtgttgagct     4513
+   2906  SLRC*A  agcttgagatgttgagcg     2911
+
+verifyAlignment 4, succeeded; score 25:
+   3926  RSAGLVV  agatctgccgggctcgttgtc     3932
+   1822  RSAYLVV  agaagcgcgtacctcgttgtc     1828
+
+verifyAlignment 5, succeeded; score 25:
+   7440  LLTSDLS  ttgctaacatccgatttgagt     7446
+    701  LLTSILS  ttgctgacatcgatcttgagt      707
+
+verifyAlignment 6, succeeded; score 24:
+     85  LVLLIRK  ttggtccttttgattcggaag       91
+    259  LVFLIRK  ctggtatttttgattaggaag      265
+
+verifyAlignment 7, succeeded; score 24:
+   3443  IFLNR-SI  atcttcctaaatcgc---tccatt     3449
+    775  IFLNRESI  atcttcttgaacagggaatcaatt      782
+
+verifyAlignment 8, succeeded; score 24:
+   1067  PV*PKAT  ccggtatagcccaaggccacg     1073
+   5707  PVNPKAT  cctgttaatcccaaggccaca     5713
+
+verifyAlignment 9, succeeded; score 24:
+   8202  TPTAP  actccaacagcgcct     8206
+    522  TPTAP  actccaacagctcct      526

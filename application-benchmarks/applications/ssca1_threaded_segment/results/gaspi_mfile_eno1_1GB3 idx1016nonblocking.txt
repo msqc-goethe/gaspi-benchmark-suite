@@ -1,0 +1,56 @@
+Program Start
+Running with OpenMP, thread count: 1
+Program Start
+Running with OpenMP, thread count: 1
+Program Start
+Running with OpenMP, thread count: 1
+Running with GASPI, world size is 3
+Using Prefetching
+
+	Verification run, using constant seed for RNG
+HPCS SSCA #1 Bioinformatics Sequence Alignment Executable Specification:
+Running...
+Using seed 2613174141
+
+Scalable Data Generator - genScalData() beginning execution...
+Inserting sequence ACDEFG*IDENTICAL*HIKLMN in location 154
+Inserting sequence ACDEFG*MISQRMATCHES*HIKLMN in location 214
+Inserting sequence ACDEFG*STARTGAPMIDSTEND*HIKLMN in location 120
+Inserting sequence MNLKIH*IDENTICAL*GFEDCA in location 115
+Inserting sequence MNLKIH*MISRQMATCHES*GFEDCA in location 263
+Inserting sequence MNLKIH*STARTMIDSTGAPEND*GFEDCA in location 285
+
+	Elapsed time: 0 hour(s), 0 minute(s), 0 second(s), 7 milliseconds,  379 micro second(s).
+
+   Length of main sequence in codons: 333
+  Length of match sequence in codons: 333
+  Weight for exactly matching codons: 5
+           Weight for similar codons: 4
+        Weight for dissimilar codons: -3
+              Penalty to start a gap: 5
+     Penalty for each codon in a gap: 2
+
+Begining Kernel 1 execution.
+
+	Elapsed time: 0 hour(s), 0 minute(s), 3 second(s), 229 milliseconds,  529 micro second(s).
+
+Begining Kernel 2 execution.
+
+	Elapsed time: 0 hour(s), 0 minute(s), 0 second(s), 442 milliseconds,  932 micro second(s).
+
+Found 3 acceptable alignments with scores from 55 to 46.
+
+Starting   Amino     Codon           Ending
+position   acids     bases           position
+
+verifyAlignment 0, succeeded; score 55:
+    160  *IDENTICAL*  tgaatagacgagaacacgatatgcgcgctgtga      170
+    121  *IDENTICAL*  tgaatagacgagaacacgatatgcgcgctgtga      131
+
+verifyAlignment 1, succeeded; score 53:
+    126  *STARTGAPMIDST---END*  tgaagcacggcgaggacgggggcgccgatgatagacagcacg---------gagaacgactga      143
+    291  *START---MIDSTGAPEND*  tgaagcacggcgaggacg---------atgatagacagcacgggggcgccggagaacgactga      308
+
+verifyAlignment 2, succeeded; score 46:
+    212  IHACDEFG*MISQRMATCHES*  atacatgcgtgcgacgagttcgggtgaatgataagccagaggatggcgacgtgccacgagagctga      233
+    267  IH------*MISRQMATCHES*  atacac------------------tgaatgataagcaggcagatggcgacgtgccacgagagctga      282

@@ -1,0 +1,56 @@
+Program Start
+Program Start
+Program Start
+Program Start
+Running with GASPI, world size is 4
+Using Prefetching
+
+	Verification run, using constant seed for RNG
+HPCS SSCA #1 Bioinformatics Sequence Alignment Executable Specification:
+Running...
+Using seed 2613174141
+
+Scalable Data Generator - genScalData() beginning execution...
+Inserting sequence ACDEFG*IDENTICAL*HIKLMN in location 70
+Inserting sequence ACDEFG*MISQRMATCHES*HIKLMN in location 94
+Inserting sequence ACDEFG*STARTGAPMIDSTEND*HIKLMN in location 15
+Inserting sequence MNLKIH*IDENTICAL*GFEDCA in location 97
+Inserting sequence MNLKIH*MISRQMATCHES*GFEDCA in location 39
+Inserting sequence MNLKIH*STARTMIDSTGAPEND*GFEDCA in location 65
+
+	Elapsed time: 0 hour(s), 0 minute(s), 0 second(s), 9 milliseconds,  390 micro second(s).
+
+   Length of main sequence in codons: 140
+  Length of match sequence in codons: 140
+  Weight for exactly matching codons: 5
+           Weight for similar codons: 4
+        Weight for dissimilar codons: -3
+              Penalty to start a gap: 5
+     Penalty for each codon in a gap: 2
+
+Begining Kernel 1 execution.
+
+Main: 53 Match: 4 
+
+	Elapsed time: 0 hour(s), 0 minute(s), 0 second(s), 910 milliseconds,  263 micro second(s).
+
+Begining Kernel 2 execution.
+
+	Elapsed time: 0 hour(s), 0 minute(s), 0 second(s), 577 milliseconds,  232 micro second(s).
+
+Found 3 acceptable alignments with scores from 55 to 44.
+
+Starting   Amino     Codon           Ending
+position   acids     bases           position
+
+verifyAlignment 0, succeeded; score 55:
+     76  *IDENTICAL*  tgaatagacgagaacacgatatgcgcgctgtga       86
+    103  *IDENTICAL*  tgaatagacgagaacacgatatgcgcgctgtga      113
+
+verifyAlignment 1, succeeded; score 54:
+    100  *MISQRMATCHES*  tgaatgataagccagaggatggcgacgtgccacgagagctga      113
+     45  *MISRQMATCHES*  tgaatgataagcaggcagatggcgacgtgccacgagagctga       58
+
+verifyAlignment 2, succeeded; score 44:
+     21  *STARTGAPMIDST  tgaagcacggcgaggacgggggcgccgatgatagacagcacg       34
+     71  *START---MIDST  tgaagcacggcgaggacg---------atgatagacagcacg       81

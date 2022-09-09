@@ -1,0 +1,65 @@
+Program Start
+Program Start
+Program Start
+Program Start
+Program Start
+Running with OpenSHMEM, world size is 5
+Using Prefetching
+
+	Verification run, using constant seed for RNG
+HPCS SSCA #1 Bioinformatics Sequence Alignment Executable Specification:
+Running...
+Using seed 2613174141
+
+Scalable Data Generator - genScalData() beginning execution...
+Inserting sequence ACDEFG*IDENTICAL*HIKLMN in location 1127
+Inserting sequence ACDEFG*MISQRMATCHES*HIKLMN in location 1292
+Inserting sequence ACDEFG*STARTGAPMIDSTEND*HIKLMN in location 1534
+Inserting sequence MNLKIH*IDENTICAL*GFEDCA in location 1201
+Inserting sequence MNLKIH*MISRQMATCHES*GFEDCA in location 815
+Inserting sequence MNLKIH*STARTMIDSTGAPEND*GFEDCA in location 648
+
+	Elapsed time: 0 hour(s), 0 minute(s), 0 second(s), 0 milliseconds,  397 micro second(s).
+
+   Length of main sequence in codons: 2125
+  Length of match sequence in codons: 2125
+  Weight for exactly matching codons: 5
+           Weight for similar codons: 4
+        Weight for dissimilar codons: -3
+              Penalty to start a gap: 5
+     Penalty for each codon in a gap: 2
+
+Begining Kernel 1 execution.
+
+Main: 9 Match: 25 
+
+	Elapsed time: 0 hour(s), 0 minute(s), 1 second(s), 214 milliseconds,  320 micro second(s).
+
+Begining Kernel 2 execution.
+
+	Elapsed time: 0 hour(s), 0 minute(s), 0 second(s), 1 milliseconds,  866 micro second(s).
+
+Found 5 acceptable alignments with scores from 55 to 21.
+
+Starting   Amino     Codon           Ending
+position   acids     bases           position
+
+verifyAlignment 0, succeeded; score 55:
+   1133  *IDENTICAL*  tgaatagacgagaacacgatatgcgcgctgtga     1143
+   1207  *IDENTICAL*  tgaatagacgagaacacgatatgcgcgctgtga     1217
+
+verifyAlignment 1, succeeded; score 54:
+   1298  *MISQRMATCHES*  tgaatgataagccagaggatggcgacgtgccacgagagctga     1311
+    821  *MISRQMATCHES*  tgaatgataagcaggcagatggcgacgtgccacgagagctga      834
+
+verifyAlignment 2, succeeded; score 53:
+   1540  *STARTGAPMIDST---END*  tgaagcacggcgaggacgggggcgccgatgatagacagcacg---------gagaacgactga     1557
+    654  *START---MIDSTGAPEND*  tgaagcacggcgaggacg---------atgatagacagcacgggggcgccggagaacgactga      671
+
+verifyAlignment 3, succeeded; score 22:
+     16  GTRLQ  gggaccagattacag       20
+   1743  GTRLQ  gggacccgcctacaa     1747
+
+verifyAlignment 4, succeeded; score 21:
+   1925  LERLLRSLL  ctggaacgcctccttcgtagccttttg     1933
+   1988  LER-LRPLL  ctggagcgt---cttcgaccacttcta     1995

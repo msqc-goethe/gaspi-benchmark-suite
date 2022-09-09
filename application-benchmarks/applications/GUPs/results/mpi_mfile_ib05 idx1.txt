@@ -1,0 +1,8 @@
+Running with MPI-3, world size is 5
+Running on 5 processors (PowerofTwo)
+Total Main table size = 2^23 = 8388608 words
+PE Main table size = 2^-32743 = 1677721 words/PE
+Default number of updates (RECOMMENDED) = 33554432	and actually done = 33554420
+Real time used = 16.739919 seconds
+0.002004456 Billion(10^9) Updates    per second [GUP/s]
+0.000400891 Billion(10^9) Updates/PE per second [GUP/s]

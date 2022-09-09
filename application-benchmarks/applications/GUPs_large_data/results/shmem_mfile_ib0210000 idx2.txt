@@ -1,0 +1,10 @@
+Scale Size: 10000
+Running on 2 processors (PowerofTwo)
+Total Main table size = 2^22 = 4194304 words
+PE Main table size = 2^204364934 = 2097152 words/PE
+Default number of updates (RECOMMENDED) = 16777216	and actually done = 16720000
+Real time used = 26.365795 seconds
+0.000636325 Billion(10^9) Updates    per second [GUP/s]
+0.000318163 Billion(10^9) Updates/PE per second [GUP/s]
+
+Finished Program

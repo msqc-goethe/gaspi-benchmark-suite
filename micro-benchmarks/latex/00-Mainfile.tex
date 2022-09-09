@@ -1,0 +1,40 @@
+\input{header}
+
+
+\begin{document}
+\input{Titlepage}
+
+\newgeometry{inner=3.5cm,outer=2.5cm,bindingoffset=0.5cm,
+            top=1.5cm,bottom=1.5cm,%
+            footskip=1.0cm,includeheadfoot}
+
+
+%\newpage\null\thispagestyle{empty}\newpage
+
+\pagenumbering{Roman}
+
+\input{03-Abbreviations}
+
+% Header
+\tableofcontents
+
+\clearpage
+
+\setcounter{page}{1}
+% Main Document
+\pagenumbering{arabic} 
+
+
+\input{10-Introduction}
+\input{20-Background}
+\input{30-Development}
+\input{40-Evaluation}
+\input{50-Conclusion}
+
+
+
+\bibliography{Literatur}
+
+
+
+\end{document}

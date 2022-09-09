@@ -1,0 +1,33 @@
+$gaspirun -N /scratch/fuchs/aglippert/zhuz/gaspi/gaspi-benchmark/programs/gaspi-benchmark/build/gaspi-benchmark
+/scratch/fuchs/aglippert/zhuz/gaspi/gaspi-benchmark/programs/gaspi-benchmark/build/gaspi-benchmark: error while loading shared libraries: libGPI2.so.0: cannot open shared object file: No such file or directory
+srun: error: node24-014: task 0: Exited with exit code 127
+/scratch/fuchs/aglippert/zhuz/gaspi/gaspi-benchmark/programs/gaspi-benchmark/build/gaspi-benchmark: error while loading shared libraries: libGPI2.so.0: cannot open shared object file: No such file or directory
+/scratch/fuchs/aglippert/zhuz/gaspi/gaspi-benchmark/programs/gaspi-benchmark/build/gaspi-benchmark: error while loading shared libraries: libGPI2.so.0: cannot open shared object file: No such file or directory
+/scratch/fuchs/aglippert/zhuz/gaspi/gaspi-benchmark/programs/gaspi-benchmark/build/gaspi-benchmark: error while loading shared libraries: libGPI2.so.0: cannot open shared object file: No such file or directory
+/scratch/fuchs/aglippert/zhuz/gaspi/gaspi-benchmark/programs/gaspi-benchmark/build/gaspi-benchmark: error while loading shared libraries: libGPI2.so.0: cannot open shared object file: No such file or directory
+/scratch/fuchs/aglippert/zhuz/gaspi/gaspi-benchmark/programs/gaspi-benchmark/build/gaspi-benchmark: error while loading shared libraries: libGPI2.so.0: cannot open shared object file: No such file or directory
+/scratch/fuchs/aglippert/zhuz/gaspi/gaspi-benchmark/programs/gaspi-benchmark/build/gaspi-benchmark: error while loading shared libraries: libGPI2.so.0: cannot open shared object file: No such file or directory
+/scratch/fuchs/aglippert/zhuz/gaspi/gaspi-benchmark/programs/gaspi-benchmark/build/gaspi-benchmark: error while loading shared libraries: libGPI2.so.0: cannot open shared object file: No such file or directory
+/scratch/fuchs/aglippert/zhuz/gaspi/gaspi-benchmark/programs/gaspi-benchmark/build/gaspi-benchmark: error while loading shared libraries: libGPI2.so.0: cannot open shared object file: No such file or directory
+/scratch/fuchs/aglippert/zhuz/gaspi/gaspi-benchmark/programs/gaspi-benchmark/build/gaspi-benchmark: error while loading shared libraries: libGPI2.so.0: cannot open shared object file: No such file or directory
+/scratch/fuchs/aglippert/zhuz/gaspi/gaspi-benchmark/programs/gaspi-benchmark/build/gaspi-benchmark: error while loading shared libraries: libGPI2.so.0: cannot open shared object file: No such file or directory
+/scratch/fuchs/aglippert/zhuz/gaspi/gaspi-benchmark/programs/gaspi-benchmark/build/gaspi-benchmark: error while loading shared libraries: libGPI2.so.0: cannot open shared object file: No such file or directory
+/scratch/fuchs/aglippert/zhuz/gaspi/gaspi-benchmark/programs/gaspi-benchmark/build/gaspi-benchmark: error while loading shared libraries: libGPI2.so.0: cannot open shared object file: No such file or directory
+srun: error: node25-002: task 1: Exited with exit code 127
+srun: error: node27-015: task 9: Exited with exit code 127
+srun: error: node25-014: task 4: Exited with exit code 127
+srun: error: node31-017: task 15: Exited with exit code 127
+srun: error: node27-014: task 8: Exited with exit code 127
+srun: error: node25-004: task 2: Exited with exit code 127
+srun: error: node29-006: task 11: Exited with exit code 127
+srun: error: node27-004: task 6: Exited with exit code 127
+srun: error: node27-005: task 7: Exited with exit code 127
+srun: error: node31-006: task 12: Exited with exit code 127
+srun: error: node31-016: task 14: Exited with exit code 127
+srun: error: node25-015: task 5: Exited with exit code 127
+/scratch/fuchs/aglippert/zhuz/gaspi/gaspi-benchmark/programs/gaspi-benchmark/build/gaspi-benchmark: error while loading shared libraries: libGPI2.so.0: cannot open shared object file: No such file or directory
+srun: error: node29-001: task 10: Exited with exit code 127
+/scratch/fuchs/aglippert/zhuz/gaspi/gaspi-benchmark/programs/gaspi-benchmark/build/gaspi-benchmark: error while loading shared libraries: libGPI2.so.0: cannot open shared object file: No such file or directory
+srun: error: node31-009: task 13: Exited with exit code 127
+/scratch/fuchs/aglippert/zhuz/gaspi/gaspi-benchmark/programs/gaspi-benchmark/build/gaspi-benchmark: error while loading shared libraries: libGPI2.so.0: cannot open shared object file: No such file or directory
+srun: error: node25-012: task 3: Exited with exit code 127

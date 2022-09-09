@@ -1,0 +1,4 @@
+$gaspirun -N /scratch/fuchs/aglippert/zhuz/gaspi/gaspi-benchmark/programs/gaspi-benchmark/build/gaspi-benchmark
+gaspi-benchmark: gbs_benchmark.c:271: gbs_executeBenchmarks: Assertion `nproc >= 2 && "Benchmarks need to be run with at least 2 nodes"' failed.
+srun: error: node24-014: task 0: Exited with exit code 134
+/home/fuchs/aglippert/zhuz/local/bin/slurm.env: Zeile 21: 87213 Abgebrochen             $program $ARGS

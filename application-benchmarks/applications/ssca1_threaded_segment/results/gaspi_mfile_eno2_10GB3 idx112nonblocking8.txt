@@ -1,0 +1,7 @@
+Killing GASPI procs...
+Program Start
+Running with OpenMP, thread count: 8
+Error: 'gaspi_proc_init(GASPI_BLOCK)' [main.c:168]: -1
+Program Start
+Running with OpenMP, thread count: 8
+Error: 'gaspi_proc_init(GASPI_BLOCK)' [main.c:168]: -1

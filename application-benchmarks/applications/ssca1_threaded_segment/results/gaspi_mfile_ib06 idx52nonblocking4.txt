@@ -1,0 +1,70 @@
+Program Start
+Running with OpenMP, thread count: 4
+Running with GASPI, world size is 6
+Using Prefetching
+
+	Verification run, using constant seed for RNG
+HPCS SSCA #1 Bioinformatics Sequence Alignment Executable Specification:
+Running...
+Using seed 2613174141
+
+Scalable Data Generator - genScalData() beginning execution...
+Inserting sequence ACDEFG*IDENTICAL*HIKLMN in location 508
+Inserting sequence ACDEFG*MISQRMATCHES*HIKLMN in location 9
+Inserting sequence ACDEFG*STARTGAPMIDSTEND*HIKLMN in location 1621
+Inserting sequence MNLKIH*IDENTICAL*GFEDCA in location 1318
+Inserting sequence MNLKIH*MISRQMATCHES*GFEDCA in location 1939
+Inserting sequence MNLKIH*STARTMIDSTGAPEND*GFEDCA in location 1661
+
+	Elapsed time: 0 hour(s), 0 minute(s), 0 second(s), 0 milliseconds,  959 micro second(s).
+
+   Length of main sequence in codons: 2124
+  Length of match sequence in codons: 2124
+  Weight for exactly matching codons: 5
+           Weight for similar codons: 4
+        Weight for dissimilar codons: -3
+              Penalty to start a gap: 5
+     Penalty for each codon in a gap: 2
+
+Begining Kernel 1 execution.
+
+	Elapsed time: 0 hour(s), 1 minute(s), 58 second(s), 596 milliseconds,  189 micro second(s).
+
+Begining Kernel 2 execution.
+
+	Elapsed time: 0 hour(s), 0 minute(s), 0 second(s), 36 milliseconds,  507 micro second(s).
+
+Found 5 acceptable alignments with scores from 55 to 21.
+
+Starting   Amino     Codon           Ending
+position   acids     bases           position
+
+verifyAlignment 0, succeeded; score 55:
+    514  *IDENTICAL*  tgaatagacgagaacacgatatgcgcgctgtga      524
+   1324  *IDENTICAL*  tgaatagacgagaacacgatatgcgcgctgtga     1334
+
+verifyAlignment 1, succeeded; score 54:
+     15  *MISQRMATCHES*  tgaatgataagccagaggatggcgacgtgccacgagagctga       28
+   1945  *MISRQMATCHES*  tgaatgataagcaggcagatggcgacgtgccacgagagctga     1958
+
+verifyAlignment 2, succeeded; score 53:
+   1627  *STARTGAPMIDST---END*  tgaagcacggcgaggacgggggcgccgatgatagacagcacg---------gagaacgactga     1644
+   1667  *START---MIDSTGAPEND*  tgaagcacggcgaggacg---------atgatagacagcacgggggcgccggagaacgactga     1684
+
+verifyAlignment 3, succeeded; score 22:
+    999  GSKSSFSS  ggttctaagtcgtccttttccagt     1006
+    598  GMKRSFSS  ggtatgaagcgcagtttttcaagt      605
+
+verifyAlignment 4, succeeded; score 21:
+    584  SVG*L  tcggttggttagctt      588
+   2044  SVG*L  tccgttgggtaacta     2048
+Program Start
+Running with OpenMP, thread count: 4
+Program Start
+Running with OpenMP, thread count: 4
+Program Start
+Running with OpenMP, thread count: 4
+Program Start
+Running with OpenMP, thread count: 4
+Program Start
+Running with OpenMP, thread count: 4
