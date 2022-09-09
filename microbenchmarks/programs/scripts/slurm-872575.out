@@ -1,6 +1,0 @@
-/scratch/fuchs/aglippert/zhuz/tools/GPI-2/bin/gaspi_run: line 81: $MFILE: ambiguous redirect
-Warning: Failed to copy machinefile to remote host. Program might not start correctly.
-Unknown cipher type ''export'
-Error: Failed to start /scratch/fuchs/aglippert/zhuz/gaspi/gaspi-benchmark/programs/scripts/run-va.sh on 
-Pseudo-terminal will not be allocated because stdin is not a terminal.
-Empty machine file (/tmp/.gpi2.B6b3pfUw)
