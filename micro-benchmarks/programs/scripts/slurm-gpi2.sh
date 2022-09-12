@@ -13,7 +13,8 @@ module load gpi-2-1.5.1-gcc-4.8.5-2u3v7sj
 gaspihome=$HOME/local
 gaspirun=$gaspihome/bin/gaspi_run
 autokit=/home/fuchs/aglippert/zhuz/Author-Kit
+builddir=/scratch/fuchs/aglippert/zhuz/gaspi/micro-benchmarks/programs/gaspi-benchmark/build
 
-.$autokit/collect_environment.sh
-$gaspirun -N /scratch/fuchs/aglippert/zhuz/gaspi/gaspi-benchmark/programs/gaspi-benchmark/build/gaspi-benchmark
+$autokit/collect_environment.sh
+$gaspirun -N $builddir/gaspi-benchmark
 
