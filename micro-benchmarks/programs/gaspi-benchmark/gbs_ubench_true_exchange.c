@@ -4,7 +4,7 @@
 *		 commuication: First, the unidirectional transfer latency
 *		 for put or get is measured. Afterwards, the transfer is
 *		 repeated while the remote side performs CPU-intensive work.
-* @author Florian Beenen
+* @author MSQC
 * @version 2020-11-27
 */
 

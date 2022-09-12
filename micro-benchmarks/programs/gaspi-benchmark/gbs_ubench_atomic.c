@@ -3,7 +3,7 @@
 * @brief Benchmark to evaluate the atomic functions
 *		 gaspi_atomic_fetch_add and
 * 		 gaspi_atomic_compare_swap.
-* @author Florian Beenen
+* @author MSQC
 * @version 2020-11-26
 */
 

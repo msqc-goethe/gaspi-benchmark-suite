@@ -5,7 +5,7 @@
 *		  using GASPI. The heat distribution on a 2D plane is evaluted.
 *		  The computation is split over multiple nodes with GASPI and
 *		  additionally multithreaded using pthreads.
-* @author Florian Beenen
+* @author MSQC
 * @version 2020-11-24
 */
 

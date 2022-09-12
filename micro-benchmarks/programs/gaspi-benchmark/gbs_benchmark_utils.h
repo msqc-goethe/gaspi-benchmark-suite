@@ -1,7 +1,7 @@
 /**
 * @file gbs_benchmark_utils.h
 * @brief File with useful functions for the GBS benchmarks.
-* @author Florian Beenen
+* @author MSQC
 * @version 2020-11-25
 */
 #ifndef __GBS_BENCHMARK_UTILS__

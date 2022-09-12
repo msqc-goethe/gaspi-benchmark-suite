@@ -5,7 +5,7 @@
 *		 transfer. This benchmark aggregates multiple
 *		 gaspi_write transfers and sends a notification only
 *		 after all RMA request have been scheduled.
-* @author Florian Beenen
+* @author MSQC
 * @version 2020-11-27
 */
 

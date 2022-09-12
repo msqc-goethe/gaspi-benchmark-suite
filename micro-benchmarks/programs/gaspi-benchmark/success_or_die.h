@@ -2,7 +2,7 @@
 * @file success_or_die.h
 * @brief Macro to handle GASPI errors and terminate the
 *		 program as soon as errors occur.
-* @author Florian Beenen
+* @author MSQC
 * @version 2020-11-27
 */
 

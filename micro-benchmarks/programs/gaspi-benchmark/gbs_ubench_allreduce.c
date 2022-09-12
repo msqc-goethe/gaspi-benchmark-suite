@@ -2,7 +2,7 @@
 * @file gbs_ubench_allreduce.c
 * @brief Benchmark to evaluate the gaspi_allreduce function with
 *		 different operations.
-* @author Florian Beenen
+* @author MSQC
 * @version 2020-11-26
 */
 

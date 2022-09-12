@@ -2,7 +2,7 @@
 * @file gbs_ubench_barrier.c
 * @brief Benchmark to evaluate the collective
 *		 gaspi_barrier function.
-* @author Florian Beenen
+* @author MSQC
 * @version 2020-11-26
 */
 

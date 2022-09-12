@@ -4,7 +4,7 @@
 *		 put RMA transfer that involves all ranks.
 *		 The first rank sends data to all other ranks but
 *		 to itself.
-* @author Florian Beenen
+* @author MSQC
 * @version 2020-11-27
 */
 

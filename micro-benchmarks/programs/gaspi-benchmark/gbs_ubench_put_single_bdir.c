@@ -4,7 +4,7 @@
 *		 put RMA transfer that involves only the first two ranks.
 *		 The first two ranks exchange a block of data via
 *		 gaspi_write_notify in a concurrent fashion.
-* @author Florian Beenen
+* @author MSQC
 * @version 2020-11-27
 */
 

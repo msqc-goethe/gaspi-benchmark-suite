@@ -2,7 +2,7 @@
 * @file gbs_ubench_get_all_udir.c
 * @brief Benchmark to evaluate the unidirectional
 *		 get RMA transfer function involving all nodes.
-* @author Florian Beenen
+* @author MSQC
 * @version 2020-11-26
 */
 

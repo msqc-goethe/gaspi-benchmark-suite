@@ -5,7 +5,7 @@
 *		 The first rank sends a block of data to the second rank.
 *		 No notifications are exchanged, the measurement is taken
 *		 by queue-flushing and waiting on a common barrier.
-* @author Florian Beenen
+* @author MSQC
 * @version 2020-11-27
 */
 

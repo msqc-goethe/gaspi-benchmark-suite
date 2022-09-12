@@ -1,7 +1,7 @@
 /**
 * @file gbs_ubench_headers.h
 * @brief Header file for all microbenchmarks.
-* @author Florian Beenen
+* @author MSQC
 * @version 2020-11-26
 */
 

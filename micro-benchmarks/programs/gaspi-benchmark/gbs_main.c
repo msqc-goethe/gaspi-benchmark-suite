@@ -7,7 +7,7 @@
 *		  implementation.
 *		  The results are provided in the same way as in
 *		  Intel MPI Benchmark (IMB).
-* @author Florian Beenen
+* @author MSQC
 * @version 2020-11-24
 */
 

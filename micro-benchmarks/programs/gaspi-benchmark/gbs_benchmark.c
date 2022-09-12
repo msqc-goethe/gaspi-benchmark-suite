@@ -5,7 +5,7 @@
 *		  of benchmarks. A list of benchmarks is registered
 *		  that can be run. Each benchmark is responsible
 *		  for handling the result generation on its own.
-* @author Florian Beenen
+* @author MSQC
 * @version 2020-11-25
 */
 
@@ -177,7 +177,7 @@ static void printOutputPreamble(FILE *f, cmdArgs_t *cmdArgs, unsigned int nproc 
 	time_t t1 = time(NULL);
 	struct tm t = *localtime(&t1);
 	fprintf(f, "%s\n", SEPARATOR_LINE);
-	fprintf(f, "# GASPI Benchmark Suite by Florian Beenen\n");
+	fprintf(f, "# GASPI Benchmark Suite by MSQC @ Goethe University Frankfurt\n");
 	fprintf(f, "# Date:  %d-%02d-%02d %02d:%02d:%02d\n", t.tm_year + 1900, t.tm_mon + 1, t.tm_mday, t.tm_hour, t.tm_min, t.tm_sec);
 	fprintf(f, "# Maximum repetitions: %d\n", cmdArgs->maxRuns);
 	fprintf(f, "# Minimum repetitions: %d\n", cmdArgs->minRuns);

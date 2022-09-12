@@ -4,7 +4,7 @@
 *		 communication routines gaspi_passive_send
 *		 and gaspi_passive_receive.
 *		 Communication happens between pairs of two ranks.
-* @author Florian Beenen
+* @author MSQC
 * @version 2020-11-27
 */
 

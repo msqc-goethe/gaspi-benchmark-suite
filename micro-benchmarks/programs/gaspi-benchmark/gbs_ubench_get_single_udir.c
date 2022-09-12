@@ -3,7 +3,7 @@
 * @brief Benchmark to evaluate the unidirectional
 *		 get RMA transfer function between the first
 *		 two ranks.
-* @author Florian Beenen
+* @author MSQC
 * @version 2020-11-26
 */
 

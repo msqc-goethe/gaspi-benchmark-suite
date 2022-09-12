@@ -3,7 +3,7 @@
 * @brief Benchmark to evaluate the ping-pong
 *		 communication scheme. The gaspi_write_notify
 *		 routine is used to transfer data.
-* @author Florian Beenen
+* @author MSQC
 * @version 2020-11-26
 */
 

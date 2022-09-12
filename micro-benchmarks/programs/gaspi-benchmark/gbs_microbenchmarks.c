@@ -3,7 +3,7 @@
 * @brief Module that executes all microbenchmarks.
 * @detail This file contains functions that are used by all
 *	      microbenchmarks.
-* @author Florian Beenen
+* @author MSQC
 * @version 2020-11-26
 */
 

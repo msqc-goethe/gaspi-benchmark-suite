@@ -4,7 +4,7 @@
 * @detail This file contains functions that parse the command
 *	      line aguments and return the parsed information in a
 *		  custom struct.
-* @author Florian Beenen
+* @author MSQC
 * @version 2020-11-24
 */
 

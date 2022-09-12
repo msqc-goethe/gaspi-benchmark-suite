@@ -5,7 +5,7 @@
 *		  of benchmarks. A list of benchmarks is registered
 *		  that can be run. Each benchmark is responsible
 *		  for handling the result generation on its own.
-* @author Florian Beenen
+* @author MSQC
 * @version 2020-11-25
 */
 

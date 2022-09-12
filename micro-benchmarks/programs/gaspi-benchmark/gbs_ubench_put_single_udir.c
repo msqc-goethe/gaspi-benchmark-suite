@@ -3,7 +3,7 @@
 * @brief Benchmark to evaluate unidirectional
 *		 put RMA transfer that involves only the first two ranks.
 *		 The first rank sends a block of data to the second rank.
-* @author Florian Beenen
+* @author MSQC
 * @version 2020-11-27
 */
 
