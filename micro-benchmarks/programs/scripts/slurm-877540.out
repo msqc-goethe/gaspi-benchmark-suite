@@ -1,0 +1,4 @@
+/var/spool/slurm/d/job877540/slurm_script: line 17: ./home/fuchs/aglippert/zhuz/Author-Kit/collect_environment.sh: No such file or directory
+
+Error: Cannot execute /scratch/fuchs/aglippert/zhuz/gaspi/gaspi-benchmark/programs/gaspi-benchmark/build/gaspi-benchmark (or file does not exist)
+
