@@ -33,7 +33,7 @@ microbenchmark_SOURCES = gbs_main.c \
 microbenchmark_LDADD = ../inc/libarraylist.a ../inc/libstopwatch.a ../inc/libutility.a
 AM_LDFLAGS = -L$(top_builddir)/inc/libarraylist.a \
 	     -L$(top_builddir)/inc/libstopwatch.a \
-	     -L$(top_builddir)/inc/libutility.a \
-             -lGPI2
-AM_CFLAGS= -I$(abs_top_srcdir)/inc -Wall -Wextra -pedantic \
+	     -L$(top_builddir)/inc/libutility.a -lGPI2 \
+	     $(gaspilib)
+AM_CFLAGS=  $(gaspiinc) -I$(abs_top_srcdir)/inc -Wall -Wextra -pedantic \
 	   -std=c99 -D_POSIX_C_SOURCE=199309L -pthread
