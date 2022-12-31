@@ -26,8 +26,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-
+#ifdef USE_GASPI
 #include "success_or_die.h"
+#endif
 #include <sys/time.h>
 #include <time.h>
 #include <limits.h>

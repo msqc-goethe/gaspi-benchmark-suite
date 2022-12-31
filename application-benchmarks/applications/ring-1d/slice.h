@@ -3,7 +3,9 @@
 
 #include "constant.h"
 
+#ifdef USE_GASPI
 #include <GASPI.h>
+#endif
 #include <omp.h>
 
 #include <stdlib.h>

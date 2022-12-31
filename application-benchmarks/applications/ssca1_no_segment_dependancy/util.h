@@ -22,7 +22,6 @@
 
 #ifndef __UTIL_H
 #define __UTIL_H
-#define USE_GASPI 1
 #include "pairwise_align.h"
 #include "types.h"
 #include <stdio.h>

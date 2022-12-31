@@ -1,7 +1,8 @@
 #include "testsome.h"
-
-#include "assert.h"
+#ifdef USE_GASPI
 #include "success_or_die.h"
+#endif
+#include "assert.h"
 #include "comm_util.h"
 
 int test_or_die

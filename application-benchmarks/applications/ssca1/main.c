@@ -27,8 +27,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-
+#ifdef USE_GASPI
 #include "success_or_die.h"
+#endif
 #include "parameters.h"
 #include "gen_sim_matrix.h"
 #include <sys/time.h>

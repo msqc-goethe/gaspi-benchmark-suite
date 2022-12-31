@@ -14,15 +14,16 @@
  */
 
 #include "assert.h"
-#include "success_or_die.h"
 
+#ifdef USE_GASPI
+#include "success_or_die.h"
+#include <GASPI.h>
+#endif
 #include "constant.h"
 #include "data.h"
 #include "topology.h"
 #include "slice.h"
 #include "comm_util.h"
-
-#include <GASPI.h>
 #include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
