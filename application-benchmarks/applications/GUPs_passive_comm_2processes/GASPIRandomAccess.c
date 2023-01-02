@@ -200,19 +200,19 @@ int main(int argc, char **argv)
     *ran = (*ran << 1) ^ ((s64Int)*ran < ZERO64B ? POLY : ZERO64B);
     remote_proc = (*ran >> (logTableSize - logNumProcs)) & (NumProcs - 1);
     //send address
-    PASSIVE_SEND(ran, oProc);
+    PASSIVE_SEND(ran,iProc);
     //receive adress
-    PASSIVE_RECV(ran_remote, oProc);
+    PASSIVE_RECV(ran_remote,iProc);
     //receive value
-    PASSIVE_RECV(remote_val,oProc)
+    PASSIVE_RECV(remote_val,iProc);
     //send value
-    PASSIVE_SEND(&HPCC_Table[*ran_remote & (LocalTableSize - 1)],oProc)
+    PASSIVE_SEND(&HPCC_Table[*ran_remote & (LocalTableSize - 1)],iProc);
     //update value
     *remote_val ^= *ran_remote;
     //send updated value
-    PASSIVE_SEND(remote_val,oProc)
+    PASSIVE_SEND(remote_val,iProc);
     //receive updated value
-    PASSIVE_RECV(remote_val,oProc)
+    PASSIVE_RECV(remote_val,iProc);
     }
     else
     {
@@ -220,19 +220,19 @@ int main(int argc, char **argv)
     *ran = (*ran << 1) ^ ((s64Int)*ran < ZERO64B ? POLY : ZERO64B);
     remote_proc = (*ran >> (logTableSize - logNumProcs)) & (NumProcs - 1);
     //receive adress
-    PASSIVE_RECV(ran_remote, oProc);
+    PASSIVE_RECV(ran_remote, iProc);
     //send address
-    PASSIVE_SEND(ran, oProc);
+    PASSIVE_SEND(ran, iProc);
     //send value
-    PASSIVE_SEND(&HPCC_Table[*ran_remote & (LocalTableSize - 1)],oProc)
+    PASSIVE_SEND(&HPCC_Table[*ran_remote & (LocalTableSize - 1)],iProc);
     //receive value
-    PASSIVE_RECV(remote_val,oProc)
+    PASSIVE_RECV(remote_val,iProc);
     //update value
     *remote_val ^= *ran_remote;
     //receive updated value
-    PASSIVE_RECV(remote_val,oProc)
+    PASSIVE_RECV(remote_val,iProc);
     //send updated value
-    PASSIVE_SEND(remote_val,oProc)
+    PASSIVE_SEND(remote_val,iProc);
     }
 
   }
