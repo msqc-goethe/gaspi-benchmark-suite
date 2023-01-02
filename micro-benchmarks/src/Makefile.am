@@ -1,4 +1,4 @@
-microbenchmarkdir = $(pkglibexecdir)/microbenchmark
+microbenchmarkdir = $(pkglibexecdir)
 microbenchmark_PROGRAMS = microbenchmark 
 microbenchmark_SOURCES = gbs_main.c \
 	       argparser.c \
