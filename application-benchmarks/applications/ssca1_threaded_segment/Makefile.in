@@ -168,7 +168,7 @@ am__define_uniq_tagged_files = \
     if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
   done | $(am__uniquify_input)`
 am__DIST_COMMON = $(srcdir)/Makefile.in $(top_srcdir)/depcomp INSTALL \
-	README
+	README.md
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
@@ -267,7 +267,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CFLAGS = -I$(abs_top_srcdir)/inc -pipe -w -lm -ldl \
 	-frename-registers -Wall -pedantic -std=c99 \
-	-D_POSIX_C_SOURCE=199309L -pthread $(am__append_1) \
+	-D_POSIX_C_SOURCE=199309L -pthread -fopenmp $(am__append_1) \
 	$(am__append_3) $(am__append_4)
 AM_LDFLAGS = -L$(top_builddir)/inc/libarraylist.a \
 	-L$(top_builddir)/inc/libstopwatch.a \
