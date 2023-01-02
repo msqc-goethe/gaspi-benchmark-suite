@@ -1,3 +1,0 @@
-Killing GASPI procs...
-/opt/gaspi/diana/gaspi_benchmark/gaspi-benchmark/ssca1_threaded_segment/script/wrapper.sh: line 12: 364971 Terminated              $2 $3
-/opt/gaspi/diana/gaspi_benchmark/gaspi-benchmark/ssca1_threaded_segment/script/wrapper.sh: line 12: 364972 Terminated              $2 $3
