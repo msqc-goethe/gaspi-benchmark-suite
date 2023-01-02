@@ -1,9 +1,1 @@
-To compile:
-* Set flags in script/path.sh and the adapat the machine file
-* Choose between mpi,shmem and gaspi by changing the variable GASPI_MPI_SHMEM in script/path.sh
-* navigate to script/
-* bash build.sh
-
-To run:
-* navigate to script/
-* bash run.sh
+## put_get_performance
