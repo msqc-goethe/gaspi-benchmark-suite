@@ -634,6 +634,7 @@ papilib
 papiinc
 gaspilib
 gaspiinc
+gaspi_library
 gaspi
 EGREP
 GREP
@@ -4387,6 +4388,7 @@ fi
 
 
 
+ enable_gaspi=yes
 else
   enable_gaspi=no
 fi
@@ -4429,8 +4431,43 @@ if test "x$ac_cv_func_shmem_barrier_all" = xyes; then :
   shmem_library=true
 fi
 
-ac_fn_c_check_func "$LINENO" "gaspi_proc_init" "ac_cv_func_gaspi_proc_init"
-if test "x$ac_cv_func_gaspi_proc_init" = xyes; then :
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for gaspi_proc_init in -lGPI2" >&5
+$as_echo_n "checking for gaspi_proc_init in -lGPI2... " >&6; }
+if ${ac_cv_lib_GPI2_gaspi_proc_init+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lGPI2  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char gaspi_proc_init ();
+int
+main ()
+{
+return gaspi_proc_init ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_GPI2_gaspi_proc_init=yes
+else
+  ac_cv_lib_GPI2_gaspi_proc_init=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_GPI2_gaspi_proc_init" >&5
+$as_echo "$ac_cv_lib_GPI2_gaspi_proc_init" >&6; }
+if test "x$ac_cv_lib_GPI2_gaspi_proc_init" = xyes; then :
   gaspi_library=true
 fi
 

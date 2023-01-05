@@ -9,7 +9,7 @@ AC_CHECK_HEADERS([stdlib.h string.h sys/time.h unistd.h math.h omp.h])
 
 AC_ARG_ENABLE([mpi],[AS_HELP_STRING([--enable-mpi],[build MPI version of application benchmarks])],[enable_mpi=yes],[enable_mpi=no])
 AC_ARG_ENABLE([shmem],[AS_HELP_STRING([--enable-shmem],[build SHMEM version of application benchmarks])],[enable_shmem=yes],[enable_shmem=no])
-AC_ARG_ENABLE([gaspi],[AS_HELP_STRING([--enable-gaspi],[build GASPI version of application benchmarks])],[AX_CHECK_GASPI],[enable_gaspi=no])
+AC_ARG_ENABLE([gaspi],[AS_HELP_STRING([--enable-gaspi],[build GASPI version of application benchmarks])],[AX_CHECK_GASPI enable_gaspi=yes],[enable_gaspi=no])
 
 AC_ARG_WITH(papi, 
 [AS_HELP_STRING([--with-papi,--with-papi=PATH],
@@ -25,7 +25,6 @@ AS_IF([test "$enable_mpi"   == yes], [mpi3_library=true])
 
 AC_CHECK_FUNC([MPI_Get_accumulate],[mpi3_library=true])
 AC_CHECK_FUNC([shmem_barrier_all],[shmem_library=true])
-AC_CHECK_FUNC([gaspi_proc_init],[gaspi_library=true])
 
 AM_CONDITIONAL([MPI3],[test x$mpi3_library == xtrue && test "$enable_mpi" == yes])
 AM_CONDITIONAL([GASPI],[test x$gaspi_library == xtrue && test "$enable_gaspi" == yes])

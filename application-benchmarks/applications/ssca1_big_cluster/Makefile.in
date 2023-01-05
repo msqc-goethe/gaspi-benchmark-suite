@@ -240,6 +240,7 @@ docdir = @docdir@
 dvidir = @dvidir@
 exec_prefix = @exec_prefix@
 gaspi = @gaspi@
+gaspi_library = @gaspi_library@
 gaspiinc = @gaspiinc@
 gaspilib = @gaspilib@
 host_alias = @host_alias@

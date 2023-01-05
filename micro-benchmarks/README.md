@@ -12,14 +12,20 @@ The GBS program is intended to be run via the gaspi_run command supplied with GP
 
 ## Build
 Configure:
+
 ```
 $ mkdir build && cd build
 $ ../configure --with-gaspi=[PATHTOGASPIBUILDDIR] --prefix=[INSTALLATIONPATH]
+```
+
 or
+
 ```
 $ ../configure --with-gaspi-include=[GASPIINCLUDEPATH] --with-gaspi-lib=[GASPILIBPATH] --prefix=[INSTALLATIONPATH]
 ```
+
 Compile:
+
 ```
 $ make
 $ make install

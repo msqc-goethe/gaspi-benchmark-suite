@@ -241,6 +241,7 @@ docdir = @docdir@
 dvidir = @dvidir@
 exec_prefix = @exec_prefix@
 gaspi = @gaspi@
+gaspi_library = @gaspi_library@
 gaspiinc = @gaspiinc@
 gaspilib = @gaspilib@
 host_alias = @host_alias@
@@ -271,8 +272,8 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CFLAGS = -I$(abs_top_srcdir)/inc -pipe -w -lm -ldl \
 	-frename-registers -Wall -pedantic -std=c99 \
-	-D_POSIX_C_SOURCE=199309L -pthread $(am__append_1) \
-	$(am__append_3) $(am__append_4) $(am__append_6)
+	-D_POSIX_C_SOURCE=199309L -pthread -fopenmp $(am__append_1) \
+	$(am__append_3) $(am__append_4)
 AM_LDFLAGS = -L$(top_builddir)/inc/libarraylist.a \
 	-L$(top_builddir)/inc/libstopwatch.a \
 	-L$(top_builddir)/inc/libutility.a $(am__append_2) \
