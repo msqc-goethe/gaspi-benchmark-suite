@@ -25,3 +25,8 @@ endif
 if SHMEM
 AM_CFLAGS += -DUSE_SHMEM
 endif
+
+if PAPI
+AM_LDFLAGS += -lpapi $(papilib)
+AM_CFLAGS += -DUSE_PAPI $(papiinc)
+endif

@@ -622,12 +622,16 @@ ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
 LIB@&t@OBJS
+PAPI_FALSE
+PAPI_TRUE
 SHMEM_FALSE
 SHMEM_TRUE
 GASPI_FALSE
 GASPI_TRUE
 MPI3_FALSE
 MPI3_TRUE
+papilib
+papiinc
 EGREP
 GREP
 CPP
@@ -727,6 +731,7 @@ enable_openmp
 enable_mpi
 enable_shmem
 enable_gaspi
+with_papi
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1362,6 +1367,13 @@ Optional Features:
   --enable-mpi            build MPI version of application benchmarks
   --enable-shmem          build SHMEM version of application benchmarks
   --enable-gaspi          build GASPI version of application benchmarks
+
+Optional Packages:
+  --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
+  --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+  --with-papi,--with-papi=PATH 
+                          search in system directories or specify prefix
+                          directory for installed PAPI package
 
 Some influential environment variables:
   CC          C compiler command
@@ -4251,6 +4263,23 @@ else
 fi
 
 
+
+@%:@ Check whether --with-papi was given.
+if test "${with_papi+set}" = set; then :
+  withval=$with_papi; 
+fi
+
+if test "$with_papi" != yes; then :
+  papiinc="-I$with_papi/include" papilib="-L$with_papi/lib -Wl,-rpath,$with_papi/lib" enable_papi==yes
+fi
+if test "$with_papi" != yes; then :
+  
+fi
+if test "$with_papi" != yes; then :
+  
+fi
+
+
 if test "$enable_shmem" == yes; then :
   shmem_library=true
 fi
@@ -4299,6 +4328,14 @@ fi
 else
   SHMEM_TRUE='#'
   SHMEM_FALSE=
+fi
+
+ if test "$with_papi" != yes; then
+  PAPI_TRUE=
+  PAPI_FALSE='#'
+else
+  PAPI_TRUE='#'
+  PAPI_FALSE=
 fi
 
 
@@ -4483,6 +4520,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${SHMEM_TRUE}" && test -z "${SHMEM_FALSE}"; then
   as_fn_error $? "conditional \"SHMEM\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${PAPI_TRUE}" && test -z "${PAPI_FALSE}"; then
+  as_fn_error $? "conditional \"PAPI\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 
