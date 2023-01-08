@@ -300,6 +300,7 @@ int main(int argc, char **argv)
   BARRIER_ALL();
 #ifdef USE_MPI3
   MPI_Win_unlock_all(window);
+  MPI_Finalize();
 #endif
   return 0;
 }
