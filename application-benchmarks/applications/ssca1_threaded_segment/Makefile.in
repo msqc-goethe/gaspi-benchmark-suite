@@ -91,8 +91,6 @@ ssca1_threaded_segment_PROGRAMS = ssca1_threaded_segment$(EXEEXT)
 @GASPI_TRUE@am__append_2 = -lGPI2 $(gaspilib)
 @GASPI_TRUE@am__append_3 = -DUSE_GASPI $(gaspiinc)
 @SHMEM_TRUE@am__append_4 = -DUSE_SHMEM
-@PAPI_TRUE@am__append_5 = -lpapi $(papilib)
-@PAPI_TRUE@am__append_6 = -DUSE_PAPI $(papiinc)
 subdir = applications/ssca1_threaded_segment
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../m4/gaspi.m4 \
@@ -256,8 +254,6 @@ localstatedir = @localstatedir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
-papiinc = @papiinc@
-papilib = @papilib@
 pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
@@ -276,8 +272,7 @@ AM_CFLAGS = -I$(abs_top_srcdir)/inc -pipe -w -lm -ldl \
 	$(am__append_3) $(am__append_4)
 AM_LDFLAGS = -L$(top_builddir)/inc/libarraylist.a \
 	-L$(top_builddir)/inc/libstopwatch.a \
-	-L$(top_builddir)/inc/libutility.a $(am__append_2) \
-	$(am__append_5)
+	-L$(top_builddir)/inc/libutility.a $(am__append_2)
 ssca1_threaded_segmentdir = $(pkglibexecdir)/ssca1_threaded_segment
 ssca1_threaded_segment_SOURCES = gen_scal_data.c \
 		gen_scal_data.h \

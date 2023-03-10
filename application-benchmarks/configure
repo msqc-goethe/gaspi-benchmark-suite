@@ -622,16 +622,12 @@ ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
-PAPI_FALSE
-PAPI_TRUE
 SHMEM_FALSE
 SHMEM_TRUE
 GASPI_FALSE
 GASPI_TRUE
 MPI3_FALSE
 MPI3_TRUE
-papilib
-papiinc
 gaspilib
 gaspiinc
 gaspi_library
@@ -738,7 +734,6 @@ enable_gaspi
 with_gaspi
 with_gaspi_include
 with_gaspi_lib
-with_papi
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1384,9 +1379,6 @@ Optional Packages:
   --with-gaspi-include=PATH
                           specify directory for installed GASPI include files
   --with-gaspi-lib=PATH   specify directory for the installed GASPI library
-  --with-papi,--with-papi=PATH
-                          search in system directories or specify prefix
-                          directory for installed PAPI package
 
 Some influential environment variables:
   CC          C compiler command
@@ -4355,82 +4347,6 @@ fi
 
 done
 
-
-
-  CPPFLAGS=$save_CPPFLAGS_1
-
-
-
-
-  CFLAGS=$save_CFLAGS_1
-
-
-
-
-  LDFLAGS=$save_LDFLAGS_1
-
-
-
-
-  LIBS=$save_LIBS_1
-
-
-if test "$gaspi" != "yes"; then :
-
-    as_fn_error $? "
-------------------------------
-GASPI path was not correctly specified.
-Please, check that the provided directories are correct.
-------------------------------" "$LINENO" 5
-
-fi
-
-
-
-
- enable_gaspi=yes
-else
-  enable_gaspi=no
-fi
-
-
-
-# Check whether --with-papi was given.
-if test "${with_papi+set}" = set; then :
-  withval=$with_papi;
-fi
-
-if test "$with_papi" != yes; then :
-  papiinc="-I$with_papi/include" papilib="-L$with_papi/lib -Wl,-rpath,$with_papi/lib" enable_papi==yes
-fi
-if test "$with_papi" != yes; then :
-
-fi
-if test "$with_papi" != yes; then :
-
-fi
-
-
-if test "$enable_shmem" == yes; then :
-  shmem_library=true
-fi
-if test "$enable_gaspi" == yes; then :
-  gaspi_library=true
-fi
-if test "$enable_mpi"   == yes; then :
-  mpi3_library=true
-fi
-
-ac_fn_c_check_func "$LINENO" "MPI_Get_accumulate" "ac_cv_func_MPI_Get_accumulate"
-if test "x$ac_cv_func_MPI_Get_accumulate" = xyes; then :
-  mpi3_library=true
-fi
-
-ac_fn_c_check_func "$LINENO" "shmem_barrier_all" "ac_cv_func_shmem_barrier_all"
-if test "x$ac_cv_func_shmem_barrier_all" = xyes; then :
-  shmem_library=true
-fi
-
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for gaspi_proc_init in -lGPI2" >&5
 $as_echo_n "checking for gaspi_proc_init in -lGPI2... " >&6; }
 if ${ac_cv_lib_GPI2_gaspi_proc_init+:} false; then :
@@ -4472,6 +4388,65 @@ if test "x$ac_cv_lib_GPI2_gaspi_proc_init" = xyes; then :
 fi
 
 
+
+  CPPFLAGS=$save_CPPFLAGS_1
+
+
+
+
+  CFLAGS=$save_CFLAGS_1
+
+
+
+
+  LDFLAGS=$save_LDFLAGS_1
+
+
+
+
+  LIBS=$save_LIBS_1
+
+
+if test "$gaspi" != "yes"; then :
+
+    as_fn_error $? "
+------------------------------
+GASPI path was not correctly specified.
+Please, check that the provided directories are correct.
+------------------------------" "$LINENO" 5
+
+fi
+
+
+
+
+ enable_gaspi=yes
+else
+  enable_gaspi=no
+fi
+
+
+if test "$enable_shmem" == yes; then :
+  shmem_library=true
+fi
+if test "$enable_gaspi" == yes; then :
+  gaspi_library=true
+fi
+if test "$enable_mpi"   == yes; then :
+  mpi3_library=true
+fi
+
+ac_fn_c_check_func "$LINENO" "MPI_Get_accumulate" "ac_cv_func_MPI_Get_accumulate"
+if test "x$ac_cv_func_MPI_Get_accumulate" = xyes; then :
+  mpi3_library=true
+fi
+
+ac_fn_c_check_func "$LINENO" "shmem_barrier_all" "ac_cv_func_shmem_barrier_all"
+if test "x$ac_cv_func_shmem_barrier_all" = xyes; then :
+  shmem_library=true
+fi
+
+
  if test x$mpi3_library == xtrue && test "$enable_mpi" == yes; then
   MPI3_TRUE=
   MPI3_FALSE='#'
@@ -4494,14 +4469,6 @@ fi
 else
   SHMEM_TRUE='#'
   SHMEM_FALSE=
-fi
-
- if test "$with_papi" != yes; then
-  PAPI_TRUE=
-  PAPI_FALSE='#'
-else
-  PAPI_TRUE='#'
-  PAPI_FALSE=
 fi
 
 
@@ -4686,10 +4653,6 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${SHMEM_TRUE}" && test -z "${SHMEM_FALSE}"; then
   as_fn_error $? "conditional \"SHMEM\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${PAPI_TRUE}" && test -z "${PAPI_FALSE}"; then
-  as_fn_error $? "conditional \"PAPI\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 
