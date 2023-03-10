@@ -14,6 +14,7 @@ The GBS program is intended to be run via the gaspi_run command supplied with GP
 Configure:
 
 ```
+$ autoreconf --install
 $ mkdir build && cd build
 $ ../configure --with-gaspi=[PATHTOGASPIBUILDDIR] --prefix=[INSTALLATIONPATH]
 ```
