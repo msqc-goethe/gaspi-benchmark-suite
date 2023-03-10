@@ -1,6 +1,8 @@
 #include "assert.h"
+#ifdef USE_GASPI
 #include "success_or_die.h"
 #include "testsome.h"
+#endif
 
 #include "slice.h"
 

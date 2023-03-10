@@ -27,8 +27,13 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-
+#ifdef USE_GASPI
 #include "success_or_die.h"
+#endif
+#ifdef USE_PAPI
+#include <papi.h>
+#include <assert.h>
+#endif
 #include "parameters.h"
 #include "gen_sim_matrix.h"
 #include <sys/time.h>
@@ -39,6 +44,23 @@
 #include <limits.h>
 #include "util.h"
 
+#ifdef USE_PAPI
+#define PAPI_CHECK(stmt)                                   \
+	do {                                                  \
+		int retval = (stmt);                           \
+		if (retval >= 0) \
+			break; \
+		if (retval != PAPI_OK) {                   \
+			fprintf(stderr,                               \
+			        "[%s:%d] PAPI call failed with %d \n", \
+			        __FILE__,                             \
+			        __LINE__,                             \
+			        retval);                           \
+			exit(EXIT_FAILURE);                           \
+		}                                                 \
+		assert(retval == PAPI_OK);                 \
+	} while (0)
+#endif
 unsigned int random_seed;
 #ifdef USE_GASPI
 gaspi_rank_t num_nodes;
@@ -127,11 +149,48 @@ int main(int argc, char **argv)
   seq_data_t *seq_data;
   struct timeval start_time;
   good_match_t *A;
-#ifdef USE_MPI3
-  MPI_Info winfo;
-#endif
+
+/* #ifdef USE_PAPI */
+/* #define NUM_NETWORK_EVENTS 2 */
+/* 	int network_event_set = PAPI_NULL,flop_event_set = PAPI_NULL; */
+/* 	int flop_event_codes[NUM_FLOP_EVENTS] = {PAPI_SP_OPS,PAPI_DP_OPS,PAPI_TOT_INS}; */
+/* 	long long network_values[NUM_NETWORK_EVENTS] = {0LL,0LL}; */
+/* 	long long flop_values[NUM_FLOP_EVENTS]; */
+/* 	const PAPI_component_info_t *component_info = NULL; */
+/* 	int num_components,cid; */
+/* 	int code,papi_retval; */
+	
+/* 	papi_retval = PAPI_library_init(PAPI_VER_CURRENT); */
+/* 	if(papi_retval != PAPI_VER_CURRENT){ */
+/* 		printf("PAPI_library_init failed with %d\n",papi_retval); */
+/* 		exit(EXIT_FAILURE); */
+/* 	} */
+/* 	// Find infiniband component */
+	
+/* 	num_components = PAPI_num_components(); */
+/* 	for(cid = 0; cid < num_components; ++cid){ */
+/* 		if((component_info = PAPI_get_component_info(cid)) == NULL) { */
+/* 			printf("PAPI_get_component_info failed with\n"); */
+/* 			return -1; */
+/* 		} */
+/* 		if(strstr(component_info->name,"infiniband")){ */
+/* 			break; */
+/* 		} */
+/* 	} */
+/* 	// Create infiniband events */
+/* 	PAPI_CHECK(PAPI_create_eventset(&network_event_set)); */
+/* 	PAPI_CHECK(PAPI_event_name_to_code("infiniband:::mlx4_0_1:port_rcv_data",&code)); */
+/* 	PAPI_CHECK(PAPI_add_event(network_event_set,code)); */
+/* 	PAPI_CHECK(PAPI_event_name_to_code("infiniband:::mlx4_0_1:port_xmit_data",&code)); */
+/* 	PAPI_CHECK(PAPI_add_event(network_event_set,code)); */
+	
+/* 	// Create event to count FLOPs */
+/* 	PAPI_CHECK(PAPI_create_eventset(&flop_event_set)); */
+/* 	PAPI_CHECK(PAPI_add_events(flop_event_set,flop_event_codes,NUM_FLOP_EVENTS)); */
+/* #endif // end of PAPI infiniband component setup */
 
 #ifdef USE_MPI3
+  MPI_Info winfo;
   MPI_Init(&argc, &argv);
   MPI_Comm_size(MPI_COMM_WORLD, &num_nodes);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -222,7 +281,6 @@ int main(int argc, char **argv)
     printf("\nScalable Data Generator - genScalData() beginning execution...\n");
   }
 
-
   gettimeofday(&start_time, NULL);
 
   sim_matrix = gen_sim_matrix(global_parameters.SIM_EXACT, global_parameters.SIM_SIMILAR, global_parameters.SIM_DISSIMILAR, global_parameters.GAP_START, global_parameters.GAP_EXTEND, global_parameters.MATCH_LIMIT);
@@ -232,28 +290,47 @@ int main(int argc, char **argv)
   if(rank == 0){
     display_elapsed(&start_time);
 
-  if(global_parameters.ENABLE_VERIF)
-  {
-    verifyData(sim_matrix, seq_data);
-  }
+  	if(global_parameters.ENABLE_VERIF)
+  	{
+  	  verifyData(sim_matrix, seq_data);
+  	}
   }
 
   // Kernel 1 run 
 
   if(rank == 0){
   printf("\nBegining Kernel 1 execution.\n");
+/* #ifdef USE_PAPI */
+/* 	PAPI_CHECK(PAPI_start(network_event_set)); */
+/* 	PAPI_CHECK(PAPI_start(flop_event_set)); */
+/* #endif */
 
   gettimeofday(&start_time, NULL);
   }
 #ifdef USE_MPI3  
   QUIET();
 #endif
-
+#ifdef USE_PAPI
+PAPI_CHECK(PAPI_hl_region_begin("Kernel 1"));
+#endif
   A=pairwise_align(seq_data, sim_matrix, global_parameters.K1_MIN_SCORE, global_parameters.K1_MAX_REPORTS, global_parameters.K1_MIN_SEPARATION);
- 
+#ifdef USE_PAPI 
+  PAPI_CHECK(PAPI_hl_region_end("Kernel 1"));
+#endif
   if (rank == 0)
   {
     display_elapsed(&start_time);
+/* #ifdef USE_PAPI */
+/* 	PAPI_CHECK(PAPI_stop(network_event_set,network_values)); */
+/* 	PAPI_CHECK(PAPI_stop(flop_event_set,flop_values)); */
+/* 	printf("port_rcv_data: %lld\n",network_values[0]); */
+/* 	printf("port_xmit_data: %lld\n",network_values[1]); */
+/* 	printf("PAPI_SP_OPS: %lld\n",flop_values[0]); */
+/* 	printf("PAPI_DP_OPS: %lld\n",flop_values[1]); */
+/* 	printf("PAPI_TOT_INS: %lld\n",flop_values[2]); */
+/* 	PAPI_CHECK(PAPI_cleanup_eventset(network_event_set)); */
+/* 	PAPI_CHECK(PAPI_cleanup_eventset(flop_event_set)); */
+/* #endif */
   }
     
   // Kernel 2 run 
@@ -280,6 +357,10 @@ int main(int argc, char **argv)
   BARRIER_ALL();
 #ifdef USE_MPI3
   MPI_Win_unlock_all(window);
+  MPI_Finalize();
+#endif
+#ifdef USE_PAPI
+  PAPI_shutdown();
 #endif
   return 0;
 }

@@ -49,7 +49,7 @@
 
   gaspi_queue_id_t queues[Queue_num];
 #else
-  shmem_ctx_t ctx_[MAXTHREADS];
+  //shmem_ctx_t ctx_[MAXTHREADS];
 #endif
 #endif
 

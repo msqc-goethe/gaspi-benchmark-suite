@@ -28,8 +28,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-
+#ifdef USE_GASPI
 #include "success_or_die.h"
+#endif
 #include "parameters.h"
 #include "gen_sim_matrix.h"
 #include <sys/time.h>
@@ -312,6 +313,7 @@ int main(int argc, char **argv)
   BARRIER_ALL();
 #ifdef USE_MPI3
   MPI_Win_unlock_all(window);
+  MPI_Finalize();
 #endif
 
   printf("\nProgram Finished\n");

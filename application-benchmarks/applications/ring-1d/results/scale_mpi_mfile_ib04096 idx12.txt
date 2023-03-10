@@ -1,3 +1,0 @@
-Running with MPI-3, world size is 4
-count 129080 
-#  nProc 4 vlen 1024 niter 1024 nthreads 2 nway 2 time 44.835 ms

@@ -1,3 +1,0 @@
-Running with OpenSHMEM,rank 0 world size is 4
-count 20541 
-#  nProc 4 vlen 32768 niter 1024 nthreads 2 nway 2 time 298.127 ms

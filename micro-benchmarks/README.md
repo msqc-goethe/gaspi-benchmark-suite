@@ -10,4 +10,23 @@ The path to the compiled GPI-2 ﬁles need to be speciﬁed in the ﬁle paths.s
 
 The GBS program is intended to be run via the gaspi_run command supplied with GPI-2. However, if only information on the parameters or the benchmarks should be obtained, the GBS program may be launched directly with either the -h parameter to print the program’s usage or with the -list parameter to get a list of all available benchmarks. 
 
-To actually run the benchmark, the program needs to be launched either manually with the help of gaspi_run from the GPI-2 library or with the launch.sh script provided with the GBS ﬁles. Most importantly, a machine ﬁle needs to be created which contains a list of host names with nodes on which the program is spawned. The path of the machine ﬁle is also speciﬁed in paths.sh. With the help of the launch.sh script, all necessary environment variables are set up automatically on the remote nodes, requiring no additional manual conﬁguration.
+## Build
+Configure:
+
+```
+$ mkdir build && cd build
+$ ../configure --with-gaspi=[PATHTOGASPIBUILDDIR] --prefix=[INSTALLATIONPATH]
+```
+
+or
+
+```
+$ ../configure --with-gaspi-include=[GASPIINCLUDEPATH] --with-gaspi-lib=[GASPILIBPATH] --prefix=[INSTALLATIONPATH]
+```
+
+Compile:
+
+```
+$ make
+$ make install
+```

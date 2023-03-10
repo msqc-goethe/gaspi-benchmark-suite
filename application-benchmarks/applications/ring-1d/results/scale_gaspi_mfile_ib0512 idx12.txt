@@ -1,3 +1,0 @@
-Running with GASPI,rank 0 world size is 4
-count 106038 
-#  nProc 4 vlen 128 niter 1024 nthreads 2 nway 2 time 10.799 ms
