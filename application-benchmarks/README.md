@@ -14,6 +14,7 @@
 
 ## Build
 ```
+$ autoreconf --install
 $ mkdir build && cd build
 ```
 Configuration for MPI build
