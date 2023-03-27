@@ -9,11 +9,3 @@ To run the GASPI Benchmarking Suite (GBS), a successfully compiled version of th
 The path to the compiled GPI-2 ﬁles need to be speciﬁed in the ﬁle paths.sh in the scripts directory. After providing the correct path, GBS may be compiled by issuing the make command in the GBS directory. The created binary should be placed in the subdirectory build by default.
 
 The GBS program is intended to be run via the gaspi_run command supplied with GPI-2. However, if only information on the parameters or the benchmarks should be obtained, the GBS program may be launched directly with either the -h parameter to print the program’s usage or with the -list parameter to get a list of all available benchmarks. 
-
-## Build
-
-```
-$ mkdir build && cd build
-$ cmake -DCMAKE_BUILD_TYPE=Release ..
-$ make
-```
