@@ -11,7 +11,6 @@ The path to the compiled GPI-2 ﬁles need to be speciﬁed in the ﬁle paths.s
 The GBS program is intended to be run via the gaspi_run command supplied with GPI-2. However, if only information on the parameters or the benchmarks should be obtained, the GBS program may be launched directly with either the -h parameter to print the program’s usage or with the -list parameter to get a list of all available benchmarks. 
 
 ## Build
-Configure:
 
 ```
 $ mkdir build && cd build
