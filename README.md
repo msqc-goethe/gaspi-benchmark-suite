@@ -24,7 +24,7 @@ $ make
 ```
 Configuration for Application Openshmem build
 ```
-$ cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_APPS=ON -DUSE_SHMEM ..
+$ CC=oshcc; CXX=oshcxx; cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_APPS=ON -DUSE_SHMEM ..
 $ make
 ```
 Configuration for Application GPI2 build
