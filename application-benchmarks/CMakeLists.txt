@@ -1,0 +1,12 @@
+cmake_minimum_required(VERSION 3.2)
+
+add_subdirectory(GUPs)
+add_subdirectory(GUPs_large_data)
+add_subdirectory(GUPs_passive_comm_2processes)
+add_subdirectory(GUPs_threaded_different_queues)
+add_subdirectory(put_get_performance)
+#add_subdirectory(ring-1d)
+add_subdirectory(ssca1)
+add_subdirectory(ssca1_big_cluster)
+add_subdirectory(ssca1_no_segment_dependancy)
+add_subdirectory(ssca1_threaded_segment)
