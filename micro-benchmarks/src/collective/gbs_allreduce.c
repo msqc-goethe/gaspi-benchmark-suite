@@ -5,6 +5,7 @@
 
 int main(int argc, char* argv[]) {
 	gaspi_rank_t my_id, num_pes;
+	gaspi_number_t max_elem;
 	size_t size;
 	int i, j;
 	int bo_ret = OPTIONS_OKAY;
@@ -37,11 +38,19 @@ int main(int argc, char* argv[]) {
 
 	print_header(my_id);
 
+	GASPI_CHECK(gaspi_allreduce_elem_max(&max_elem));
+
 	for (size = options.min_message_size; size <= options.max_message_size;
 	     size *= 2) {
+		if(size >= max_elem){
+			fprintf(stderr,"%d elements exceede limit of %d for gaspi_allreduce!\n",size,max_elem);
+			return EXIT_FAILURE;
+		}
 		allocate_memory((void**) &send_buffer, size * sizeof(float));
 		allocate_memory((void**) &recv_buffer, size * sizeof(float));
+
 		GASPI_CHECK(gaspi_barrier(GASPI_GROUP_ALL, GASPI_BLOCK));
+
 		for (i = 0; i < options.iterations + options.skip; ++i) {
 			if (i == options.skip) {
 				time = stopwatch_start();
