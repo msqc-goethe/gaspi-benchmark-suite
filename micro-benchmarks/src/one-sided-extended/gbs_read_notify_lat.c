@@ -63,7 +63,7 @@ int main(int argc, char* argv[]) {
 			}
 			time = stopwatch_stop(time);
 		}
-		print_result_lat(my_id, time, size);
+		print_result_lat(my_id, time/1e3, size);
 		free_gaspi_memory(segment_id);
 	}
 	return EXIT_SUCCESS;

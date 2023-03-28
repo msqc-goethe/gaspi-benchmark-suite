@@ -56,7 +56,7 @@ int main(int argc, char* argv[]) {
 		}
 	}
 	time = stopwatch_stop(time);
-	print_atomic_lat(my_id, old_value, new_value, time);
+	print_atomic_lat(my_id, old_value, new_value, time/1e3);
 	free_gaspi_memory(segment_id);
 
 	return EXIT_SUCCESS;

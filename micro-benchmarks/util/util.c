@@ -99,9 +99,9 @@ void print_header(const gaspi_rank_t id) {
 				        FIELD_WIDTH,
 				        "new_value",
 				        FIELD_WIDTH,
-				        "Latency[ns]");
+				        "Latency[us]");
 			else if (options.format == CSV)
-				fprintf(stdout, "old_value,new_value,Latency[ns]\n");
+				fprintf(stdout, "old_value,new_value,Latency[us]\n");
 		}
 		else if (options.subtype == LAT) {
 			if (options.format == PLAIN)
@@ -112,7 +112,7 @@ void print_header(const gaspi_rank_t id) {
 				        FIELD_WIDTH,
 				        "Latency[ns]");
 			else if (options.format == CSV)
-				fprintf(stdout, "message_size[B],Latency[ns]\n");
+				fprintf(stdout, "message_size[B],Latency[us]\n");
 		}
 		else if (options.subtype == BW) {
 			if (options.format == PLAIN)
@@ -121,9 +121,9 @@ void print_header(const gaspi_rank_t id) {
 				        10,
 				        "message_size[B]",
 				        FIELD_WIDTH,
-				        "Bandwidth[GB/s]");
+				        "Bandwidth[MB/s]");
 			else if (options.format == CSV)
-				fprintf(stdout, "message_size[B],Bandwidth[GB/s]\n");
+				fprintf(stdout, "message_size[B],Bandwidth[MB/s]\n");
 		}
 		else if (options.subtype == ALLREDUCE) {
 			if (options.format == PLAIN)
@@ -134,15 +134,15 @@ void print_header(const gaspi_rank_t id) {
 				        FIELD_WIDTH,
 				        "#ranks",
 				        FIELD_WIDTH,
-				        "min_time[ns]",
+				        "min_time[us]",
 				        FIELD_WIDTH,
-				        "avg_time[ns]",
+				        "avg_time[us]",
 				        FIELD_WIDTH,
-				        "max_time[ns]");
+				        "max_time[us]");
 			else if (options.format == CSV)
 				fprintf(stdout,
-				        "#elements,#ranks,min_time[ns],avg_time[ns],max_time["
-				        "ns]\n");
+				        "#elements,#ranks,min_time[us],avg_time[us],max_time["
+				        "us]\n");
 		}
 		else if (options.subtype == BARRIER) {
 			if (options.format == PLAIN)
@@ -151,15 +151,15 @@ void print_header(const gaspi_rank_t id) {
 				        10,
 				        "#ranks",
 				        FIELD_WIDTH,
-				        "min_time[ns]",
+				        "min_time[us]",
 				        FIELD_WIDTH,
-				        "avg_time[ns]",
+				        "avg_time[us]",
 				        FIELD_WIDTH,
-				        "max_time[ns]");
+				        "max_time[us]");
 			else if (options.format == CSV)
 				fprintf(stdout,
-				        "#elements,#ranks,min_time[ns],avg_time[ns],max_time["
-				        "ns]\n");
+				        "#elements,#ranks,min_time[us],avg_time[us],max_time["
+				        "us]\n");
 		}
 		fflush(stdout);
 	}
@@ -171,7 +171,7 @@ void print_result_bw(const gaspi_rank_t id,
 	if (id == 0) {
 		size_t bytes = size * options.iterations * options.window_size;
 		double bw = (double) bytes / time;
-
+		bw *= 1e3;
 		if (options.format == PLAIN) {
 			fprintf(stdout,
 			        "%-*d%*.*f\n",
