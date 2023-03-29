@@ -16,7 +16,7 @@ int main(int argc, char* argv[]) {
 	GASPI_CHECK(gaspi_proc_init(GASPI_BLOCK));
 	GASPI_CHECK(gaspi_proc_rank(&my_id));
 	GASPI_CHECK(gaspi_proc_num(&num_pes));
-	GASPI_CHECK(gaspi_group_commit(GASPI_GROUP_ALL, GASPI_BLOCK));
+
 	bo_ret = benchmark_options(argc, argv);
 
 	switch (bo_ret) {
@@ -39,15 +39,16 @@ int main(int argc, char* argv[]) {
 	const gaspi_notification_id_t notification_id = 0;
 
 	print_header(my_id);
-
 	int window_size = options.window_size;
 	for (size = options.min_message_size; size <= options.max_message_size;
 	     size *= 2) {
 		allocate_gaspi_memory(segment_id, size * window_size * sizeof(char),'a');
 		if (my_id == 0) {
 			for (i = 0; i < options.iterations + options.skip; ++i) {
-				if (i == options.skip)
+				if (i == options.skip){
+					GASPI_CHECK(gaspi_wait(q_id,GASPI_BLOCK));
 					time = stopwatch_start();
+				}
 				for (j = 0; j < window_size; ++j) {
 					GASPI_CHECK(gaspi_read_notify(segment_id,
 					                        j * size,
