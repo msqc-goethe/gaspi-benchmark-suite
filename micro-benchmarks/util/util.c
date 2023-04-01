@@ -1,5 +1,6 @@
 #include "util.h"
 #include "check.h"
+#include "math.h"
 
 struct benchmark_options_t options;
 struct bad_usage_t bad_usage;
@@ -106,24 +107,48 @@ void print_header(const gaspi_rank_t id) {
 		else if (options.subtype == LAT) {
 			if (options.format == PLAIN)
 				fprintf(stdout,
-				        "%-*s%*s\n",
+				        "%-*s%*s%*s%*s%*s%*s%*s\n",
 				        10,
-				        "message_size[B]",
+				        "msg_size",
 				        FIELD_WIDTH,
-				        "Latency[ns]");
+				        "min_lat",
+				        FIELD_WIDTH,
+				        "max_lat",
+				        FIELD_WIDTH,
+				        "avg_lat",
+				        FIELD_WIDTH,
+				        "median_lat",
+				        FIELD_WIDTH,
+				        "var_lat",
+				        FIELD_WIDTH,
+				        "std_lat");
 			else if (options.format == CSV)
-				fprintf(stdout, "message_size[B],Latency[us]\n");
+				fprintf(stdout,
+				        "msg_size,min_lat,max_lat,avg_lat,median_lat,var_lat,"
+				        "std_lat\n");
 		}
 		else if (options.subtype == BW) {
 			if (options.format == PLAIN)
 				fprintf(stdout,
-				        "%-*s%*s\n",
+				        "%-*s%*s%*s%*s%*s%*s%*s\n",
 				        10,
-				        "message_size[B]",
+				        "msg_size",
 				        FIELD_WIDTH,
-				        "Bandwidth[MB/s]");
+				        "min_bw",
+				        FIELD_WIDTH,
+				        "max_bw",
+				        FIELD_WIDTH,
+				        "avg_bw",
+				        FIELD_WIDTH,
+				        "median_bw",
+				        FIELD_WIDTH,
+				        "var_bw",
+				        FIELD_WIDTH,
+				        "std_bw");
 			else if (options.format == CSV)
-				fprintf(stdout, "message_size[B],Bandwidth[MB/s]\n");
+				fprintf(
+				    stdout,
+				    "msg_size,min_bw,max_bw,avg_bw,median_bw,var_bw,std_bw\n");
 		}
 		else if (options.subtype == ALLREDUCE) {
 			if (options.format == PLAIN)
@@ -165,46 +190,101 @@ void print_header(const gaspi_rank_t id) {
 	}
 }
 
-void print_result_bw(const gaspi_rank_t id,
-                     const double time,
-                     const size_t size) {
-	if (id == 0) {
-		size_t bytes = size * options.iterations * options.window_size;
-		double bw = (double) bytes / time;
-		bw *= 1e3;
-		if (options.format == PLAIN) {
-			fprintf(stdout,
-			        "%-*d%*.*f\n",
-			        10,
-			        size,
-			        FIELD_WIDTH,
-			        FLOAT_PRECISION,
-			        bw);
-		}
-		else if (options.format == CSV) {
-			fprintf(stdout, "%d,%.*f\n", size, FLOAT_PRECISION, bw);
-		}
-		fflush(stdout);
-	}
+static int less(const void* a, const void* b) {
+	return *((const double*) (a)) < *((const double*) (b));
 }
 
-void print_result_lat(const gaspi_rank_t id,
-                      const double time,
-                      const size_t size) {
-	if (id == 0) {
-		double tmp = time / (double) (options.iterations * options.window_size);
+void compute_statistics(struct measurements_t measurements,
+                        struct statistics_t* statistics,
+                        const size_t size) {
+	int n, i;
+	double sum = 0;
+	double* t;
 
+	n = measurements.n;
+	t = measurements.time;
+
+	if (options.subtype == BW) {
+		for (i = 0; i < n; ++i) {
+			t[i] = (double) size / t[i];
+			t[i] *= 1e3; // MB/s
+		}
+	}
+	else if (options.subtype == LAT) {
+		for (i = 0; i < n; ++i) {
+			t[i] *= 1e-3; // ns to us
+		}
+	}
+
+	qsort(t, n, sizeof *t, less);
+
+	statistics->min = t[0];
+	statistics->max = t[n - 1];
+
+	for (i = 0; i < n; ++i) {
+		sum += t[i];
+	}
+
+	statistics->avg = sum / n;
+	statistics->median = t[n / 2];
+
+	sum = 0;
+
+	for (i = 0; i < n; ++i) {
+		sum += (t[i] - statistics->avg) * (t[i] - statistics->avg);
+	}
+
+	statistics->var = sum / n;
+	statistics->std = sqrt(statistics->var);
+}
+
+void print_result(const gaspi_rank_t id,
+                  struct measurements_t measurements,
+                  const size_t size) {
+	if (id == 0) {
+		struct statistics_t statistics;
+		size_t bytes = size * options.window_size;
+		compute_statistics(measurements, &statistics, bytes);
 		if (options.format == PLAIN) {
 			fprintf(stdout,
-			        "%-*d%*.*f\n",
+			        "%-*d%*.*f%*.*f%*.*f%*.*f%*.*f%*.*f\n",
 			        10,
 			        size,
 			        FIELD_WIDTH,
 			        FLOAT_PRECISION,
-			        tmp);
+			        statistics.min,
+			        FIELD_WIDTH,
+			        FLOAT_PRECISION,
+			        statistics.max,
+			        FIELD_WIDTH,
+			        FLOAT_PRECISION,
+			        statistics.avg,
+			        FIELD_WIDTH,
+			        FLOAT_PRECISION,
+			        statistics.median,
+			        FIELD_WIDTH,
+			        FLOAT_PRECISION,
+			        statistics.var,
+			        FIELD_WIDTH,
+			        FLOAT_PRECISION,
+			        statistics.std);
 		}
 		else if (options.format == CSV) {
-			fprintf(stdout, "%d,%.*f\n", size, FLOAT_PRECISION, tmp);
+			fprintf(stdout,
+			        "%d,%.*f%.*f%.*f%.*f%.*f%.*f\n",
+			        size,
+			        FLOAT_PRECISION,
+			        statistics.min,
+			        FLOAT_PRECISION,
+			        statistics.max,
+			        FLOAT_PRECISION,
+			        statistics.avg,
+			        FLOAT_PRECISION,
+			        statistics.median,
+			        FLOAT_PRECISION,
+			        statistics.std,
+			        FLOAT_PRECISION,
+			        statistics.var);
 		}
 		fflush(stdout);
 	}

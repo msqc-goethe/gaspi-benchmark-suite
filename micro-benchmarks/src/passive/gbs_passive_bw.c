@@ -9,6 +9,7 @@ int main(int argc, char* argv[]) {
 	int i, j;
 	int bo_ret = OPTIONS_OKAY;
 	double time;
+	struct measurements_t measurements;
 
 	options.type = PASSIVE;
 	options.subtype = BW;
@@ -34,6 +35,9 @@ int main(int argc, char* argv[]) {
 		return EXIT_FAILURE;
 	}
 
+	measurements.time = malloc(options.iterations * sizeof(double));
+	measurements.n = options.iterations;
+
 	const gaspi_segment_id_t segment_id = 0;
 	const gaspi_queue_id_t q_id = 0;
 	gaspi_rank_t remote_id;
@@ -46,8 +50,8 @@ int main(int argc, char* argv[]) {
 		allocate_gaspi_memory(
 		    segment_id, size * window_size * sizeof(char), 'a');
 		for (i = 0; i < options.iterations + options.skip; ++i) {
-			if (i == options.skip){
-				GASPI_CHECK(gaspi_wait(q_id,GASPI_BLOCK));
+			if (i == options.skip) {
+				GASPI_CHECK(gaspi_wait(q_id, GASPI_BLOCK));
 				time = stopwatch_start();
 			}
 			if (my_id == 0) {
@@ -55,8 +59,8 @@ int main(int argc, char* argv[]) {
 					GASPI_CHECK(gaspi_passive_send(
 					    segment_id, j * size, 1, size, GASPI_BLOCK));
 				}
-				GASPI_CHECK(
-				    gaspi_passive_receive(segment_id, 0, &remote_id, 1, GASPI_BLOCK));
+				GASPI_CHECK(gaspi_passive_receive(
+				    segment_id, 0, &remote_id, 1, GASPI_BLOCK));
 			}
 			else if (my_id == 1) {
 				for (j = 0; j < window_size; ++j) {
@@ -66,10 +70,13 @@ int main(int argc, char* argv[]) {
 				GASPI_CHECK(
 				    gaspi_passive_send(segment_id, 0, 0, 1, GASPI_BLOCK));
 			}
+			if (i >= options.skip) {
+				measurements.time[i - options.skip] = stopwatch_stop(time);
+			}
 		}
-		time = stopwatch_stop(time);
-		print_result_bw(my_id, time, size);
+		print_result(my_id, measurements, size);
 		free_gaspi_memory(segment_id);
 	}
+	free(measurements.time);
 	return EXIT_SUCCESS;
 }

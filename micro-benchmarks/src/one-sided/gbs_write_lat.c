@@ -9,6 +9,7 @@ int main(int argc, char* argv[]) {
 	int i, j;
 	int bo_ret = OPTIONS_OKAY;
 	double time;
+	struct measurements_t measurements;
 
 	options.type = ONESIDED;
 	options.subtype = LAT;
@@ -34,6 +35,9 @@ int main(int argc, char* argv[]) {
 		return EXIT_FAILURE;
 	}
 
+	measurements.time = malloc(options.iterations * sizeof(double));
+	measurements.n = options.iterations;
+
 	const gaspi_segment_id_t segment_id = 0;
 	const gaspi_queue_id_t q_id = 0;
 
@@ -42,11 +46,13 @@ int main(int argc, char* argv[]) {
 	int window_size = options.window_size;
 	for (size = options.min_message_size; size <= options.max_message_size;
 	     size *= 2) {
-		allocate_gaspi_memory(segment_id, size * window_size * sizeof(char),'a');
+		allocate_gaspi_memory(
+		    segment_id, size * window_size * sizeof(char), 'a');
 		if (my_id == 0) {
 			for (i = 0; i < options.iterations + options.skip; ++i) {
-				if (i == options.skip)
+				if (i >= options.skip) {
 					time = stopwatch_start();
+				}
 				for (j = 0; j < window_size; ++j) {
 					GASPI_CHECK(gaspi_write(segment_id,
 					                        j * size,
@@ -58,11 +64,14 @@ int main(int argc, char* argv[]) {
 					                        GASPI_BLOCK));
 					GASPI_CHECK(gaspi_wait(q_id, GASPI_BLOCK));
 				}
+				if (i >= options.skip) {
+					measurements.time[i - options.skip] = stopwatch_stop(time);
+				}
 			}
-			time = stopwatch_stop(time);
 		}
-		print_result_lat(my_id, time/1e3, size);
+		print_result(my_id, measurements, size);
 		free_gaspi_memory(segment_id);
 	}
+	free(measurements.time);
 	return EXIT_SUCCESS;
 }
