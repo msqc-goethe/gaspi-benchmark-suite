@@ -271,7 +271,7 @@ void print_result(const gaspi_rank_t id,
 		}
 		else if (options.format == CSV) {
 			fprintf(stdout,
-			        "%d,%.*f%.*f%.*f%.*f%.*f%.*f\n",
+			        "%d,%.*f,%.*f,%.*f,%.*f,%.*f,%.*f\n",
 			        size,
 			        FLOAT_PRECISION,
 			        statistics.min,
