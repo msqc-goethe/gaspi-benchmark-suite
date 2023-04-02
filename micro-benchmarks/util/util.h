@@ -75,9 +75,7 @@ void print_result(const gaspi_rank_t id,
 void print_result_coll(const gaspi_rank_t id,
                        const int num_pes,
                        const size_t size,
-                       const double min_time,
-                       const double avg_time,
-                       const double max_time);
+                       struct measurements_t measurements);
 void print_atomic_lat(const gaspi_rank_t id,
                       const char old_value,
                       const char new_value,

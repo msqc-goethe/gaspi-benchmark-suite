@@ -19,14 +19,19 @@ int benchmark_options(int argc, char* argv[]) {
 
 	int option_index = 0;
 	int c;
+	char* optstring = NULL;
 
-	switch (options.type) {
-		case COLLECTIVE:
-			break;
-		case PASSIVE:
-			break;
-		case ONESIDED:
-			break;
+	if (options.type == PASSIVE) {
+		optstring = "chi:w:s:e:u";
+	}
+	else if (options.type == ONESIDED) {
+		optstring = "chi:w:s:e:u";
+	}
+	else if (options.type == ATOMIC) {
+		optstring = "chi:w:s:e:u";
+	}
+	else if (options.type == COLLECTIVE) {
+		optstring = "chi:w:s:e:u";
 	}
 
 	// set default values
@@ -37,9 +42,13 @@ int benchmark_options(int argc, char* argv[]) {
 	options.skip = 10;
 	options.format = PLAIN;
 
+	if (options.subtype == ALLREDUCE) {
+		gaspi_allreduce_elem_max(&c);
+		options.max_message_size = (size_t) c;
+	}
+
 	while (1) {
-		c = getopt_long(
-		    argc, argv, "chvi:w:s:e:u:", long_options, &option_index);
+		c = getopt_long(argc, argv, optstring, long_options, &option_index);
 		if (c == -1)
 			break;
 		switch (c) {
@@ -153,45 +162,53 @@ void print_header(const gaspi_rank_t id) {
 		else if (options.subtype == ALLREDUCE) {
 			if (options.format == PLAIN)
 				fprintf(stdout,
-				        "%-*s%*s%*s%*s%*s\n",
+				        "%-*s%*s%*s%*s%*s%*s%*s\n",
 				        10,
 				        "#elements",
 				        FIELD_WIDTH,
 				        "#ranks",
 				        FIELD_WIDTH,
-				        "min_time[us]",
+				        "min_lat",
 				        FIELD_WIDTH,
-				        "avg_time[us]",
+				        "max_lat",
 				        FIELD_WIDTH,
-				        "max_time[us]");
+				        "avg_lat",
+				        FIELD_WIDTH,
+				        "var_lat",
+				        FIELD_WIDTH,
+				        "std_lat");
 			else if (options.format == CSV)
 				fprintf(stdout,
-				        "#elements,#ranks,min_time[us],avg_time[us],max_time["
-				        "us]\n");
+				        "#elements,#ranks,min_lat,max_lat,avg_lat,var_lat,std_"
+				        "lat\n");
 		}
 		else if (options.subtype == BARRIER) {
 			if (options.format == PLAIN)
 				fprintf(stdout,
-				        "%-*s%*s%*s%*s\n",
+				        "%-*s%*s%*s%*s%*s%*s\n",
 				        10,
 				        "#ranks",
 				        FIELD_WIDTH,
-				        "min_time[us]",
+				        "min_lat",
 				        FIELD_WIDTH,
-				        "avg_time[us]",
+				        "max_lat",
 				        FIELD_WIDTH,
-				        "max_time[us]");
+				        "avg_lat",
+				        FIELD_WIDTH,
+				        "var_lat",
+				        FIELD_WIDTH,
+				        "std_lat");
 			else if (options.format == CSV)
 				fprintf(stdout,
-				        "#elements,#ranks,min_time[us],avg_time[us],max_time["
-				        "us]\n");
+				        "#elements,#ranks,min_lat,max_lat,avg_lat,var_lat,std_"
+				        "lat\n");
 		}
 		fflush(stdout);
 	}
 }
 
-static int less(const void* a, const void* b) {
-	return *((const double*) (a)) < *((const double*) (b));
+static int double_cmp(const void* a, const void* b) {
+	return *((const double*) (a)) > *((const double*) (b));
 }
 
 void compute_statistics(struct measurements_t measurements,
@@ -210,13 +227,14 @@ void compute_statistics(struct measurements_t measurements,
 			t[i] *= 1e3; // MB/s
 		}
 	}
-	else if (options.subtype == LAT) {
+	else if (options.subtype == LAT || options.subtype == ALLREDUCE ||
+	         options.subtype == BARRIER) {
 		for (i = 0; i < n; ++i) {
 			t[i] *= 1e-3; // ns to us
 		}
 	}
 
-	qsort(t, n, sizeof *t, less);
+	qsort(t, n, sizeof *t, double_cmp);
 
 	statistics->min = t[0];
 	statistics->max = t[n - 1];
@@ -293,67 +311,87 @@ void print_result(const gaspi_rank_t id,
 void print_result_coll(const gaspi_rank_t id,
                        const int num_pes,
                        const size_t size,
-                       const double min_time,
-                       const double avg_time,
-                       const double max_time) {
+                       struct measurements_t measurements) {
 	if (id == 0) {
+		struct statistics_t statistics;
+		compute_statistics(measurements, &statistics, 0);
 		if (options.subtype == ALLREDUCE) {
 			if (options.format == PLAIN) {
 				fprintf(stdout,
-				        "%-*d%*d%*.*f%*.*f%*.*f\n",
+				        "%-*d%*d%*.*f%*.*f%*.*f%*.*f%*.*f\n",
 				        10,
 				        size,
 				        FIELD_WIDTH,
 				        num_pes,
 				        FIELD_WIDTH,
 				        FLOAT_PRECISION,
-				        min_time,
+				        statistics.min,
 				        FIELD_WIDTH,
 				        FLOAT_PRECISION,
-				        avg_time,
+				        statistics.max,
 				        FIELD_WIDTH,
 				        FLOAT_PRECISION,
-				        max_time);
+				        statistics.avg,
+				        FIELD_WIDTH,
+				        FLOAT_PRECISION,
+				        statistics.var,
+				        FIELD_WIDTH,
+				        FLOAT_PRECISION,
+				        statistics.std);
 			}
 			else if (options.format == CSV) {
 				fprintf(stdout,
-				        "%d,%d,%*.*f,%*.*f,%*.*f\n",
+				        "%d,%d,%*.*f,%*.*f,%*.*f,%*.*f,%*.*f\n",
 				        size,
 				        num_pes,
 				        FLOAT_PRECISION,
-				        min_time,
+				        statistics.min,
 				        FLOAT_PRECISION,
-				        avg_time,
+				        statistics.max,
 				        FLOAT_PRECISION,
-				        min_time);
+				        statistics.avg,
+				        FLOAT_PRECISION,
+				        statistics.var,
+				        FLOAT_PRECISION,
+				        statistics.std);
 			}
 		}
 		else if (options.subtype == BARRIER) {
 			if (options.format == PLAIN) {
 				fprintf(stdout,
-				        "%-*d%*.*f%*.*f%*.*f\n",
+				        "%-*d%*.*f%*.*f%*.*f%*.*f%*.*f\n",
 				        10,
 				        num_pes,
 				        FIELD_WIDTH,
 				        FLOAT_PRECISION,
-				        min_time,
+				        statistics.min,
 				        FIELD_WIDTH,
 				        FLOAT_PRECISION,
-				        avg_time,
+				        statistics.max,
 				        FIELD_WIDTH,
 				        FLOAT_PRECISION,
-				        max_time);
+				        statistics.avg,
+				        FIELD_WIDTH,
+				        FLOAT_PRECISION,
+				        statistics.var,
+				        FIELD_WIDTH,
+				        FLOAT_PRECISION,
+				        statistics.std);
 			}
 			else if (options.format == CSV) {
 				fprintf(stdout,
-				        "%d,%*.*f,%*.*f,%*.*f\n",
+				        "%d,%*.*f,%*.*f,%*.*f,%*.*f,%*.*f\n",
 				        num_pes,
 				        FLOAT_PRECISION,
-				        min_time,
+				        statistics.min,
 				        FLOAT_PRECISION,
-				        avg_time,
+				        statistics.max,
 				        FLOAT_PRECISION,
-				        min_time);
+				        statistics.avg,
+				        FLOAT_PRECISION,
+				        statistics.var,
+				        FLOAT_PRECISION,
+				        statistics.std);
 			}
 		}
 		fflush(stdout);
