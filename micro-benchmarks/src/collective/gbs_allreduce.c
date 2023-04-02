@@ -11,7 +11,8 @@ int main(int argc, char* argv[]) {
 	int bo_ret = OPTIONS_OKAY;
 	float* send_buffer;
 	float* recv_buffer;
-	double time, min_time, max_time, avg_time;
+	struct measurements_t measurements;
+	double time;
 
 	options.type = COLLECTIVE;
 	options.subtype = ALLREDUCE;
@@ -36,14 +37,20 @@ int main(int argc, char* argv[]) {
 		return EXIT_FAILURE;
 	}
 
+	measurements.time = malloc(options.iterations * sizeof(double));
+	measurements.n = options.iterations;
+
 	print_header(my_id);
 
 	GASPI_CHECK(gaspi_allreduce_elem_max(&max_elem));
 
 	for (size = options.min_message_size; size <= options.max_message_size;
 	     size *= 2) {
-		if(size >= max_elem){
-			fprintf(stderr,"%d elements exceede limit of %d for gaspi_allreduce!\n",size,max_elem);
+		if (size >= max_elem) {
+			fprintf(stderr,
+			        "%d elements exceede limit of %d for gaspi_allreduce!\n",
+			        size,
+			        max_elem);
 			return EXIT_FAILURE;
 		}
 		allocate_memory((void**) &send_buffer, size * sizeof(float));
@@ -52,7 +59,7 @@ int main(int argc, char* argv[]) {
 		GASPI_CHECK(gaspi_barrier(GASPI_GROUP_ALL, GASPI_BLOCK));
 
 		for (i = 0; i < options.iterations + options.skip; ++i) {
-			if (i == options.skip) {
+			if (i >= options.skip) {
 				time = stopwatch_start();
 			}
 			GASPI_CHECK(gaspi_allreduce(send_buffer,
@@ -62,35 +69,14 @@ int main(int argc, char* argv[]) {
 			                            GASPI_TYPE_FLOAT,
 			                            GASPI_GROUP_ALL,
 			                            GASPI_BLOCK));
+			if (i >= options.skip) {
+				measurements.time[i - options.skip] = stopwatch_stop(time);
+			}
 		}
-		time = stopwatch_stop(time);
-		GASPI_CHECK(gaspi_allreduce(&time,
-		                            &min_time,
-		                            1,
-		                            GASPI_OP_MIN,
-		                            GASPI_TYPE_DOUBLE,
-		                            GASPI_GROUP_ALL,
-		                            GASPI_BLOCK));
-		GASPI_CHECK(gaspi_allreduce(&time,
-		                            &max_time,
-		                            1,
-		                            GASPI_OP_MAX,
-		                            GASPI_TYPE_DOUBLE,
-		                            GASPI_GROUP_ALL,
-		                            GASPI_BLOCK));
-		GASPI_CHECK(gaspi_allreduce(&time,
-		                            &avg_time,
-		                            1,
-		                            GASPI_OP_SUM,
-		                            GASPI_TYPE_DOUBLE,
-		                            GASPI_GROUP_ALL,
-		                            GASPI_BLOCK));
-		min_time /= options.iterations;
-		avg_time /= options.iterations * num_pes;
-		max_time /= options.iterations;
-		print_result_coll(my_id, num_pes, size, min_time, avg_time, max_time);
+		print_result_coll(my_id, num_pes, size, measurements);
 		free_memory(send_buffer);
 		free_memory(recv_buffer);
 	}
+	free(measurements.time);
 	return EXIT_SUCCESS;
 }
