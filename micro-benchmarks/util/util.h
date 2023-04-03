@@ -8,13 +8,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifndef MIN
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
-#endif
-#ifndef MAX
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
-#endif
-
 #ifndef FIELD_WIDTH
 #define FIELD_WIDTH 20
 #endif
@@ -29,7 +22,7 @@ enum benchmark_type { COLLECTIVE = 0, PASSIVE, ONESIDED, ATOMIC };
 
 enum benchmark_subtype { BW = 0, LAT, ALLREDUCE, BARRIER };
 
-enum output_format { PLAIN = 0, CSV };
+enum output_format { PLAIN = 0, CSV, RAW_CSV };
 
 struct measurements_t {
 	double* time;
@@ -77,9 +70,9 @@ void print_result_coll(const gaspi_rank_t id,
                        const size_t size,
                        struct measurements_t measurements);
 void print_atomic_lat(const gaspi_rank_t id,
-                      const char old_value,
-                      const char new_value,
-                      const double time);
+                      char const* old_value,
+                      char const* new_value,
+                      struct measurements_t measurements);
 
 extern struct benchmark_options_t options;
 extern struct bad_usage_t bad_usage;

@@ -8,9 +8,10 @@ int main(int argc, char* argv[]) {
 	size_t size;
 	int i, j;
 	int bo_ret = OPTIONS_OKAY;
+	struct measurements_t measurements;
 	double time;
-	char* new_value;
-
+	char *old, *new;
+	char* segment_ptr;
 	options.type = ATOMIC;
 	options.subtype = LAT;
 
@@ -35,28 +36,39 @@ int main(int argc, char* argv[]) {
 		return EXIT_FAILURE;
 	}
 
+	old = malloc(options.iterations * sizeof(char));
+	new = malloc(options.iterations * sizeof(char));
+	measurements.time = malloc(options.iterations * sizeof(double));
+	measurements.n = options.iterations;
+
 	const gaspi_segment_id_t segment_id = 0;
 	gaspi_atomic_value_t old_value;
 
 	print_header(my_id);
 
 	allocate_gaspi_memory(segment_id, sizeof(char), 'a');
+	GASPI_CHECK(gaspi_segment_ptr(segment_id, (void**) &segment_ptr));
 	for (i = 0; i < options.iterations + options.skip; ++i) {
-		if (i == options.skip)
-			time = stopwatch_start();
 		if (my_id == 0) {
+			if (i >= options.skip) {
+				time = stopwatch_start();
+			}
 			GASPI_CHECK(gaspi_atomic_fetch_add(
 			    segment_id, 0, 1, 1, &old_value, GASPI_BLOCK));
+			if (i >= options.skip) {
+				measurements.time[i - options.skip] = stopwatch_stop(time);
+				old[i - options.skip] = old_value;
+				GASPI_CHECK(gaspi_read(
+				    segment_id, 0, 1, segment_id, 0, 1, 0, GASPI_BLOCK));
+				GASPI_CHECK(gaspi_wait(0, GASPI_BLOCK));
+				new[i - options.skip] = *segment_ptr;
+			}
 		}
 	}
-	time = stopwatch_stop(time);
-	if (my_id == 0) {
-		GASPI_CHECK(
-		    gaspi_read(segment_id, 0, 1, segment_id, 0, 1, 0, GASPI_BLOCK));
-		GASPI_CHECK(gaspi_wait(0, GASPI_BLOCK));
-		GASPI_CHECK(gaspi_segment_ptr(segment_id, (void**) &new_value));
-		print_atomic_lat(my_id, old_value, *new_value, time/1e3);
-	}
+	print_atomic_lat(my_id, old, new, measurements);
 	free_gaspi_memory(segment_id);
+	free(measurements.time);
+	free(old);
+	free(new);
 	return EXIT_SUCCESS;
 }
