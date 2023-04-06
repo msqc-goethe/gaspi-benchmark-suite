@@ -34,6 +34,9 @@ int benchmark_options(int argc, char* argv[]) {
 	else if (options.type == COLLECTIVE) {
 		optstring = "chi:w:s:e:u";
 	}
+	else if (options.type == NOTIFY) {
+		optstring = "chi:w:s:e:u";
+	}
 
 	// set default values
 	options.window_size = 64;
@@ -107,7 +110,7 @@ void print_header(const gaspi_rank_t id) {
 		if (options.type == ATOMIC) {
 			if (options.format == PLAIN)
 				fprintf(stdout,
-				        "%-*s%*s%*s%*s%*s%*s%*s\n",
+				        "%-*s%*s%*s%*s%*s%*s%*s%*s\n",
 				        10,
 				        "old_value",
 				        FIELD_WIDTH,
@@ -128,6 +131,32 @@ void print_header(const gaspi_rank_t id) {
 				        "std_lat\n");
 			else if (options.format == RAW_CSV) {
 				fprintf(stdout, "old,new,count,lat\n");
+			}
+		}
+		else if (options.type == NOTIFY) {
+			if (options.format == PLAIN) {
+				fprintf(stdout,
+				        "%-*s%*s%*s%*s%*s%*s\n",
+				        10,
+				        "notification_rate",
+				        FIELD_WIDTH,
+				        "min_lat",
+				        FIELD_WIDTH,
+				        "max_lat",
+				        FIELD_WIDTH,
+				        "avg_lat",
+				        FIELD_WIDTH,
+				        "var_lat",
+				        FIELD_WIDTH,
+				        "std_lat");
+			}
+			else if (options.format == CSV) {
+				fprintf(stdout,
+				        "notification_rate,min_lat,max_lat,avg_"
+				        "lat,var_lat,std_lat\n");
+			}
+			else if (options.format == RAW_CSV) {
+				fprintf(stdout, "count,lat\n");
 			}
 		}
 		else if (options.subtype == LAT) {
@@ -354,7 +383,7 @@ void print_result_coll(const gaspi_rank_t id,
 		if (options.subtype == ALLREDUCE) {
 			if (options.format == PLAIN) {
 				fprintf(stdout,
-				        "%-*d%*d%*.*f%*.*f%*.*f%*.*f%*.*f\n",
+				        "%-*d%*d%*.*f%*.*f%*.*f%*.*f%*.*f%*.*f\n",
 				        10,
 				        size,
 				        FIELD_WIDTH,
@@ -370,6 +399,8 @@ void print_result_coll(const gaspi_rank_t id,
 				        statistics.avg,
 				        FIELD_WIDTH,
 				        FLOAT_PRECISION,
+				        statistics.median FIELD_WIDTH,
+				        FLOAT_PRECISION,
 				        statistics.var,
 				        FIELD_WIDTH,
 				        FLOAT_PRECISION,
@@ -377,7 +408,7 @@ void print_result_coll(const gaspi_rank_t id,
 			}
 			else if (options.format == CSV) {
 				fprintf(stdout,
-				        "%d,%d,%*.*f,%*.*f,%*.*f,%*.*f,%*.*f\n",
+				        "%d,%d,%.*f,%.*f,%.*f,%.*f,%.*f,%.*f\n",
 				        size,
 				        num_pes,
 				        FLOAT_PRECISION,
@@ -386,6 +417,8 @@ void print_result_coll(const gaspi_rank_t id,
 				        statistics.max,
 				        FLOAT_PRECISION,
 				        statistics.avg,
+				        FLOAT_PRECISION,
+				        statistics.median,
 				        FLOAT_PRECISION,
 				        statistics.var,
 				        FLOAT_PRECISION,
@@ -395,7 +428,7 @@ void print_result_coll(const gaspi_rank_t id,
 		else if (options.subtype == BARRIER) {
 			if (options.format == PLAIN) {
 				fprintf(stdout,
-				        "%-*d%*.*f%*.*f%*.*f%*.*f%*.*f\n",
+				        "%-*d%*.*f%*.*f%*.*f%*.*f%*.*f%*.*f\n",
 				        10,
 				        num_pes,
 				        FIELD_WIDTH,
@@ -409,6 +442,9 @@ void print_result_coll(const gaspi_rank_t id,
 				        statistics.avg,
 				        FIELD_WIDTH,
 				        FLOAT_PRECISION,
+				        statistics.median,
+				        FIELD_WIDTH,
+				        FLOAT_PRECISION,
 				        statistics.var,
 				        FIELD_WIDTH,
 				        FLOAT_PRECISION,
@@ -416,7 +452,7 @@ void print_result_coll(const gaspi_rank_t id,
 			}
 			else if (options.format == CSV) {
 				fprintf(stdout,
-				        "%d,%*.*f,%*.*f,%*.*f,%*.*f,%*.*f\n",
+				        "%d,%.*f,%.*f,%.*f,%.*f,%.*f,%.*f\n",
 				        num_pes,
 				        FLOAT_PRECISION,
 				        statistics.min,
@@ -425,9 +461,74 @@ void print_result_coll(const gaspi_rank_t id,
 				        FLOAT_PRECISION,
 				        statistics.avg,
 				        FLOAT_PRECISION,
+				        statistics.median,
+				        FLOAT_PRECISION,
 				        statistics.var,
 				        FLOAT_PRECISION,
 				        statistics.std);
+			}
+		}
+		fflush(stdout);
+	}
+}
+
+void print_notify_lat(const gaspi_rank_t id,
+                      struct measurements_t measurements) {
+	struct statistics_t statistics;
+	double rate;
+	int i;
+	if (id == 0) {
+		compute_statistics(measurements, &statistics, 0);
+		rate = 1 / (statistics.avg * 1e-6);
+		if (options.format == PLAIN) {
+			fprintf(stdout,
+			        "%-*f%*.*f%*.*f%*.*f%*.*f%*.*f%*.*f\n",
+			        10,
+			        rate,
+			        FIELD_WIDTH,
+			        FLOAT_PRECISION,
+			        statistics.min,
+			        FIELD_WIDTH,
+			        FLOAT_PRECISION,
+			        statistics.max,
+			        FIELD_WIDTH,
+			        FLOAT_PRECISION,
+			        statistics.avg,
+			        FIELD_WIDTH,
+			        FLOAT_PRECISION,
+			        statistics.median,
+			        FIELD_WIDTH,
+			        FLOAT_PRECISION,
+			        statistics.var,
+			        FIELD_WIDTH,
+			        FLOAT_PRECISION,
+			        statistics.std);
+		}
+		else if (options.format == CSV) {
+			fprintf(stdout,
+			        "%.*f,%.*f,%.*f,%.*f,%.*f,%.*f,%.*f\n",
+			        FLOAT_PRECISION,
+			        rate,
+			        FLOAT_PRECISION,
+			        statistics.min,
+			        FLOAT_PRECISION,
+			        statistics.max,
+			        FLOAT_PRECISION,
+			        statistics.avg,
+			        FLOAT_PRECISION,
+			        statistics.median,
+			        FLOAT_PRECISION,
+			        statistics.var,
+			        FLOAT_PRECISION,
+			        statistics.std);
+		}
+		else if (options.format == RAW_CSV) {
+			for (i = 0; i < measurements.n; ++i) {
+				fprintf(stdout,
+				        "%d,%.*f\n",
+				        i,
+				        FLOAT_PRECISION,
+				        measurements.time[i]);
 			}
 		}
 		fflush(stdout);
@@ -444,7 +545,7 @@ void print_atomic_lat(const gaspi_rank_t id,
 		compute_statistics(measurements, &statistics, 0);
 		if (options.format == PLAIN) {
 			fprintf(stdout,
-			        "%-*c%*c%*.*f%*.*f%*.*f%*.*f%*.*f\n",
+			        "%-*c%*c%*.*f%*.*f%*.*f%*.*f%*.*f%*.*f\n",
 			        10,
 			        *old,
 			        FIELD_WIDTH,
@@ -460,6 +561,9 @@ void print_atomic_lat(const gaspi_rank_t id,
 			        statistics.avg,
 			        FIELD_WIDTH,
 			        FLOAT_PRECISION,
+			        statistics.median,
+			        FIELD_WIDTH,
+			        FLOAT_PRECISION,
 			        statistics.var,
 			        FIELD_WIDTH,
 			        FLOAT_PRECISION,
@@ -467,7 +571,7 @@ void print_atomic_lat(const gaspi_rank_t id,
 		}
 		else if (options.format == CSV) {
 			fprintf(stdout,
-			        "%c,%c,%.*f,%.*f,%.*f,%.*f,%.*f\n",
+			        "%c,%c,%.*f,%.*f,%.*f,%.*f,%.*f,%.*f\n",
 			        *old,
 			        *new,
 			        FLOAT_PRECISION,
@@ -476,6 +580,8 @@ void print_atomic_lat(const gaspi_rank_t id,
 			        statistics.max,
 			        FLOAT_PRECISION,
 			        statistics.avg,
+			        FLOAT_PRECISION,
+			        statistics.median,
 			        FLOAT_PRECISION,
 			        statistics.var,
 			        FLOAT_PRECISION,
