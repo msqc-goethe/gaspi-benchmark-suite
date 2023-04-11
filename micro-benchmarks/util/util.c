@@ -103,8 +103,36 @@ void print_bad_usage(const gaspi_rank_t id) {
 
 void print_help_message(const gaspi_rank_t id) {
 	if (id == 0) {
-		fprintf(stdout, "Help Message\n");
+		fprintf(stdout, "GASPI Micro Benchmark:\n");
+		fprintf(stdout, "%s:\n", options.name);
 		fprintf(stdout, "\n");
+		fprintf(stdout, "\t -h [--help]\tDisplay this help message.\n");
+
+		if (options.subtype != BARRIER && options.type != ATOMIC &&
+		    options.type != NOTIFY) {
+			fprintf(stdout,
+			        "\t -w [--window_size] arg\tNumber of messages sent per "
+			        "iteration. Default 64.\n");
+			fprintf(stdout,
+			        "\t -s [--min_message_size] arg\t Minimum message size. "
+			        "Default 1 byte.\n");
+			fprintf(stdout,
+			        "\t -e [--max_message_size] arg\t Maximum message size. "
+			        "Default (1 << 22) byte.\n");
+		}
+
+		fprintf(
+		    stdout,
+		    "\t -i [--iterations] arg\tNumber of iterations. Default 10.\n");
+		fprintf(stdout,
+		        "\t -u [--warmup-iterations] arg\tNumber of warmup iterations. "
+		        "Default 10.\n");
+		fprintf(stdout,
+		        "\t --csv\tPrint output in csv format with statistics.\n");
+		fprintf(
+		    stdout,
+		    "\t --raw_csv\tPrint the collected raw data without statistics.\n");
+		fprintf(stdout, "\n\n");
 		fflush(stdout);
 	}
 }

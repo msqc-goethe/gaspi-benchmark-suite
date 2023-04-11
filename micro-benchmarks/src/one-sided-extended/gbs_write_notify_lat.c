@@ -13,6 +13,7 @@ int main(int argc, char* argv[]) {
 
 	options.type = ONESIDED;
 	options.subtype = LAT;
+	options.name = "gbs_write_notify_lat";
 
 	GASPI_CHECK(gaspi_proc_init(GASPI_BLOCK));
 	GASPI_CHECK(gaspi_proc_rank(&my_id));
@@ -26,12 +27,11 @@ int main(int argc, char* argv[]) {
 			break;
 		case OPTIONS_HELP:
 			print_help_message(my_id);
-			break;
+			return EXIT_SUCCESS;
 	}
 
 	if (num_pes > 2) {
 		fprintf(stderr, "Benchmark requires exactly two processes!\n");
-		gaspi_proc_term(GASPI_BLOCK);
 		return EXIT_FAILURE;
 	}
 

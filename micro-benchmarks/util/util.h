@@ -56,6 +56,8 @@ struct benchmark_options_t {
 
 	size_t min_message_size;
 	size_t max_message_size;
+
+	char* name;
 };
 
 int benchmark_options(int argc, char* argv[]);

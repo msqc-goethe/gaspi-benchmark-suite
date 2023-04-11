@@ -13,6 +13,7 @@ int main(int argc, char* argv[]) {
 
 	options.type = COLLECTIVE;
 	options.subtype = BARRIER;
+	options.name = "gbs_barrier";
 
 	GASPI_CHECK(gaspi_proc_init(GASPI_BLOCK));
 	GASPI_CHECK(gaspi_proc_rank(&my_id));
@@ -26,7 +27,7 @@ int main(int argc, char* argv[]) {
 			break;
 		case OPTIONS_HELP:
 			print_help_message(my_id);
-			break;
+			return EXIT_SUCCESS;
 	}
 
 	if (num_pes < 2) {

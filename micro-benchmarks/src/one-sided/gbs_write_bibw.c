@@ -13,6 +13,7 @@ int main(int argc, char* argv[]) {
 
 	options.type = ONESIDED;
 	options.subtype = BW;
+	options.name = "gbs_write_bibw";
 
 	gaspi_config_t conf;
 
@@ -28,12 +29,11 @@ int main(int argc, char* argv[]) {
 			break;
 		case OPTIONS_HELP:
 			print_help_message(my_id);
-			break;
+			return EXIT_SUCCESS;
 	}
 
 	if (num_pes > 2) {
 		fprintf(stderr, "Benchmark requires exactly two processes!\n");
-		gaspi_proc_term(GASPI_BLOCK);
 		return EXIT_FAILURE;
 	}
 
