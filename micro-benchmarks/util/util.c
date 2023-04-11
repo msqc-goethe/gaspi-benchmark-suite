@@ -23,19 +23,24 @@ int benchmark_options(int argc, char* argv[]) {
 	char* optstring = NULL;
 
 	if (options.type == PASSIVE) {
-		optstring = "chi:w:s:e:u";
+		optstring = "hi:w:s:e:u";
 	}
 	else if (options.type == ONESIDED) {
-		optstring = "chi:w:s:e:u";
+		optstring = "hi:w:s:e:u";
 	}
 	else if (options.type == ATOMIC) {
-		optstring = "chi:w:s:e:u";
+		optstring = "hi:u:";
 	}
 	else if (options.type == COLLECTIVE) {
-		optstring = "chi:w:s:e:u";
+		if (options.subtype == ALLREDUCE) {
+			optstring = "hi:w:s:e:u";
+		}
+		else if (options.subtype == BARRIER) {
+			optstring = "hi:u:";
+		}
 	}
 	else if (options.type == NOTIFY) {
-		optstring = "chi:w:s:e:u";
+		optstring = "hi:u:";
 	}
 
 	// set default values
@@ -94,15 +99,14 @@ void print_bad_usage(const gaspi_rank_t id) {
 		    stderr, "%s [-%c]\n\n", bad_usage.message, (char) bad_usage.opt);
 		fflush(stderr);
 	}
-	gaspi_proc_term(GASPI_BLOCK);
 }
 
 void print_help_message(const gaspi_rank_t id) {
 	if (id == 0) {
 		fprintf(stdout, "Help Message\n");
+		fprintf(stdout, "\n");
 		fflush(stdout);
 	}
-	gaspi_proc_term(GASPI_BLOCK);
 }
 
 void print_header(const gaspi_rank_t id) {
@@ -399,7 +403,8 @@ void print_result_coll(const gaspi_rank_t id,
 				        statistics.avg,
 				        FIELD_WIDTH,
 				        FLOAT_PRECISION,
-				        statistics.median FIELD_WIDTH,
+				        statistics.median,
+				        FIELD_WIDTH,
 				        FLOAT_PRECISION,
 				        statistics.var,
 				        FIELD_WIDTH,
