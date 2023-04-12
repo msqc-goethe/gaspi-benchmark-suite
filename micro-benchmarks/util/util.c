@@ -266,7 +266,7 @@ void print_header(const gaspi_rank_t id) {
 				        "elements,ranks,min_lat,max_lat,avg_lat,var_lat,std_"
 				        "lat\n");
 			else if (options.format == RAW_CSV) {
-				fprintf(stdout, "elements,ranks,count,lat\n");
+				fprintf(stdout, "ranks,elements,count,lat\n");
 			}
 		}
 		else if (options.subtype == BARRIER) {
@@ -287,10 +287,10 @@ void print_header(const gaspi_rank_t id) {
 				        "std_lat");
 			else if (options.format == CSV)
 				fprintf(stdout,
-				        "elements,ranks,min_lat,max_lat,avg_lat,var_lat,std_"
+				        "ranks,min_lat,max_lat,avg_lat,var_lat,std_"
 				        "lat\n");
 			else if (options.format == RAW_CSV) {
-				fprintf(stdout, "elements,ranks,count,lat\n");
+				fprintf(stdout, "ranks,count,lat\n");
 			}
 		}
 		fflush(stdout);
@@ -398,7 +398,12 @@ void print_result(const gaspi_rank_t id,
 		}
 		else if (options.format == RAW_CSV) {
 			for (i = 0; i < measurements.n; ++i) {
-				fprintf(stdout, "%d,%d,%.*f\n", size, i, measurements.time[i]);
+				fprintf(stdout,
+				        "%d,%d,%.*f\n",
+				        size,
+				        i,
+				        FLOAT_PRECISION,
+				        measurements.time[i]);
 			}
 		}
 		fflush(stdout);
@@ -409,6 +414,7 @@ void print_result_coll(const gaspi_rank_t id,
                        const int num_pes,
                        const size_t size,
                        struct measurements_t measurements) {
+	int i;
 	if (id == 0) {
 		struct statistics_t statistics;
 		compute_statistics(measurements, &statistics, 0);
@@ -457,6 +463,17 @@ void print_result_coll(const gaspi_rank_t id,
 				        FLOAT_PRECISION,
 				        statistics.std);
 			}
+			else if (options.format == RAW_CSV) {
+				for (i = 0; i < measurements.n; ++i) {
+					fprintf(stdout,
+					        "%d,%d,%d,%.*f\n",
+					        num_pes,
+					        size,
+					        i,
+					        FLOAT_PRECISION,
+					        measurements.time[i]);
+				}
+			}
 		}
 		else if (options.subtype == BARRIER) {
 			if (options.format == PLAIN) {
@@ -499,6 +516,16 @@ void print_result_coll(const gaspi_rank_t id,
 				        statistics.var,
 				        FLOAT_PRECISION,
 				        statistics.std);
+			}
+			else if (options.format == RAW_CSV) {
+				for (i = 0; i < measurements.n; ++i) {
+					fprintf(stdout,
+					        "%d,%d,%.*f\n",
+					        num_pes,
+					        i,
+					        FLOAT_PRECISION,
+					        measurements.time[i]);
+				}
 			}
 		}
 		fflush(stdout);
