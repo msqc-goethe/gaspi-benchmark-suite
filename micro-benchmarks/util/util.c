@@ -1,4 +1,5 @@
 #include "util.h"
+#include "benchdefs.h"
 #include "check.h"
 #include "math.h"
 
@@ -23,17 +24,17 @@ int benchmark_options(int argc, char* argv[]) {
 	char* optstring = NULL;
 
 	if (options.type == PASSIVE) {
-		optstring = "hi:w:s:e:u";
+		optstring = "hi:w:s:e:u:";
 	}
 	else if (options.type == ONESIDED) {
-		optstring = "hi:w:s:e:u";
+		optstring = "hi:w:s:e:u:";
 	}
 	else if (options.type == ATOMIC) {
 		optstring = "hi:u:";
 	}
 	else if (options.type == COLLECTIVE) {
 		if (options.subtype == ALLREDUCE) {
-			optstring = "hi:w:s:e:u";
+			optstring = "hi:w:s:e:u:";
 		}
 		else if (options.subtype == BARRIER) {
 			optstring = "hi:u:";
@@ -44,11 +45,11 @@ int benchmark_options(int argc, char* argv[]) {
 	}
 
 	// set default values
-	options.window_size = 64;
-	options.min_message_size = 1ULL;
-	options.max_message_size = (1ULL << 22);
-	options.iterations = 10;
-	options.skip = 10;
+	options.window_size = DEFAULT_WINDOW_SIZE;
+	options.min_message_size = DEFAULT_MIN_MESSAGE_SIZE;
+	options.max_message_size = DEFAULT_MAX_MESSAGE_SIZE;
+	options.iterations = DEFAULT_ITERATIONS;
+	options.skip = DEFAULT_WARMUP_ITERATIONS;
 	options.format = PLAIN;
 
 	if (options.subtype == ALLREDUCE) {
@@ -83,6 +84,7 @@ int benchmark_options(int argc, char* argv[]) {
 				break;
 			case 'u':
 				options.skip = atoi(optarg);
+				printf("Options.kip: %i\n",options.skip);
 				break;
 			default:
 				bad_usage.message = "Invalid option";
