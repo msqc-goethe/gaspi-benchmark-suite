@@ -80,7 +80,7 @@ int main(int argc, char* argv[]) {
 		}
 		else if (my_id == 1) {
 			for (i = 0; i < options.iterations + options.skip; ++i) {
-				if (i == options.skip) {
+				if (i >= options.skip) {
 					GASPI_CHECK(gaspi_wait(q_id, GASPI_BLOCK));
 					GASPI_CHECK(gaspi_barrier(q_id, GASPI_BLOCK));
 				}
