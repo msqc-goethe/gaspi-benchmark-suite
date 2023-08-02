@@ -84,7 +84,6 @@ int benchmark_options(int argc, char* argv[]) {
 				break;
 			case 'u':
 				options.skip = atoi(optarg);
-				printf("Options.kip: %i\n",options.skip);
 				break;
 			default:
 				bad_usage.message = "Invalid option";
