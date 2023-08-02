@@ -42,18 +42,19 @@ int main(int argc, char* argv[]) {
 	measurements.n = options.iterations;
 
 	const gaspi_segment_id_t segment_id = 0;
+	const gaspi_queue_id_t q_id = 0;
 	gaspi_atomic_value_t new_value = 'z';
 	gaspi_atomic_value_t old_value = 'a';
 	gaspi_atomic_value_t comparator = 'a';
 
 	print_header(my_id);
-
+	
 	allocate_gaspi_memory(segment_id, sizeof(char), 'a');
 	for (i = 0; i < options.iterations + options.skip; ++i) {
+		comparator = old_value;
+		new_value = i % 2 == 0 ? 'y' : 'z';
 		if (my_id == 0) {
 			if (i >= options.skip) {
-				comparator = old_value;
-				new_value = i % 2 == 0 ? 'y' : 'z';
 				time = stopwatch_start();
 			}
 			GASPI_CHECK(gaspi_atomic_compare_swap(segment_id,
@@ -70,6 +71,7 @@ int main(int argc, char* argv[]) {
 			}
 		}
 	}
+	GASPI_CHECK(gaspi_barrier(q_id, GASPI_BLOCK));
 	print_atomic_lat(my_id, old, new, measurements);
 	free_gaspi_memory(segment_id);
 	free(measurements.time);

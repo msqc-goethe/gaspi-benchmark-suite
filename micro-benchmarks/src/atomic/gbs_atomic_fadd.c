@@ -43,6 +43,7 @@ int main(int argc, char* argv[]) {
 	measurements.n = options.iterations;
 
 	const gaspi_segment_id_t segment_id = 0;
+	const gaspi_queue_id_t q_id = 0;
 	gaspi_atomic_value_t old_value;
 
 	print_header(my_id);
@@ -66,6 +67,7 @@ int main(int argc, char* argv[]) {
 			}
 		}
 	}
+	GASPI_CHECK(gaspi_barrier(q_id,GASPI_BLOCK));
 	print_atomic_lat(my_id, old, new, measurements);
 	free_gaspi_memory(segment_id);
 	free(measurements.time);

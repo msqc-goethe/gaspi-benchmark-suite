@@ -141,7 +141,7 @@ void print_help_message(const gaspi_rank_t id) {
 void print_header(const gaspi_rank_t id) {
 	if (id == 0) {
 		if (options.type == ATOMIC) {
-			if (options.format == PLAIN)
+			if (options.format == PLAIN) {
 				fprintf(stdout,
 				        "%-*s%*s%*s%*s%*s%*s%*s%*s\n",
 				        10,
@@ -155,13 +155,18 @@ void print_header(const gaspi_rank_t id) {
 				        FIELD_WIDTH,
 				        "avg_lat",
 				        FIELD_WIDTH,
+				        "median_lat",
+				        FIELD_WIDTH,
 				        "var_lat",
 				        FIELD_WIDTH,
 				        "std_lat");
-			else if (options.format == CSV)
+			}
+			else if (options.format == CSV) {
 				fprintf(stdout,
-				        "old_value,new_value,min_lat,max_lat,avg_lat,var_lat,"
+				        "old_value,new_value,min_lat,max_lat,avg_lat,median_"
+				        "lat,var_lat,"
 				        "std_lat\n");
+			}
 			else if (options.format == RAW_CSV) {
 				fprintf(stdout, "old,new,count,lat\n");
 			}
