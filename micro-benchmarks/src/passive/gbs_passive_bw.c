@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
 		allocate_gaspi_memory(
 		    segment_id, size * window_size * sizeof(char), 'a');
 		for (i = 0; i < options.iterations + options.skip; ++i) {
-			if (i == options.skip) {
+			if (i >= options.skip) {
 				GASPI_CHECK(gaspi_wait(q_id, GASPI_BLOCK));
 				time = stopwatch_start();
 			}
