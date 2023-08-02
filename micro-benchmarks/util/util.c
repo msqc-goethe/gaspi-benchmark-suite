@@ -183,8 +183,8 @@ void print_header(const gaspi_rank_t id) {
 				        "max_lat",
 				        FIELD_WIDTH,
 				        "avg_lat",
-						FIELD_WIDTH,
-						"median_lat",
+				        FIELD_WIDTH,
+				        "median_lat",
 				        FIELD_WIDTH,
 				        "var_lat",
 				        FIELD_WIDTH,
@@ -265,15 +265,16 @@ void print_header(const gaspi_rank_t id) {
 				        "max_lat",
 				        FIELD_WIDTH,
 				        "avg_lat",
-						FIELD_WIDTH,
-						"media_lat",
+				        FIELD_WIDTH,
+				        "media_lat",
 				        FIELD_WIDTH,
 				        "var_lat",
 				        FIELD_WIDTH,
 				        "std_lat");
 			else if (options.format == CSV)
 				fprintf(stdout,
-				        "elements,ranks,min_lat,max_lat,avg_lat,median_lat,var_lat,std_"
+				        "elements,ranks,min_lat,max_lat,avg_lat,median_lat,var_"
+				        "lat,std_"
 				        "lat\n");
 			else if (options.format == RAW_CSV) {
 				fprintf(stdout, "ranks,elements,count,lat\n");
@@ -291,8 +292,8 @@ void print_header(const gaspi_rank_t id) {
 				        "max_lat",
 				        FIELD_WIDTH,
 				        "avg_lat",
-						FIELD_WIDHT,
-						"median_lat",
+				        FIELD_WIDTH,
+				        "median_lat",
 				        FIELD_WIDTH,
 				        "var_lat",
 				        FIELD_WIDTH,
