@@ -16,8 +16,6 @@
 
    For more information please contact the SSCA1 developers at:
    bakermb@ornl.gov
- ________________________________________________________________________
-  This file is adapted by Diana Waschbuesch, Heidelberg University. 
 */
 
 #ifndef _TYPES_H
@@ -27,16 +25,10 @@
 
 typedef uint64_t index_t;
 
-#ifdef USE_GASPI
-#include <GASPI.h>
-extern gaspi_rank_t num_nodes;
-extern gaspi_rank_t rank;
-#else
 extern int num_nodes;
 extern int rank;
-#endif
 
-#if defined(USE_SHMEM) || defined(USE_MPI3)|| defined(USE_GASPI)
+#if defined(USE_SHMEM) || defined(USE_MPI3)
 typedef uint16_t codon_t;
 typedef int16_t score_t;
 #else
@@ -44,28 +36,17 @@ typedef int_fast8_t codon_t;
 typedef int_fast16_t score_t;
 #endif
 
-extern codon_t *scan_back_main;
-extern codon_t *scan_back_match;
-
 typedef struct _sequence_t {
-  codon_t *sequence;
-  index_t length;
-  index_t backing_memory;
-  index_t local_size;
+	codon_t* sequence;
+	index_t length;
+	index_t backing_memory;
+	index_t local_size;
 } seq_t;
 
 typedef struct _seq_data_t {
-  seq_t *main;
-  seq_t *match;
-  index_t max_validation;
+	seq_t* main;
+	seq_t* match;
+	index_t max_validation;
 } seq_data_t;
 
-typedef struct
-{
-  index_t *goodEnds[2];
-  score_t *goodScores;
-  int report;
-  int size;
-  score_t min_score;
-} current_ends_t;
 #endif

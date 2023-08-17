@@ -16,8 +16,6 @@
 
    For more information please contact the SSCA1 developers at:
    bakermb@ornl.gov
- ________________________________________________________________________
-  This file is adapted by Diana Waschbuesch, Heidelberg University. 
 */
 
 #ifndef _SORT_H
@@ -29,11 +27,11 @@ void index_sort(score_t numbers[], index_t indexes[], index_t array_size);
 void sort(index_t numbers[], index_t array_size);
 
 typedef struct {
-  score_t score;
-  index_t main_end;
-  index_t match_end;
+	score_t score;
+	index_t main_end;
+	index_t match_end;
 } sort_ends_t;
 
-void ends_sort(sort_ends_t *ends, index_t array_size);
+void ends_sort(sort_ends_t* ends, index_t array_size);
 
 #endif

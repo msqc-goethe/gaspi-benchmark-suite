@@ -16,8 +16,6 @@
 
    For more information please contact the SSCA1 developers at:
    bakermb@ornl.gov
- ________________________________________________________________________
-  This file is adapted by Diana Waschbuesch, Heidelberg University. 
 */
 
 #include "gen_sim_matrix.h"
@@ -46,8 +44,11 @@ typedef struct _seq_data
 } seq_data_t;
 */
 
-seq_data_t *gen_scal_data( sim_matrix_t *simMatrix, index_t mainLen, index_t matchLen, int constant_rng);
-void release_scal_data(seq_data_t *doomed_scal_data);
-void verifyData(sim_matrix_t *simMatrix, seq_data_t *seqData);
+seq_data_t* gen_scal_data(sim_matrix_t* simMatrix,
+                          index_t mainLen,
+                          index_t matchLen,
+                          int constant_rng);
+void release_scal_data(seq_data_t* doomed_scal_data);
+void verifyData(sim_matrix_t* simMatrix, seq_data_t* seqData);
 
 #endif

@@ -16,8 +16,6 @@
 
    For more information please contact the SSCA1 developers at:
    bakermb@ornl.gov
- ________________________________________________________________________
-  This file is adapted by Diana Waschbuesch, Heidelberg University. 
 */
 
 #ifndef _SCAN_BACKWARDS_H
@@ -26,7 +24,7 @@
 #include "pairwise_align.h"
 #include "types.h"
 
-void scanBackward(good_match_t *A, int maxReports, int minSeparation);
-int verify_alignment(good_match_t *A, int maxDisplay);
+void scanBackward(good_match_t* A, int maxReports, int minSeparation);
+int verify_alignment(good_match_t* A, int maxDisplay);
 
 #endif
