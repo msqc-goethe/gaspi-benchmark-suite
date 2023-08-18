@@ -38,10 +38,13 @@
 #include <hpcc.h>
 #include <sched.h>
 #include <stdio.h>
+#include "GASPI.h"
 #include "RandomAccess.h"
-#include "shmem.h"
-#define MAXTHREADS 256
+#include "check.h"
 
+#define MAXTHREADS 256
+#define BARRIER_ALL() GASPI_CHECK(gaspi_barrier(GASPI_GROUP_ALL, GASPI_BLOCK))
+#define FLUSH() GASPI_CHECK(gaspi_wait(gaspi_queue_id, GASPI_BLOCK))
 void do_abort(char* f) {
 	fprintf(stderr, "%s\n", f);
 }
@@ -56,7 +59,10 @@ int main(int argc, char** argv) {
 	int debug = 0;
 
 	s64Int i;
-	int NumProcs, logNumProcs, MyProc;
+	gaspi_rank_t NumProcs, logNumProcs, MyProc;
+	const gaspi_segment_id_t gaspi_segment_id_table = 0;
+	const gaspi_queue_id_t gaspi_queue_id = 0;
+
 	u64Int GlobalStartMyProc;
 	u64Int Top; /* Number of table entries in top of Table */
 	s64Int LocalTableSize; /* Local table width */
@@ -80,41 +86,22 @@ int main(int argc, char** argv) {
 	s64Int GlbNumUpdates; /* for reduction */
 #endif
 
-	long* llpSync;
-	long long* llpWrk;
-
-	long* ipSync;
-	int* ipWrk;
-
 	FILE* outFile = NULL;
 	double* GUPs;
 
 	int numthreads;
 	int *sAbort, *rAbort;
 
-	shmem_init();
+	GASPI_CHECK(gaspi_proc_init(GASPI_BLOCK));
+	GASPI_CHECK(gaspi_proc_rank(&MyProc));
+	GASPI_CHECK(gaspi_proc_num(&NumProcs));
 
 	/*Allocate symmetric memory*/
-	sAbort = (int*) shmem_malloc(sizeof(int));
-	rAbort = (int*) shmem_malloc(sizeof(int));
-	llpSync = (long*) shmem_malloc(sizeof(long) * _SHMEM_BCAST_SYNC_SIZE);
-	llpWrk =
-	    (long long*) shmem_malloc(sizeof(long long) * _SHMEM_REDUCE_SYNC_SIZE);
-	ipSync = (long*) shmem_malloc(sizeof(long) * _SHMEM_BCAST_SYNC_SIZE);
-	ipWrk = (int*) shmem_malloc(sizeof(int) * _SHMEM_REDUCE_SYNC_SIZE);
-
-	GUPs = (double*) shmem_malloc(sizeof(double));
-
-
-	for (i = 0; i < _SHMEM_BCAST_SYNC_SIZE; i += 1) {
-		ipSync[i] = _SHMEM_SYNC_VALUE;
-		llpSync[i] = _SHMEM_SYNC_VALUE;
-	}
+	sAbort = (int*) malloc(sizeof(int));
+	rAbort = (int*) malloc(sizeof(int));
+	GUPs = (double*) malloc(sizeof(double));
 
 	*GUPs = -1;
-
-	NumProcs = shmem_n_pes();
-	MyProc = shmem_my_pe();
 
 	if (0 == MyProc) {
 		outFile = stdout;
@@ -137,21 +124,32 @@ int main(int argc, char** argv) {
 
 	*sAbort = 0;
 
-	/*Shmalloc HPCC_Table for RMA*/
-	HPCC_Table = (u64Int*) shmem_malloc(sizeof(u64Int) * LocalTableSize);
+	/*alloc HPCC_Table for RMA*/
+	GASPI_CHECK(gaspi_segment_create(gaspi_segment_id_table,
+	                                 sizeof(u64Int) * LocalTableSize,
+	                                 GASPI_GROUP_ALL,
+	                                 GASPI_BLOCK,
+	                                 GASPI_MEM_INITIALIZED));
+	GASPI_CHECK(
+	    gaspi_segment_ptr(gaspi_segment_id_table, (void**) &HPCC_Table));
+
 	if (!HPCC_Table)
 		*sAbort = 1;
-
-	shmem_barrier_all();
-	shmem_int_sum_to_all(rAbort, sAbort, 1, 0, 0, NumProcs, ipWrk, ipSync);
-	shmem_barrier_all();
-
+	BARRIER_ALL();
+	GASPI_CHECK(gaspi_allreduce(sAbort,
+	                            rAbort,
+	                            1,
+	                            GASPI_OP_SUM,
+	                            GASPI_TYPE_INT,
+	                            GASPI_GROUP_ALL,
+	                            GASPI_BLOCK));
+	BARRIER_ALL();
 	if (*rAbort > 0) {
 		if (MyProc == 0)
 			fprintf(outFile, "Failed to allocate memory for the main table.\n");
 		/* check all allocations in case there are new added and their order changes */
 		if (HPCC_Table)
-			HPCC_free(HPCC_Table);
+			GASPI_CHECK(gaspi_segment_delete(gaspi_segment_id_table));
 		goto failed_table;
 	}
 
@@ -193,7 +191,7 @@ int main(int argc, char** argv) {
 	for (i = 0; i < LocalTableSize; i++)
 		HPCC_Table[i] = MyProc;
 
-	shmem_barrier_all();
+	BARRIER_ALL();
 
 	int j, k;
 	int logTableLocal, ipartner, iterate, niterate;
@@ -207,38 +205,48 @@ int main(int argc, char** argv) {
 	s64Int remotecount;
 	int thisPeId;
 	int numNodes;
-	int count2;
-
+	const gaspi_segment_id_t gaspi_segment_id_updates = 1;
+	const gaspi_segment_id_t gaspi_segment_id_remote_val = 2;
 	s64Int* count;
 	s64Int* updates;
-	s64Int* all_updates;
+	s64Int old_val;
 	s64Int* ran;
 
-	thisPeId = shmem_my_pe();
-	numNodes = shmem_n_pes();
+	thisPeId = MyProc;
+	numNodes = NumProcs;
+	/* An array of length npes to avoid overwrites*/
+	GASPI_CHECK(gaspi_segment_create(gaspi_segment_id_updates,
+	                                 sizeof(s64Int) * numNodes,
+	                                 GASPI_GROUP_ALL,
+	                                 GASPI_BLOCK,
+	                                 GASPI_MEM_INITIALIZED));
+	GASPI_CHECK(gaspi_segment_ptr(gaspi_segment_id_updates, (void**) &updates));
 
-	count = (s64Int*) shmem_malloc(sizeof(s64Int));
-	ran = (s64Int*) shmem_malloc(sizeof(s64Int));
-	updates = (s64Int*) shmem_malloc(
-	    sizeof(s64Int) *
-	    numNodes); /* An array of length npes to avoid overwrites*/
-	all_updates = (s64Int*) shmem_malloc(
-	    sizeof(s64Int) * numNodes); /*: An array to collect sum*/
-
+	count = (s64Int*) malloc(sizeof(s64Int));
+	s64Int* all_updates = (s64Int*) malloc(numNodes * sizeof(s64Int));
+	ran = (s64Int*) malloc(sizeof(s64Int));
 	*ran = starts(4 * GlobalStartMyProc);
 
 	niterate = ProcNumUpdates;
 	logTableLocal = logTableSize - logNumProcs;
 	nlocalm1 = LocalTableSize - 1;
-
+	// Likely not needless due to GASPI_MEM_INITIALIZED
 	for (j = 0; j < numNodes; j++) {
 		updates[j] = 0;
-		all_updates = 0;
+		all_updates[j] = 0;
 	}
-	int verify = 0;
-	u64Int remote_val;
+	int verify = 1;
 
-	shmem_barrier_all();
+	u64Int* remote_val;
+	GASPI_CHECK(gaspi_segment_create(gaspi_segment_id_remote_val,
+	                                 sizeof(u64Int),
+	                                 GASPI_GROUP_ALL,
+	                                 GASPI_BLOCK,
+	                                 GASPI_MEM_INITIALIZED));
+	GASPI_CHECK(
+	    gaspi_segment_ptr(gaspi_segment_id_remote_val, (void**) &remote_val));
+
+	BARRIER_ALL();
 	/* Begin timed section */
 	RealTime = -RTSEC();
 	for (iterate = 0; iterate < niterate; iterate++) {
@@ -248,19 +256,35 @@ int main(int argc, char** argv) {
 		/*Forces updates to remote PE only*/
 		if (remote_proc == MyProc)
 			remote_proc = (remote_proc + 1) / numNodes;
-
-		remote_val = shmem_longlong_g(&HPCC_Table[*ran & (LocalTableSize - 1)],
-		                              remote_proc);
-		remote_val ^= *ran;
-		shmem_longlong_p(
-		    &HPCC_Table[*ran & (LocalTableSize - 1)], remote_val, remote_proc);
-		shmem_quiet();
-
-		if (verify)
-			shmem_longlong_inc(&updates[thisPeId], remote_proc);
+		GASPI_CHECK(gaspi_read(gaspi_segment_id_remote_val,
+		                       0,
+		                       remote_proc,
+		                       gaspi_segment_id_table,
+		                       *ran & (LocalTableSize - 1),
+		                       1,
+		                       gaspi_queue_id,
+		                       GASPI_BLOCK));
+		*remote_val ^= *ran;
+		GASPI_CHECK(gaspi_write(gaspi_segment_id_table,
+		                        *ran & (LocalTableSize - 1),
+		                        remote_proc,
+		                        gaspi_segment_id_remote_val,
+		                        0,
+		                        1,
+		                        gaspi_queue_id,
+		                        GASPI_BLOCK));
+		FLUSH();
+		if (verify) {
+			GASPI_CHECK(gaspi_atomic_fetch_add(gaspi_segment_id_updates,
+			                                   thisPeId * sizeof(s64Int),
+			                                   remote_proc,
+			                                   1,
+			                                   (gaspi_atomic_value_t*) &old_val,
+			                                   GASPI_BLOCK));
+		}
 	}
 
-	shmem_barrier_all();
+	BARRIER_ALL();
 	/* End timed section */
 	RealTime += RTSEC();
 
@@ -282,9 +306,13 @@ int main(int argc, char** argv) {
 			loc_updates += updates[j];
 		int cpu = sched_getcpu();
 		printf("PE%d CPU%d  updates:%d\n", MyProc, cpu, loc_updates);
-
-		shmem_longlong_sum_to_all(
-		    all_updates, updates, NumProcs, 0, 0, NumProcs, llpWrk, llpSync);
+		GASPI_CHECK(gaspi_allreduce(updates,
+		                            all_updates,
+		                            numNodes,
+		                            GASPI_OP_SUM,
+		                            GASPI_TYPE_LONG,
+		                            GASPI_GROUP_ALL,
+		                            GASPI_BLOCK));
 		if (MyProc == 0) {
 			for (j = 1; j < numNodes; j++)
 				all_updates[0] += all_updates[j];
@@ -294,36 +322,23 @@ int main(int argc, char** argv) {
 				printf("Verification failed!\n");
 		}
 	}
-	shmem_barrier_all();
+	BARRIER_ALL();
 	/* End verification phase */
-
-	shmem_free(count);
-	shmem_free(updates);
-	shmem_free(ran);
-	shmem_barrier_all();
-
+	free(count);
+	free(ran);
 	/* Deallocate memory (in reverse order of allocation which should
  *      help fragmentation) */
-
-	HPCC_free(HPCC_Table);
+	GASPI_CHECK(gaspi_segment_delete(gaspi_segment_id_remote_val));
+	GASPI_CHECK(gaspi_segment_delete(gaspi_segment_id_updates));
+	GASPI_CHECK(gaspi_segment_delete(gaspi_segment_id_table));
+	BARRIER_ALL();
 failed_table:
 
 	if (0 == MyProc)
 		if (outFile != stderr)
 			fclose(outFile);
-
-	shmem_barrier_all();
-
-	shmem_free(sAbort);
-	shmem_free(rAbort);
-	shmem_free(llpSync);
-	shmem_free(llpWrk);
-	shmem_free(ipSync);
-	shmem_free(ipWrk);
-
-	shmem_barrier_all();
-
-	shmem_finalize();
+	free(sAbort);
+	free(rAbort);
 
 	return 0;
 }

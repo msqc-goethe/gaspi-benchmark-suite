@@ -33,14 +33,16 @@
  *
  *
  */
-
-#define _GNU_SOURCE //needed to get sched_getcpu to work since glibc 2.14
+#define _GNU_SOURCE
 #include <hpcc.h>
 #include <sched.h>
 #include <stdio.h>
 #include "RandomAccess.h"
-#include "shmem.h"
+#include "check.h"
+#include "mpi.h"
 #define MAXTHREADS 256
+#define BARRIER_ALL() MPI_CHECK(MPI_Barrier(MPI_COMM_WORLD))
+#define FLUSH(win) MPI_CHECK(MPI_Win_flush_all(win))
 
 void do_abort(char* f) {
 	fprintf(stderr, "%s\n", f);
@@ -54,7 +56,6 @@ u64Int* HPCC_Table;
 
 int main(int argc, char** argv) {
 	int debug = 0;
-
 	s64Int i;
 	int NumProcs, logNumProcs, MyProc;
 	u64Int GlobalStartMyProc;
@@ -80,48 +81,32 @@ int main(int argc, char** argv) {
 	s64Int GlbNumUpdates; /* for reduction */
 #endif
 
-	long* llpSync;
-	long long* llpWrk;
-
-	long* ipSync;
-	int* ipWrk;
-
 	FILE* outFile = NULL;
 	double* GUPs;
 
 	int numthreads;
 	int *sAbort, *rAbort;
 
-	shmem_init();
+	MPI_Win table_win, updates_win;
+	MPI_CHECK(MPI_Init(&argc, &argv));
+	MPI_CHECK(MPI_Comm_size(MPI_COMM_WORLD, &NumProcs));
+	MPI_CHECK(MPI_Comm_rank(MPI_COMM_WORLD, &MyProc));
 
 	/*Allocate symmetric memory*/
-	sAbort = (int*) shmem_malloc(sizeof(int));
-	rAbort = (int*) shmem_malloc(sizeof(int));
-	llpSync = (long*) shmem_malloc(sizeof(long) * _SHMEM_BCAST_SYNC_SIZE);
-	llpWrk =
-	    (long long*) shmem_malloc(sizeof(long long) * _SHMEM_REDUCE_SYNC_SIZE);
-	ipSync = (long*) shmem_malloc(sizeof(long) * _SHMEM_BCAST_SYNC_SIZE);
-	ipWrk = (int*) shmem_malloc(sizeof(int) * _SHMEM_REDUCE_SYNC_SIZE);
+	sAbort = (int*) malloc(sizeof(int));
+	rAbort = (int*) malloc(sizeof(int));
 
-	GUPs = (double*) shmem_malloc(sizeof(double));
-
-
-	for (i = 0; i < _SHMEM_BCAST_SYNC_SIZE; i += 1) {
-		ipSync[i] = _SHMEM_SYNC_VALUE;
-		llpSync[i] = _SHMEM_SYNC_VALUE;
-	}
+	GUPs = (double*) malloc(sizeof(double));
 
 	*GUPs = -1;
-
-	NumProcs = shmem_n_pes();
-	MyProc = shmem_my_pe();
 
 	if (0 == MyProc) {
 		outFile = stdout;
 		setbuf(outFile, NULL);
 	}
 
-	TotalMem = 20000000; /* max single node memory */
+	//TotalMem = 20000000; /* max single node memory */
+	TotalMem = 2000; /* max single node memory */
 	TotalMem *= NumProcs; /* max memory in NumProcs nodes */
 
 	TotalMem /= sizeof(u64Int);
@@ -136,24 +121,31 @@ int main(int argc, char** argv) {
 	GlobalStartMyProc = (MinLocalTableSize * MyProc);
 
 	*sAbort = 0;
-
-	/*Shmalloc HPCC_Table for RMA*/
-	HPCC_Table = (u64Int*) shmem_malloc(sizeof(u64Int) * LocalTableSize);
+	/*malloc HPCC_Table for RMA*/
+	HPCC_Table = (u64Int*) malloc(sizeof(u64Int) * LocalTableSize);
 	if (!HPCC_Table)
 		*sAbort = 1;
 
-	shmem_barrier_all();
-	shmem_int_sum_to_all(rAbort, sAbort, 1, 0, 0, NumProcs, ipWrk, ipSync);
-	shmem_barrier_all();
+	MPI_CHECK(
+	    MPI_Allreduce(sAbort, rAbort, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD));
 
 	if (*rAbort > 0) {
 		if (MyProc == 0)
 			fprintf(outFile, "Failed to allocate memory for the main table.\n");
 		/* check all allocations in case there are new added and their order changes */
 		if (HPCC_Table)
-			HPCC_free(HPCC_Table);
+			free(HPCC_Table);
 		goto failed_table;
 	}
+
+	MPI_CHECK(MPI_Win_create(HPCC_Table,
+	                         sizeof(s64Int) * LocalTableSize,
+	                         1,
+	                         MPI_INFO_NULL,
+	                         MPI_COMM_WORLD,
+	                         &table_win));
+
+	MPI_CHECK(MPI_Win_lock_all(0, table_win));
 
 	/* Default number of global updates to table: 4x number of table entries */
 	NumUpdates_Default = 4 * TableSize;
@@ -193,7 +185,7 @@ int main(int argc, char** argv) {
 	for (i = 0; i < LocalTableSize; i++)
 		HPCC_Table[i] = MyProc;
 
-	shmem_barrier_all();
+	BARRIER_ALL();
 
 	int j, k;
 	int logTableLocal, ipartner, iterate, niterate;
@@ -214,16 +206,21 @@ int main(int argc, char** argv) {
 	s64Int* all_updates;
 	s64Int* ran;
 
-	thisPeId = shmem_my_pe();
-	numNodes = shmem_n_pes();
+	thisPeId = MyProc;
+	numNodes = NumProcs;
 
-	count = (s64Int*) shmem_malloc(sizeof(s64Int));
-	ran = (s64Int*) shmem_malloc(sizeof(s64Int));
-	updates = (s64Int*) shmem_malloc(
-	    sizeof(s64Int) *
-	    numNodes); /* An array of length npes to avoid overwrites*/
-	all_updates = (s64Int*) shmem_malloc(
-	    sizeof(s64Int) * numNodes); /*: An array to collect sum*/
+	updates = (s64Int*) malloc(sizeof(s64Int) * numNodes);
+	MPI_CHECK(MPI_Win_create(updates,
+	                         sizeof(s64Int) * numNodes,
+	                         1,
+	                         MPI_INFO_NULL,
+	                         MPI_COMM_WORLD,
+	                         &updates_win));
+	MPI_CHECK(MPI_Win_lock_all(0, updates_win));
+
+	count = (s64Int*) malloc(sizeof(s64Int));
+	ran = (s64Int*) malloc(sizeof(s64Int));
+	all_updates = (s64Int*) malloc(sizeof(s64Int) * numNodes);
 
 	*ran = starts(4 * GlobalStartMyProc);
 
@@ -233,12 +230,12 @@ int main(int argc, char** argv) {
 
 	for (j = 0; j < numNodes; j++) {
 		updates[j] = 0;
-		all_updates = 0;
+		all_updates[j] = 0;
 	}
-	int verify = 0;
+	int verify = 1;
 	u64Int remote_val;
 
-	shmem_barrier_all();
+	BARRIER_ALL();
 	/* Begin timed section */
 	RealTime = -RTSEC();
 	for (iterate = 0; iterate < niterate; iterate++) {
@@ -248,21 +245,48 @@ int main(int argc, char** argv) {
 		/*Forces updates to remote PE only*/
 		if (remote_proc == MyProc)
 			remote_proc = (remote_proc + 1) / numNodes;
-
-		remote_val = shmem_longlong_g(&HPCC_Table[*ran & (LocalTableSize - 1)],
-		                              remote_proc);
+		MPI_CHECK(MPI_Get(&remote_val,
+		                  1,
+		                  MPI_LONG_LONG,
+		                  remote_proc,
+		                  *ran & (LocalTableSize - 1),
+		                  1,
+		                  MPI_LONG_LONG,
+		                  table_win));
 		remote_val ^= *ran;
-		shmem_longlong_p(
-		    &HPCC_Table[*ran & (LocalTableSize - 1)], remote_val, remote_proc);
-		shmem_quiet();
-
-		if (verify)
-			shmem_longlong_inc(&updates[thisPeId], remote_proc);
+		MPI_CHECK(MPI_Put(&remote_val,
+		                  1,
+		                  MPI_LONG_LONG,
+		                  remote_proc,
+		                  *ran & (LocalTableSize - 1),
+		                  1,
+		                  MPI_LONG_LONG,
+		                  table_win));
+		FLUSH(table_win);
+		if (verify) {
+			s64Int one = 1;
+			s64Int tmp;
+			MPI_CHECK(MPI_Get_accumulate(&one,
+			                             1,
+			                             MPI_LONG_LONG,
+			                             &tmp,
+			                             1,
+			                             MPI_LONG_LONG,
+			                             remote_proc,
+			                             thisPeId * sizeof(s64Int),
+			                             1,
+			                             MPI_LONG_LONG,
+			                             MPI_SUM,
+			                             updates_win));
+			FLUSH(updates_win);
+		}
 	}
-
-	shmem_barrier_all();
+	BARRIER_ALL();
 	/* End timed section */
 	RealTime += RTSEC();
+
+	MPI_CHECK(MPI_Win_unlock_all(table_win));
+	MPI_CHECK(MPI_Win_unlock_all(updates_win));
 
 	/* Print timing results */
 	if (MyProc == 0) {
@@ -283,8 +307,12 @@ int main(int argc, char** argv) {
 		int cpu = sched_getcpu();
 		printf("PE%d CPU%d  updates:%d\n", MyProc, cpu, loc_updates);
 
-		shmem_longlong_sum_to_all(
-		    all_updates, updates, NumProcs, 0, 0, NumProcs, llpWrk, llpSync);
+		MPI_CHECK(MPI_Allreduce(updates,
+		                        all_updates,
+		                        numNodes,
+		                        MPI_LONG_LONG,
+		                        MPI_SUM,
+		                        MPI_COMM_WORLD));
 		if (MyProc == 0) {
 			for (j = 1; j < numNodes; j++)
 				all_updates[0] += all_updates[j];
@@ -294,37 +322,30 @@ int main(int argc, char** argv) {
 				printf("Verification failed!\n");
 		}
 	}
-	shmem_barrier_all();
+	BARRIER_ALL();
 	/* End verification phase */
 
-	shmem_free(count);
-	shmem_free(updates);
-	shmem_free(ran);
-	shmem_barrier_all();
+	free(count);
+	free(ran);
 
 	/* Deallocate memory (in reverse order of allocation which should
  *      help fragmentation) */
+	free(updates);
+	free(HPCC_Table);
+	MPI_Win_free(&table_win);
+	MPI_Win_free(&updates_win);
 
-	HPCC_free(HPCC_Table);
 failed_table:
 
 	if (0 == MyProc)
 		if (outFile != stderr)
 			fclose(outFile);
 
-	shmem_barrier_all();
-
-	shmem_free(sAbort);
-	shmem_free(rAbort);
-	shmem_free(llpSync);
-	shmem_free(llpWrk);
-	shmem_free(ipSync);
-	shmem_free(ipWrk);
-
-	shmem_barrier_all();
-
-	shmem_finalize();
-
+	BARRIER_ALL();
+	free(sAbort);
+	free(rAbort);
+	BARRIER_ALL();
+	MPI_Finalize();
 	return 0;
 }
 
