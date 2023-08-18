@@ -40,7 +40,6 @@ int main(int argc, char* argv[]) {
 
 	const gaspi_segment_id_t segment_id_a = 0;
 	const gaspi_segment_id_t segment_id_b = 1;
-	const gaspi_queue_id_t q_id = 0;
 	gaspi_rank_t remote_id;
 
 	print_header(my_id);

@@ -39,7 +39,6 @@ int main(int argc, char* argv[]) {
 	measurements.n = options.iterations;
 
 	const gaspi_segment_id_t segment_id = 0;
-	const gaspi_queue_id_t q_id = 0;
 	gaspi_rank_t remote_id;
 
 	print_header(my_id);
@@ -51,7 +50,6 @@ int main(int argc, char* argv[]) {
 		    segment_id, size * window_size * sizeof(char), 'a');
 		for (i = 0; i < options.iterations + options.skip; ++i) {
 			if (i >= options.skip) {
-				GASPI_CHECK(gaspi_wait(q_id, GASPI_BLOCK));
 				time = stopwatch_start();
 			}
 			if (my_id == 0) {
