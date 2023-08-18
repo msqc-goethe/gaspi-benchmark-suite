@@ -24,6 +24,9 @@
 #include "gen_scal_data.h"
 #include "gen_sim_matrix.h"
 #include "types.h"
+#ifdef USE_SHMEM
+#include "shmem.h"
+#endif
 
 #define index2d(x, y, stride) ((y) + ((x) * (stride)))
 
