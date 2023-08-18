@@ -1,0 +1,33 @@
+SSCA1
+-----
+
+This benchmark is based on the DARPA HPCS benchmark challenge SSCA1. In
+particular, this implments SSCA1 kernel 1. Kernel 2 is also implmented for
+the verification of the output of kernel 1, but is not optimized for
+parallel execution.
+
+
+COPYRIGHT
+---------
+
+This file is part of SSCA1.
+
+Copyright (C) 2008-2018, UT-Battelle, LLC.
+
+This product includes software produced by UT-Battelle, LLC under Contract No.
+DE-AC05-00OR22725 with the Department of Energy.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the New BSD 3-clause software license (LICENSE).
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+LICENSE for more details.
+
+For more information please contact the SSCA1 developers at:
+bakermb@ornl.gov
+
+__________________________________________________________________________________________________________________________________________
+This is a modified version of the Oak Ridge OpenSHMEM Benchmark Suite/ SSCA1 developed by Thomas Naughton, Ferrol Aderholdt, Matt Baker, Swaroop Pophale, Manjunath Gorentla Venkata and Neena Imam
+It contains a mpi, gaspi and OpenSHMEM version.
