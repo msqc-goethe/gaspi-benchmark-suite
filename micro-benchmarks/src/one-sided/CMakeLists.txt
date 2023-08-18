@@ -51,3 +51,5 @@ target_include_directories(
                             "${PROJECT_SOURCE_DIR}/micro-benchmarks/util"
 )
 target_compile_features(gbs_read_lat PRIVATE c_std_11)
+
+install(TARGETS gbs_write_bw gbs_write_lat gbs_read_bw gbs_read_lat gbs_write_bibw RUNTIME DESTINATION bin/one-sided)

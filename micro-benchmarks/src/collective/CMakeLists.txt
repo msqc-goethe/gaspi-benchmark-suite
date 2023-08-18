@@ -21,3 +21,5 @@ target_include_directories(
                        "${PROJECT_SOURCE_DIR}/micro-benchmarks/util"
 )
 target_compile_features(gbs_allreduce PRIVATE c_std_11)
+
+install(TARGETS gbs_barrier gbs_allreduce RUNTIME DESTINATION bin/collective)

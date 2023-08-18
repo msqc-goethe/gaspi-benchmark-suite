@@ -21,3 +21,5 @@ target_include_directories(
                             "${PROJECT_SOURCE_DIR}/micro-benchmarks/util"
 )
 target_compile_features(gbs_atomic_cas PRIVATE c_std_11)
+
+install(TARGETS gbs_atomic_fadd gbs_atomic_cas RUNTIME DESTINATION bin/atomic)

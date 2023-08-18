@@ -41,3 +41,5 @@ target_include_directories(
                        "${PROJECT_SOURCE_DIR}/micro-benchmarks/util"
 )
 target_compile_features(gbs_read_notify_bw PRIVATE c_std_11)
+
+install(TARGETS gbs_write_notify_bw gbs_write_notify_lat gbs_read_notify_bw gbs_read_notify_lat RUNTIME DESTINATION bin/one-sided-extended)

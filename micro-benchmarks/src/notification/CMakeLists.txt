@@ -21,3 +21,5 @@ target_include_directories(
                        "${PROJECT_SOURCE_DIR}/micro-benchmarks/util"
 )
 target_compile_features(gbs_notification_ping_pong PRIVATE c_std_11)
+
+install(TARGETS gbs_notification_rate gbs_notification_ping_pong RUNTIME DESTINATION bin/notification)

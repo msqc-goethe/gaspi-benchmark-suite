@@ -21,3 +21,5 @@ target_include_directories(
                             "${PROJECT_SOURCE_DIR}/micro-benchmarks/util"
 )
 target_compile_features(gbs_passive_lat PRIVATE c_std_11)
+
+install(TARGETS gbs_passive_bw gbs_passive_lat RUNTIME DESTINATION bin/passive)
