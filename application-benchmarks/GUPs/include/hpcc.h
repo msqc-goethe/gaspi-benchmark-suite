@@ -20,7 +20,9 @@ vararg.h (if necessary)
 #define SHMEMFFT_TIMING_COUNT 8
 
 /* Define 64-bit types and corresponding format strings for printf() and constants */
+#ifdef USE_GASPI
 #define LONG_IS_64BITS
+#endif
 #ifdef LONG_IS_64BITS
 typedef unsigned long u64Int;
 typedef long s64Int;
