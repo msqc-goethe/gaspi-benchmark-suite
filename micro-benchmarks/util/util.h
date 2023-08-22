@@ -62,8 +62,8 @@ struct benchmark_options_t {
 
 int benchmark_options(int argc, char* argv[]);
 void print_header(const gaspi_rank_t id);
-void print_bad_usage(const gaspi_rank_t id);
-void print_help_message(const gaspi_rank_t id);
+void print_bad_usage(void);
+void print_help_message(void);
 void print_result(const gaspi_rank_t id,
                   struct measurements_t timings,
                   const size_t size);

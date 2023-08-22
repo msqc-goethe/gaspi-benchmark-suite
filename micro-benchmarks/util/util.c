@@ -22,7 +22,6 @@ int benchmark_options(int argc, char* argv[]) {
 	int option_index = 0;
 	int c;
 	char* optstring = NULL;
-
 	if (options.type == PASSIVE) {
 		optstring = "hi:w:s:e:u:";
 	}
@@ -51,11 +50,6 @@ int benchmark_options(int argc, char* argv[]) {
 	options.iterations = DEFAULT_ITERATIONS;
 	options.skip = DEFAULT_WARMUP_ITERATIONS;
 	options.format = PLAIN;
-
-	if (options.subtype == ALLREDUCE) {
-		gaspi_allreduce_elem_max(&c);
-		options.max_message_size = (size_t) c;
-	}
 
 	while (1) {
 		c = getopt_long(argc, argv, optstring, long_options, &option_index);
@@ -94,48 +88,40 @@ int benchmark_options(int argc, char* argv[]) {
 	return OPTIONS_OKAY;
 }
 
-void print_bad_usage(const gaspi_rank_t id) {
-	if (id == 0) {
-		fprintf(
-		    stderr, "%s [-%c]\n\n", bad_usage.message, (char) bad_usage.opt);
-		fflush(stderr);
-	}
+void print_bad_usage() {
+	fprintf(stderr, "%s [-%c]\n\n", bad_usage.message, (char) bad_usage.opt);
+	fflush(stderr);
 }
 
-void print_help_message(const gaspi_rank_t id) {
-	if (id == 0) {
-		fprintf(stdout, "GASPI Micro Benchmark:\n");
-		fprintf(stdout, "%s:\n", options.name);
-		fprintf(stdout, "\n");
-		fprintf(stdout, "\t -h [--help]\tDisplay this help message.\n");
+void print_help_message() {
+	fprintf(stdout, "GASPI Micro Benchmark:\n");
+	fprintf(stdout, "%s:\n", options.name);
+	fprintf(stdout, "\n");
+	fprintf(stdout, "\t -h [--help]\tDisplay this help message.\n");
 
-		if (options.subtype != BARRIER && options.type != ATOMIC &&
-		    options.type != NOTIFY) {
-			fprintf(stdout,
-			        "\t -w [--window_size] arg\tNumber of messages sent per "
-			        "iteration. Default 64.\n");
-			fprintf(stdout,
-			        "\t -s [--min_message_size] arg\t Minimum message size. "
-			        "Default 1 byte.\n");
-			fprintf(stdout,
-			        "\t -e [--max_message_size] arg\t Maximum message size. "
-			        "Default (1 << 22) byte.\n");
-		}
-
-		fprintf(
-		    stdout,
-		    "\t -i [--iterations] arg\tNumber of iterations. Default 10.\n");
+	if (options.subtype != BARRIER && options.type != ATOMIC &&
+	    options.type != NOTIFY) {
 		fprintf(stdout,
-		        "\t -u [--warmup-iterations] arg\tNumber of warmup iterations. "
-		        "Default 10.\n");
+		        "\t -w [--window_size] arg\tNumber of messages sent per "
+		        "iteration. Default 64.\n");
 		fprintf(stdout,
-		        "\t --csv\tPrint output in csv format with statistics.\n");
-		fprintf(
-		    stdout,
-		    "\t --raw_csv\tPrint the collected raw data without statistics.\n");
-		fprintf(stdout, "\n\n");
-		fflush(stdout);
+		        "\t -s [--min_message_size] arg\t Minimum message size. "
+		        "Default 1 byte.\n");
+		fprintf(stdout,
+		        "\t -e [--max_message_size] arg\t Maximum message size. "
+		        "Default (1 << 22) byte.\n");
 	}
+
+	fprintf(stdout,
+	        "\t -i [--iterations] arg\tNumber of iterations. Default 10.\n");
+	fprintf(stdout,
+	        "\t -u [--warmup-iterations] arg\tNumber of warmup iterations. "
+	        "Default 10.\n");
+	fprintf(stdout, "\t --csv\tPrint output in csv format with statistics.\n");
+	fprintf(stdout,
+	        "\t --raw_csv\tPrint the collected raw data without statistics.\n");
+	fprintf(stdout, "\n\n");
+	fflush(stdout);
 }
 
 void print_header(const gaspi_rank_t id) {
