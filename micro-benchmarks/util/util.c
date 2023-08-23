@@ -41,7 +41,7 @@ int benchmark_options(int argc, char* argv[]) {
 		}
 	}
 	else if (options.type == NOTIFY) {
-		optstring = "hi:u:";
+		optstring = "hi:u:w:";
 	}
 
 	// set default values
