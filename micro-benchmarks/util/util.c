@@ -41,7 +41,10 @@ int benchmark_options(int argc, char* argv[]) {
 		}
 	}
 	else if (options.type == NOTIFY) {
-		optstring = "hi:u:w:";
+		if (options.subtype == RATE)
+			optstring = "hi:u:w:";
+		else
+			optstring = "hi:u:";
 	}
 
 	// set default values
@@ -111,6 +114,11 @@ void print_help_message() {
 		fprintf(stdout,
 		        "\t -e [--max_message_size] arg\t Maximum message size. "
 		        "Default (1 << 22) byte.\n");
+	}
+	else if (options.type == NOTIFY && options.subtype == RATE) {
+		fprintf(stdout,
+		        "\t -w [--window_size] arg\tNumber of messages sent per "
+		        "iteration. Default 64.\n");
 	}
 
 	fprintf(stdout,
