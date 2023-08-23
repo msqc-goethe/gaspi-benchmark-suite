@@ -33,9 +33,6 @@ int main(int argc, char* argv[]) {
 	GASPI_CHECK(gaspi_proc_rank(&my_id));
 	GASPI_CHECK(gaspi_proc_num(&num_pes));
 
-	GASPI_CHECK(
-	    gaspi_allreduce_elem_max((gaspi_number_t*) options.max_message_size));
-
 	if (num_pes < 2) {
 		fprintf(stderr, "Benchmark requires >= 2 processes!\n");
 		return EXIT_FAILURE;
