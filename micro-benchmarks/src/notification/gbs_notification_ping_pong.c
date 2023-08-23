@@ -12,7 +12,7 @@ int main(int argc, char* argv[]) {
 	struct measurements_t measurements;
 
 	options.type = NOTIFY;
-	options.subtype = LAT;
+	options.subtype = PINGPONG;
 	options.name = "gbs_notification_ping_pong";
 
 	bo_ret = benchmark_options(argc, argv);

@@ -20,7 +20,7 @@ enum options_ret_type { OPTIONS_OKAY = 0, OPTIONS_HELP, OPTIONS_BAD_USAGE };
 
 enum benchmark_type { COLLECTIVE = 0, PASSIVE, ONESIDED, ATOMIC, NOTIFY };
 
-enum benchmark_subtype { BW = 0, LAT, ALLREDUCE, BARRIER };
+enum benchmark_subtype { BW = 0, LAT, ALLREDUCE, BARRIER, RATE, PINGPONG };
 
 enum output_format { PLAIN = 0, CSV, RAW_CSV };
 

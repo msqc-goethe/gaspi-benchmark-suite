@@ -147,42 +147,67 @@ void print_header(const gaspi_rank_t id) {
 				        "std_lat");
 			}
 			else if (options.format == CSV) {
-				fprintf(
-				    stdout,
-				    "#iterations,min_lat,max_lat,avg_lat,median_"
-				    "lat,var_lat,"
-				    "std_lat\n");
+				fprintf(stdout,
+				        "#iterations,min_lat,max_lat,avg_lat,median_"
+				        "lat,var_lat,"
+				        "std_lat\n");
 			}
 			else if (options.format == RAW_CSV) {
 				fprintf(stdout, "old,new,count,lat\n");
 			}
 		}
 		else if (options.type == NOTIFY) {
-			if (options.format == PLAIN) {
-				fprintf(stdout,
-				        "%-*s%*s%*s%*s%*s%*s\n",
-				        10,
-				        "notification_rate",
-				        FIELD_WIDTH,
-				        "min_lat",
-				        FIELD_WIDTH,
-				        "max_lat",
-				        FIELD_WIDTH,
-				        "avg_lat",
-				        FIELD_WIDTH,
-				        "median_lat",
-				        FIELD_WIDTH,
-				        "var_lat",
-				        FIELD_WIDTH,
-				        "std_lat");
+			if (options.subtype == RATE) {
+				if (options.format == PLAIN) {
+					fprintf(stdout,
+					        "%-*s%*s%*s%*s%*s%*s\n",
+					        10,
+					        "min_rate",
+					        FIELD_WIDTH,
+					        "max_rate",
+					        FIELD_WIDTH,
+					        "avg_rate",
+					        FIELD_WIDTH,
+					        "median_rate",
+					        FIELD_WIDTH,
+					        "var_rate",
+					        FIELD_WIDTH,
+					        "std_rate");
+				}
+				else if (options.format == CSV) {
+					fprintf(stdout,
+					        "min_rate,max_rate,avg_"
+					        "rate,median_rate,var_rate,std_rate\n");
+				}
+				else if (options.format == RAW_CSV) {
+					fprintf(stdout, "count,lat\n");
+				}
 			}
-			else if (options.format == CSV) {
-				fprintf(stdout,
-				        "notification_rate,min_lat,max_lat,avg_"
-				        "lat,median_lat,var_lat,std_lat\n");
-			}
-			else if (options.format == RAW_CSV) {
-				fprintf(stdout, "count,lat\n");
+			else if (options.subtype == PINGPONG) {
+				if (options.format == PLAIN) {
+					fprintf(stdout,
+					        "%-*s%*s%*s%*s%*s%*s\n",
+					        10,
+					        "min_lat",
+					        FIELD_WIDTH,
+					        "max_lat",
+					        FIELD_WIDTH,
+					        "avg_lat",
+					        FIELD_WIDTH,
+					        "median_lat",
+					        FIELD_WIDTH,
+					        "var_lat",
+					        FIELD_WIDTH,
+					        "std_lat");
+				}
+				else if (options.format == CSV) {
+					fprintf(stdout,
+					        "min_lat,max_lat,avg_"
+					        "lat,median_lat,var_lat,std_lat\n");
+				}
+				else if (options.format == RAW_CSV) {
+					fprintf(stdout, "count,lat\n");
+				}
 			}
 		}
 		else if (options.subtype == LAT) {
@@ -322,8 +347,13 @@ void compute_statistics(struct measurements_t measurements,
 			t[i] *= 1e3; // MB/s
 		}
 	}
-	else if (options.subtype == LAT || options.subtype == ALLREDUCE ||
-	         options.subtype == BARRIER) {
+	else if (options.type == NOTIFY && options.subtype == RATE) {
+		for (i = 0; i < n; ++i) {
+			t[i] = options.window_size / (t[i] * 1e-9);
+		}
+	}
+	else if (options.subtype == LAT || options.type == COLLECTIVE ||
+	         options.subtype == PINGPONG) {
 		for (i = 0; i < n; ++i) {
 			t[i] *= 1e-3; // ns to us
 		}
@@ -546,17 +576,13 @@ void print_result_coll(const gaspi_rank_t id,
 void print_notify_lat(const gaspi_rank_t id,
                       struct measurements_t measurements) {
 	struct statistics_t statistics;
-	double rate;
 	int i;
 	if (id == 0) {
 		compute_statistics(measurements, &statistics, 0);
-		rate = 1 / (statistics.avg * 1e-6);
 		if (options.format == PLAIN) {
 			fprintf(stdout,
-			        "%-*f%*.*f%*.*f%*.*f%*.*f%*.*f%*.*f\n",
+			        "%-*.*f%*.*f%*.*f%*.*f%*.*f%*.*f\n",
 			        10,
-			        rate,
-			        FIELD_WIDTH,
 			        FLOAT_PRECISION,
 			        statistics.min,
 			        FIELD_WIDTH,
@@ -577,9 +603,7 @@ void print_notify_lat(const gaspi_rank_t id,
 		}
 		else if (options.format == CSV) {
 			fprintf(stdout,
-			        "%.*f,%.*f,%.*f,%.*f,%.*f,%.*f,%.*f\n",
-			        FLOAT_PRECISION,
-			        rate,
+			        "%.*f,%.*f,%.*f,%.*f,%.*f,%.*f\n",
 			        FLOAT_PRECISION,
 			        statistics.min,
 			        FLOAT_PRECISION,

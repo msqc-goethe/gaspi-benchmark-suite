@@ -7,12 +7,13 @@ int main(int argc, char* argv[]) {
 	gaspi_rank_t my_id, num_pes;
 	size_t size;
 	int i, j;
+	int window_size;
 	int bo_ret = OPTIONS_OKAY;
 	double time;
 	struct measurements_t measurements;
 
 	options.type = NOTIFY;
-	options.subtype = LAT;
+	options.subtype = RATE;
 	options.name = "gbs_notification_rate";
 
 	bo_ret = benchmark_options(argc, argv);
@@ -40,27 +41,34 @@ int main(int argc, char* argv[]) {
 
 	const gaspi_segment_id_t segment_id = 0;
 	const gaspi_queue_id_t q_id = 0;
-	gaspi_notification_t notification_val = 1;
-	gaspi_notification_id_t notification_id = 0;
+	const gaspi_notification_t notification_val = 1;
+	const gaspi_notification_id_t notification_id = 0;
+	gaspi_notification_id_t first;
 
 	print_header(my_id);
-
+	window_size = options.window_size;
 	allocate_gaspi_memory(segment_id, sizeof(char), 'a');
 	for (i = 0; i < options.iterations + options.skip; ++i) {
 		if (my_id == 0) {
 			if (i >= options.skip) {
 				time = stopwatch_start();
 			}
-			GASPI_CHECK(gaspi_notify(segment_id,
-			                         1,
-			                         notification_id,
-			                         notification_val,
-			                         q_id,
-			                         GASPI_BLOCK));
+			for (j = 0; j < window_size; ++j) {
+				GASPI_CHECK(gaspi_notify(segment_id,
+				                         1,
+				                         notification_id + j,
+				                         notification_val,
+				                         q_id,
+				                         GASPI_BLOCK));
+			}
 			GASPI_CHECK(gaspi_wait(q_id, GASPI_BLOCK));
 			if (i >= options.skip) {
 				measurements.time[i - options.skip] = stopwatch_stop(time);
 			}
+		}
+		else {
+			GASPI_CHECK(gaspi_notify_waitsome(
+			    segment_id, notification_id, window_size, &first, GASPI_BLOCK));
 		}
 	}
 	print_notify_lat(my_id, measurements);
