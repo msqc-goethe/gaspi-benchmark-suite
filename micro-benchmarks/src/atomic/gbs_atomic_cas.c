@@ -43,39 +43,55 @@ int main(int argc, char* argv[]) {
 
 	const gaspi_segment_id_t segment_id = 0;
 	const gaspi_queue_id_t q_id = 0;
-	gaspi_atomic_value_t new_value = 'z';
-	gaspi_atomic_value_t old_value = 'a';
-	gaspi_atomic_value_t comparator = 'a';
+	gaspi_pointer_t ptr;
+	size_t new_value = 1;
+	size_t comparator = 0;
+	size_t old_value;
 
 	print_header(my_id);
-	
-	allocate_gaspi_memory(segment_id, sizeof(char), 'a');
+
+	allocate_gaspi_memory_initialized(segment_id, sizeof(size_t));
+	GASPI_CHECK(gaspi_segment_ptr(segment_id, &ptr));
 	for (i = 0; i < options.iterations + options.skip; ++i) {
-		comparator = old_value;
-		new_value = i % 2 == 0 ? 'y' : 'z';
 		if (my_id == 0) {
 			if (i >= options.skip) {
 				time = stopwatch_start();
 			}
-			GASPI_CHECK(gaspi_atomic_compare_swap(segment_id,
-			                                      0,
-			                                      1,
-			                                      comparator,
-			                                      new_value,
-			                                      &old_value,
-			                                      GASPI_BLOCK));
+			GASPI_CHECK(
+			    gaspi_atomic_compare_swap(segment_id,
+			                              0,
+			                              1,
+			                              (gaspi_atomic_value_t) comparator,
+			                              (gaspi_atomic_value_t) new_value,
+			                              (gaspi_atomic_value_t*) &old_value,
+			                              GASPI_BLOCK));
 			if (i >= options.skip) {
 				measurements.time[i - options.skip] = stopwatch_stop(time);
-				old[i - options.skip] = old_value;
-				new[i - options.skip] = new_value;
 			}
+			comparator = new_value++;
 		}
 	}
+
+	if (my_id == 0 && verify) {
+		GASPI_CHECK(
+		    gaspi_read(segment_id, 0, 1, segment_id, 0, 1, 0, GASPI_BLOCK));
+		GASPI_CHECK(gaspi_wait(0, GASPI_BLOCK));
+		size_t expected_counter_val = options.iterations + options.skip;
+		size_t actual_counter_val = *((size_t*) ptr);
+
+		if (actual_counter_val != expected_counter_val) {
+			fprintf(stderr,
+			        "Error: expected result is %d but actual result is %d\n",
+			        expected_counter_val,
+			        actual_counter_val);
+			return EXIT_FAILURE;
+		}
+	}
+
 	GASPI_CHECK(gaspi_barrier(q_id, GASPI_BLOCK));
-	print_atomic_lat(my_id, old, new, measurements);
+
+	print_atomic_lat(my_id, measurements);
 	free_gaspi_memory(segment_id);
 	free(measurements.time);
-	free(old);
-	free(new);
 	return EXIT_SUCCESS;
 }

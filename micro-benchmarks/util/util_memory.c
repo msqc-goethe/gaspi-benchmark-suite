@@ -12,6 +12,13 @@ void allocate_gaspi_memory(const gaspi_segment_id_t id,
 	GASPI_CHECK(gaspi_barrier(GASPI_GROUP_ALL, GASPI_BLOCK));
 }
 
+// allocate zeroed memory segments
+void allocate_gaspi_memory_initialized(const gaspi_segment_id_t id,
+                                       const size_t size) {
+	GASPI_CHECK(gaspi_segment_create(
+	    id, size, GASPI_GROUP_ALL, GASPI_BLOCK, GASPI_MEM_INITIALIZED));
+}
+
 void free_gaspi_memory(const gaspi_segment_id_t id) {
 	GASPI_CHECK(gaspi_barrier(GASPI_GROUP_ALL, GASPI_BLOCK));
 	GASPI_CHECK(gaspi_segment_delete(id));

@@ -72,12 +72,11 @@ void print_result_coll(const gaspi_rank_t id,
                        const size_t size,
                        struct measurements_t measurements);
 void print_atomic_lat(const gaspi_rank_t id,
-                      char const* old_value,
-                      char const* new_value,
                       struct measurements_t measurements);
 void print_notify_lat(const gaspi_rank_t id,
                       struct measurements_t measurements);
 
 extern struct benchmark_options_t options;
 extern struct bad_usage_t bad_usage;
+extern int verify;
 #endif
