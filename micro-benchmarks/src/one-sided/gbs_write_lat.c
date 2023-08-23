@@ -40,14 +40,17 @@ int main(int argc, char* argv[]) {
 
 	const gaspi_segment_id_t segment_id = 0;
 	const gaspi_queue_id_t q_id = 0;
+	gaspi_pointer_t ptr;
 
 	print_header(my_id);
 
 	int window_size = options.window_size;
 	for (size = options.min_message_size; size <= options.max_message_size;
 	     size *= 2) {
-		allocate_gaspi_memory(
-		    segment_id, size * window_size * sizeof(char), 'a');
+		allocate_gaspi_memory(segment_id,
+		                      size * window_size * sizeof(char),
+		                      my_id == 0 ? 'a' : 'b');
+		GASPI_CHECK(gaspi_segment_ptr(segment_id, &ptr));
 		if (my_id == 0) {
 			for (i = 0; i < options.iterations + options.skip; ++i) {
 				if (i >= options.skip) {
@@ -66,6 +69,19 @@ int main(int argc, char* argv[]) {
 				}
 				if (i >= options.skip) {
 					measurements.time[i - options.skip] = stopwatch_stop(time);
+				}
+			}
+		}
+		if (verify) {
+			GASPI_CHECK(gaspi_barrier(GASPI_GROUP_ALL, GASPI_BLOCK));
+		}
+		if (my_id == 1 && verify) {
+			for (i = 0; i < size * window_size; ++i) {
+				if (((char*) ptr)[i] != 'a') {
+					fprintf(stderr,
+					        "Verification failed. Result is invalid! %c\n",
+					        ((char*) ptr)[i]);
+					return EXIT_FAILURE;
 				}
 			}
 		}

@@ -17,24 +17,24 @@ int benchmark_options(int argc, char* argv[]) {
 	    {"iterations", required_argument, 0, 'i'},
 	    {"csv", no_argument, 0, 0},
 	    {"raw_csv", no_argument, 0, 1},
-	    {"warmup-iterations", required_argument, 0, 'u'},
-	    {"verbose", no_argument, &options.verbose, 'v'}};
+	    {"verify", no_argument, 0, 'v'},
+	    {"warmup-iterations", required_argument, 0, 'u'}};
 
 	int option_index = 0;
 	int c;
 	char* optstring = NULL;
 	if (options.type == PASSIVE) {
-		optstring = "hi:w:s:e:u:";
+		optstring = "hi:w:s:e:u:v";
 	}
 	else if (options.type == ONESIDED) {
-		optstring = "hi:w:s:e:u:";
+		optstring = "hi:w:s:e:u:v";
 	}
 	else if (options.type == ATOMIC) {
 		optstring = "hi:u:";
 	}
 	else if (options.type == COLLECTIVE) {
 		if (options.subtype == ALLREDUCE) {
-			optstring = "hi:w:s:e:u:";
+			optstring = "hi:w:s:e:u:v";
 		}
 		else if (options.subtype == BARRIER) {
 			optstring = "hi:u:";
@@ -80,6 +80,9 @@ int benchmark_options(int argc, char* argv[]) {
 			case 1:
 				options.format = RAW_CSV;
 				break;
+			case 'v':
+				verify = 1;
+				break;
 			case 'u':
 				options.skip = atoi(optarg);
 				break;
@@ -114,6 +117,7 @@ void print_help_message() {
 		fprintf(stdout,
 		        "\t -e [--max_message_size] arg\t Maximum message size. "
 		        "Default (1 << 22) byte.\n");
+		fprintf(stdout,"\t -v [--verify]\tCheck results of the performed operation.\n");
 	}
 	else if (options.type == NOTIFY && options.subtype == RATE) {
 		fprintf(stdout,

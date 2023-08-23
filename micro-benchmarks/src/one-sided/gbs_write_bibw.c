@@ -9,6 +9,7 @@ int main(int argc, char* argv[]) {
 	int i, j;
 	int bo_ret = OPTIONS_OKAY;
 	double time;
+	char check_val;
 	struct measurements_t measurements;
 
 	options.type = ONESIDED;
@@ -43,6 +44,9 @@ int main(int argc, char* argv[]) {
 	const gaspi_segment_id_t segment_id_a = 0;
 	const gaspi_segment_id_t segment_id_b = 1;
 	const gaspi_queue_id_t q_id = 0;
+	gaspi_pointer_t ptr_a;
+	gaspi_pointer_t ptr_b;
+	char* ptr_check;
 
 	print_header(my_id);
 
@@ -53,6 +57,9 @@ int main(int argc, char* argv[]) {
 		    segment_id_a, size * window_size * sizeof(char), 'a');
 		allocate_gaspi_memory(
 		    segment_id_b, size * window_size * sizeof(char), 'b');
+		GASPI_CHECK(gaspi_segment_ptr(segment_id_a, &ptr_a));
+		GASPI_CHECK(gaspi_segment_ptr(segment_id_b, &ptr_b));
+
 		GASPI_CHECK(gaspi_barrier(GASPI_GROUP_ALL, GASPI_BLOCK));
 		if (my_id == 0) {
 			for (i = 0; i < options.iterations + options.skip; ++i) {
@@ -93,6 +100,17 @@ int main(int argc, char* argv[]) {
 			}
 		}
 		GASPI_CHECK(gaspi_barrier(GASPI_GROUP_ALL, GASPI_BLOCK));
+		if (verify) {
+			ptr_check = my_id == 0 ? ptr_b : ptr_a;
+			check_val = my_id == 0 ? 'a' : 'b';
+			for (i = 0; i < size * window_size; ++i) {
+				if (ptr_check[i] != check_val) {
+					fprintf(stderr,
+					        "Verification failed. Result is invalid!\n");
+					return EXIT_FAILURE;
+				}
+			}
+		}
 		print_result(my_id, measurements, size * 2);
 		free_gaspi_memory(segment_id_a);
 		free_gaspi_memory(segment_id_b);
