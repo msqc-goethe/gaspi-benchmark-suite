@@ -42,4 +42,14 @@ target_include_directories(
 )
 target_compile_features(gbs_read_notify_bw PRIVATE c_std_11)
 
-install(TARGETS gbs_write_notify_bw gbs_write_notify_lat gbs_read_notify_bw gbs_read_notify_lat RUNTIME DESTINATION bin/one-sided-extended)
+add_executable(gbs_write_notify_bibw "gbs_write_notify_bibw.c")
+target_link_libraries(
+  gbs_write_notify_bibw PRIVATE "benchmark_utility" "${GPI2_LIBRARIES}"
+)
+target_include_directories(
+  gbs_write_notify_bibw PRIVATE "${GPI2_INCLUDE_DIRS}"
+                       "${PROJECT_SOURCE_DIR}/micro-benchmarks/util"
+)
+target_compile_features(gbs_write_notify_bibw PRIVATE c_std_11)
+
+install(TARGETS gbs_write_notify_bw gbs_write_notify_lat gbs_write_notify_bibw gbs_read_notify_bw gbs_read_notify_lat RUNTIME DESTINATION bin/one-sided-extended)

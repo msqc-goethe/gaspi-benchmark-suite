@@ -44,6 +44,10 @@ int main(int argc, char* argv[]) {
 	const gaspi_segment_id_t segment_id_send = 0;
 	const gaspi_segment_id_t segment_id_recv = 1;
 	const gaspi_queue_id_t q_id = 0;
+	const gaspi_notification_t notification_val = 1;
+	const gaspi_notification_id_t notification_id = 0;
+	gaspi_notification_id_t first;
+
 	gaspi_pointer_t ptr;
 
 	print_header(my_id);
@@ -57,25 +61,32 @@ int main(int argc, char* argv[]) {
 		allocate_gaspi_memory(
 		    segment_id_recv, size * window_size * sizeof(char), 'y');
 		GASPI_CHECK(gaspi_segment_ptr(segment_id_recv, &ptr));
-
 		GASPI_CHECK(gaspi_barrier(GASPI_GROUP_ALL, GASPI_BLOCK));
+
 		if (my_id == 0) {
 			for (i = 0; i < options.iterations + options.skip; ++i) {
+				GASPI_CHECK(gaspi_barrier(q_id, GASPI_BLOCK));
 				if (i >= options.skip) {
 					time = stopwatch_start();
 				}
 				for (j = 0; j < window_size; ++j) {
-					GASPI_CHECK(gaspi_write(segment_id_send,
-					                        j * size,
-					                        1,
-					                        segment_id_recv,
-					                        j * size,
-					                        size,
-					                        q_id,
-					                        GASPI_BLOCK));
+					GASPI_CHECK(gaspi_write_notify(segment_id_send,
+					                               j * size,
+					                               1,
+					                               segment_id_recv,
+					                               j * size,
+					                               size,
+					                               notification_id + j,
+					                               notification_val,
+					                               q_id,
+					                               GASPI_BLOCK));
 				}
 				GASPI_CHECK(gaspi_wait(q_id, GASPI_BLOCK));
-				GASPI_CHECK(gaspi_barrier(GASPI_GROUP_ALL, GASPI_BLOCK));
+				GASPI_CHECK(gaspi_notify_waitsome(segment_id_recv,
+				                                  notification_id,
+				                                  window_size,
+				                                  &first,
+				                                  GASPI_BLOCK));
 				if (i >= options.skip) {
 					measurements.time[i - options.skip] = stopwatch_stop(time);
 				}
@@ -83,18 +94,25 @@ int main(int argc, char* argv[]) {
 		}
 		else if (my_id == 1) {
 			for (i = 0; i < options.iterations + options.skip; ++i) {
+				GASPI_CHECK(gaspi_barrier(q_id, GASPI_BLOCK));
 				for (j = 0; j < window_size; ++j) {
-					GASPI_CHECK(gaspi_write(segment_id_send,
+					GASPI_CHECK(gaspi_write_notify(segment_id_send,
 					                        j * size,
 					                        0,
 					                        segment_id_recv,
 					                        j * size,
 					                        size,
+					                        notification_id + j,
+					                        notification_val,
 					                        q_id,
 					                        GASPI_BLOCK));
 				}
 				GASPI_CHECK(gaspi_wait(q_id, GASPI_BLOCK));
-				GASPI_CHECK(gaspi_barrier(GASPI_GROUP_ALL, GASPI_BLOCK));
+				GASPI_CHECK(gaspi_notify_waitsome(segment_id_recv,
+				                                  notification_id,
+				                                  window_size,
+				                                  &first,
+				                                  GASPI_BLOCK));
 			}
 		}
 		GASPI_CHECK(gaspi_barrier(GASPI_GROUP_ALL, GASPI_BLOCK));
