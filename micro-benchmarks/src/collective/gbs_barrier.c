@@ -51,5 +51,6 @@ int main(int argc, char* argv[]) {
 	}
 	print_result_coll(my_id, num_pes, size, measurements);
 	free(measurements.time);
+	GASPI_CHECK(gaspi_proc_term(GASPI_BLOCK));
 	return EXIT_SUCCESS;
 }

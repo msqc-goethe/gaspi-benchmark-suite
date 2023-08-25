@@ -79,5 +79,6 @@ int main(int argc, char* argv[]) {
 		free_memory(recv_buffer);
 	}
 	free(measurements.time);
+	GASPI_CHECK(gaspi_proc_term(GASPI_BLOCK));
 	return EXIT_SUCCESS;
 }
