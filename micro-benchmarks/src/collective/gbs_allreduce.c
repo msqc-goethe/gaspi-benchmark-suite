@@ -44,16 +44,16 @@ int main(int argc, char* argv[]) {
 	print_header(my_id);
 
 	GASPI_CHECK(gaspi_allreduce_elem_max(&max_elem));
+	if (options.max_message_size > max_elem) {
+		fprintf(stdout,
+		        "limit for allreduce is %d requested was %d\n",
+		        max_elem,
+		        options.max_message_size);
+		options.max_message_size = max_elem;
+	}
 
 	for (size = options.min_message_size; size <= options.max_message_size;
 	     size *= 2) {
-		if (size >= max_elem) {
-			fprintf(stderr,
-			        "%d elements exceede limit of %d for gaspi_allreduce!\n",
-			        size,
-			        max_elem);
-			return EXIT_FAILURE;
-		}
 		allocate_memory((void**) &send_buffer, size * sizeof(float));
 		allocate_memory((void**) &recv_buffer, size * sizeof(float));
 
