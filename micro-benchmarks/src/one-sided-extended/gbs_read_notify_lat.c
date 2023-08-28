@@ -45,36 +45,32 @@ int main(int argc, char* argv[]) {
 
 	print_header(my_id);
 
-	int window_size = options.window_size;
 	for (size = options.min_message_size; size <= options.max_message_size;
 	     size *= 2) {
-		allocate_gaspi_memory(segment_id,
-		                      size * window_size * sizeof(char),
-		                      my_id == 0 ? 'a' : 'b');
+		allocate_gaspi_memory(
+		    segment_id, size * sizeof(char), my_id == 0 ? 'a' : 'b');
 		GASPI_CHECK(gaspi_segment_ptr(segment_id, &ptr));
 		if (my_id == 0) {
 			for (i = 0; i < options.iterations + options.skip; ++i) {
 				if (i >= options.skip) {
 					time = stopwatch_start();
 				}
-				for (j = 0; j < window_size; ++j) {
-					GASPI_CHECK(gaspi_read_notify(segment_id,
-					                              j * size,
-					                              1,
-					                              segment_id,
-					                              j * size,
-					                              size,
-					                              notification_id,
-					                              q_id,
-					                              GASPI_BLOCK));
-					GASPI_CHECK(gaspi_wait(q_id, GASPI_BLOCK));
-				}
+				GASPI_CHECK(gaspi_read_notify(segment_id,
+				                              j * size,
+				                              1,
+				                              segment_id,
+				                              j * size,
+				                              size,
+				                              notification_id,
+				                              q_id,
+				                              GASPI_BLOCK));
+				GASPI_CHECK(gaspi_wait(q_id, GASPI_BLOCK));
 				if (i >= options.skip) {
 					measurements.time[i - options.skip] = stopwatch_stop(time);
 				}
 			}
 			if (verify) {
-				for (i = 0; i < size * window_size; ++i) {
+				for (i = 0; i < size; ++i) {
 					if (((char*) ptr)[i] != 'b') {
 						fprintf(stderr,
 						        "Verification failed. Result is invalid!\n");
