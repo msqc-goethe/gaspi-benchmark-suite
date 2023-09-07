@@ -20,7 +20,7 @@ int main(int argc, char* argv[]) {
 	switch (bo_ret) {
 		case OPTIONS_BAD_USAGE:
 			print_bad_usage();
-			break;
+			return EXIT_FAILURE;
 		case OPTIONS_HELP:
 			print_help_message();
 			return EXIT_SUCCESS;
@@ -55,10 +55,10 @@ int main(int argc, char* argv[]) {
 					time = stopwatch_start();
 				}
 				GASPI_CHECK(gaspi_read(segment_id,
-				                       j * size,
+				                       0,
 				                       1,
 				                       segment_id,
-				                       j * size,
+				                       0,
 				                       size,
 				                       q_id,
 				                       GASPI_BLOCK));
@@ -67,7 +67,7 @@ int main(int argc, char* argv[]) {
 					measurements.time[i - options.skip] = stopwatch_stop(time);
 				}
 			}
-			if (verify) {
+			if (options.verify) {
 				for (i = 0; i < size; ++i) {
 					if (((char*) ptr)[i] != 'b') {
 						fprintf(stderr,

@@ -20,7 +20,7 @@ int main(int argc, char* argv[]) {
 	switch (bo_ret) {
 		case OPTIONS_BAD_USAGE:
 			print_bad_usage();
-			break;
+			return EXIT_FAILURE;
 		case OPTIONS_HELP:
 			print_help_message();
 			return EXIT_SUCCESS;
@@ -69,7 +69,7 @@ int main(int argc, char* argv[]) {
 					measurements.time[i - options.skip] = stopwatch_stop(time);
 				}
 			}
-			if (verify) {
+			if (options.verify) {
 				for (i = 0; i < size; ++i) {
 					if (((char*) ptr)[i] != 'b') {
 						fprintf(stderr,

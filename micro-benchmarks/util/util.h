@@ -53,11 +53,14 @@ struct benchmark_options_t {
 	int window_size;
 	int iterations;
 	int skip;
+	int single_buffer;
+	int verify;
 
 	size_t min_message_size;
 	size_t max_message_size;
 
 	char* name;
+	char* memory_mode;
 };
 
 int benchmark_options(int argc, char* argv[]);
@@ -78,5 +81,4 @@ void print_notify_lat(const gaspi_rank_t id,
 
 extern struct benchmark_options_t options;
 extern struct bad_usage_t bad_usage;
-extern int verify;
 #endif

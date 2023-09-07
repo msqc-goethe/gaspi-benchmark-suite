@@ -21,7 +21,7 @@ int main(int argc, char* argv[]) {
 	switch (bo_ret) {
 		case OPTIONS_BAD_USAGE:
 			print_bad_usage();
-			break;
+			return EXIT_FAILURE;
 		case OPTIONS_HELP:
 			print_help_message();
 			return EXIT_SUCCESS;
@@ -72,7 +72,7 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
-	if (my_id == 0 && verify) {
+	if (my_id == 0 && options.verify) {
 		GASPI_CHECK(
 		    gaspi_read(segment_id, 0, 1, segment_id, 0, 1, 0, GASPI_BLOCK));
 		GASPI_CHECK(gaspi_wait(0, GASPI_BLOCK));

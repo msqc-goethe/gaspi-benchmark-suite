@@ -23,7 +23,7 @@ int main(int argc, char* argv[]) {
 	switch (bo_ret) {
 		case OPTIONS_BAD_USAGE:
 			print_bad_usage();
-			break;
+			return EXIT_FAILURE;
 		case OPTIONS_HELP:
 			print_help_message();
 			return EXIT_SUCCESS;
@@ -116,7 +116,7 @@ int main(int argc, char* argv[]) {
 			}
 		}
 		GASPI_CHECK(gaspi_barrier(GASPI_GROUP_ALL, GASPI_BLOCK));
-		if (verify) {
+		if (options.verify) {
 			check_val = my_id == 0 ? 'b' : 'a';
 			for (i = 0; i < size * window_size; ++i) {
 				if (((char*) ptr)[i] != check_val) {

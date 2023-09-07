@@ -20,7 +20,7 @@ int main(int argc, char* argv[]) {
 	switch (bo_ret) {
 		case OPTIONS_BAD_USAGE:
 			print_bad_usage();
-			break;
+			return EXIT_FAILURE;
 		case OPTIONS_HELP:
 			print_help_message();
 			return EXIT_SUCCESS;

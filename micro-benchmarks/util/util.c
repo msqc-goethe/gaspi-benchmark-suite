@@ -18,6 +18,7 @@ int benchmark_options(int argc, char* argv[]) {
 	    {"csv", no_argument, 0, 0},
 	    {"raw_csv", no_argument, 0, 1},
 	    {"verify", no_argument, 0, 'v'},
+	    {"single-buffer", no_argument, 0, 'b'},
 	    {"warmup-iterations", required_argument, 0, 'u'}};
 
 	int option_index = 0;
@@ -27,7 +28,12 @@ int benchmark_options(int argc, char* argv[]) {
 		optstring = "hi:w:s:e:u:v";
 	}
 	else if (options.type == ONESIDED) {
-		optstring = "hi:w:s:e:u:v";
+		if (options.subtype == LAT) {
+			optstring = "hi:w:s:e:u:v";
+		}
+		else {
+			optstring = "hi:w:s:e:u:vb";
+		}
 	}
 	else if (options.type == ATOMIC) {
 		optstring = "hi:u:";
@@ -54,6 +60,10 @@ int benchmark_options(int argc, char* argv[]) {
 	options.iterations = DEFAULT_ITERATIONS;
 	options.skip = DEFAULT_WARMUP_ITERATIONS;
 	options.format = PLAIN;
+	options.verify = 0;
+	options.single_buffer = 0;
+	options.memory_mode =
+	    options.subtype == LAT ? "single_buffer" : "multiple_buffer";
 
 	while (1) {
 		c = getopt_long(argc, argv, optstring, long_options, &option_index);
@@ -81,7 +91,11 @@ int benchmark_options(int argc, char* argv[]) {
 				options.format = RAW_CSV;
 				break;
 			case 'v':
-				verify = 1;
+				options.verify = 1;
+				break;
+			case 'b':
+				options.single_buffer = 1;
+				options.memory_mode = "single_buffer";
 				break;
 			case 'u':
 				options.skip = atoi(optarg);
@@ -117,7 +131,14 @@ void print_help_message() {
 		fprintf(stdout,
 		        "\t -e [--max_message_size] arg\t Maximum message size. "
 		        "Default (1 << 22) byte.\n");
-		fprintf(stdout,"\t -v [--verify]\tCheck results of the performed operation.\n");
+		fprintf(stdout,
+		        "\t -v [--verify]\tCheck results of the performed "
+		        "operation.\n");
+		if (options.subtype != LAT) {
+			fprintf(stdout,
+			        "\t -b [--single-buffer]\tUse a single memory allocation "
+			        "for the measurements.\n");
+		}
 	}
 	else if (options.type == NOTIFY && options.subtype == RATE) {
 		fprintf(stdout,
@@ -251,8 +272,10 @@ void print_header(const gaspi_rank_t id) {
 		else if (options.subtype == BW) {
 			if (options.format == PLAIN)
 				fprintf(stdout,
-				        "%-*s%*s%*s%*s%*s%*s%*s\n",
+				        "%-*s%*s%*s%*s%*s%*s%*s%*s\n",
 				        10,
+				        "memory_mode",
+				        FIELD_WIDTH,
 				        "msg_size",
 				        FIELD_WIDTH,
 				        "min_bw",
@@ -267,9 +290,9 @@ void print_header(const gaspi_rank_t id) {
 				        FIELD_WIDTH,
 				        "std_bw");
 			else if (options.format == CSV)
-				fprintf(
-				    stdout,
-				    "msg_size,min_bw,max_bw,avg_bw,median_bw,var_bw,std_bw\n");
+				fprintf(stdout,
+				        "memory_mode,msg_size,min_bw,max_bw,avg_bw,median_bw,"
+				        "var_bw,std_bw\n");
 			else if (options.format == RAW_CSV) {
 				fprintf(stdout, "msg_size,count,bw\n");
 			}
@@ -404,8 +427,10 @@ void print_result(const gaspi_rank_t id,
 		compute_statistics(measurements, &statistics, bytes);
 		if (options.format == PLAIN) {
 			fprintf(stdout,
-			        "%-*d%*.*f%*.*f%*.*f%*.*f%*.*f%*.*f\n",
+			        "%-*s%*d%*.*f%*.*f%*.*f%*.*f%*.*f%*.*f\n",
 			        10,
+			        options.memory_mode,
+			        FIELD_WIDTH,
 			        size,
 			        FIELD_WIDTH,
 			        FLOAT_PRECISION,
@@ -428,7 +453,8 @@ void print_result(const gaspi_rank_t id,
 		}
 		else if (options.format == CSV) {
 			fprintf(stdout,
-			        "%d,%.*f,%.*f,%.*f,%.*f,%.*f,%.*f\n",
+			        "%s,%d,%.*f,%.*f,%.*f,%.*f,%.*f,%.*f\n",
+			        options.memory_mode,
 			        size,
 			        FLOAT_PRECISION,
 			        statistics.min,
