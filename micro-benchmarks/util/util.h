@@ -55,6 +55,7 @@ struct benchmark_options_t {
 	int skip;
 	int single_buffer;
 	int verify;
+	int gaspi_timer;
 
 	size_t min_message_size;
 	size_t max_message_size;

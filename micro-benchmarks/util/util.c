@@ -2,6 +2,7 @@
 #include "benchdefs.h"
 #include "check.h"
 #include "math.h"
+#include "stopwatch.h"
 
 struct benchmark_options_t options;
 struct bad_usage_t bad_usage;
@@ -19,38 +20,39 @@ int benchmark_options(int argc, char* argv[]) {
 	    {"raw_csv", no_argument, 0, 1},
 	    {"verify", no_argument, 0, 'v'},
 	    {"single-buffer", no_argument, 0, 'b'},
+	    {"timer", required_argument, 0, 't'},
 	    {"warmup-iterations", required_argument, 0, 'u'}};
 
 	int option_index = 0;
 	int c;
 	char* optstring = NULL;
 	if (options.type == PASSIVE) {
-		optstring = "hi:w:s:e:u:v";
+		optstring = "hi:w:s:e:u:vt:";
 	}
 	else if (options.type == ONESIDED) {
 		if (options.subtype == LAT) {
-			optstring = "hi:w:s:e:u:v";
+			optstring = "hi:w:s:e:u:vt:";
 		}
 		else {
-			optstring = "hi:w:s:e:u:vb";
+			optstring = "hi:w:s:e:u:vbt:";
 		}
 	}
 	else if (options.type == ATOMIC) {
-		optstring = "hi:u:";
+		optstring = "hi:u:t:";
 	}
 	else if (options.type == COLLECTIVE) {
 		if (options.subtype == ALLREDUCE) {
-			optstring = "hi:w:s:e:u:v";
+			optstring = "hi:w:s:e:u:vt:";
 		}
 		else if (options.subtype == BARRIER) {
-			optstring = "hi:u:";
+			optstring = "hi:u:t:";
 		}
 	}
 	else if (options.type == NOTIFY) {
 		if (options.subtype == RATE)
-			optstring = "hi:u:w:";
+			optstring = "hi:u:w:t:";
 		else
-			optstring = "hi:u:";
+			optstring = "hi:u:t:";
 	}
 
 	// set default values
@@ -64,6 +66,7 @@ int benchmark_options(int argc, char* argv[]) {
 	options.single_buffer = 0;
 	options.memory_mode =
 	    options.subtype == LAT ? "single_buffer" : "multiple_buffer";
+	options.gaspi_timer = 0;
 
 	while (1) {
 		c = getopt_long(argc, argv, optstring, long_options, &option_index);
@@ -97,6 +100,9 @@ int benchmark_options(int argc, char* argv[]) {
 				options.single_buffer = 1;
 				options.memory_mode = "single_buffer";
 				break;
+			case 't':
+				options.gaspi_timer = atoi(optarg);
+				break;
 			case 'u':
 				options.skip = atoi(optarg);
 				break;
@@ -106,6 +112,7 @@ int benchmark_options(int argc, char* argv[]) {
 				return OPTIONS_BAD_USAGE;
 		}
 	}
+	init_timer(&benchmark_timer);
 	return OPTIONS_OKAY;
 }
 
@@ -154,6 +161,9 @@ void print_help_message() {
 	fprintf(stdout, "\t --csv\tPrint output in csv format with statistics.\n");
 	fprintf(stdout,
 	        "\t --raw_csv\tPrint the collected raw data without statistics.\n");
+	fprintf(stdout,
+	        "\t -t [--timer] arg\t 0: clock_gettime | 1: gaspi_time_get | 2: "
+	        "gaspi_time_ticks.\n");
 	fprintf(stdout, "\n\n");
 	fflush(stdout);
 }
