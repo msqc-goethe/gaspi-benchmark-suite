@@ -30,13 +30,13 @@ int main(int argc, char* argv[]) {
 	GASPI_CHECK(gaspi_proc_rank(&my_id));
 	GASPI_CHECK(gaspi_proc_num(&num_pes));
 
-	measurements.time = malloc(options.iterations * sizeof(double));
-	measurements.n = options.iterations;
-
 	if (num_pes > 2) {
 		fprintf(stderr, "Benchmark requires exactly two processes!\n");
 		return EXIT_FAILURE;
 	}
+
+	measurements.time = malloc(options.iterations * sizeof(double));
+	measurements.n = options.iterations;
 
 	const gaspi_segment_id_t segment_id = 0;
 	const gaspi_queue_id_t q_id = 0;
@@ -53,16 +53,16 @@ int main(int argc, char* argv[]) {
 		for (size = options.min_message_size; size <= options.max_message_size;
 		     size *= 2) {
 			if (my_id == 0) {
-				if (i >= options.skip) {
-					time = stopwatch_start();
-				}
 				for (i = 0; i < options.iterations + options.skip; ++i) {
+					if (i >= options.skip) {
+						time = stopwatch_start();
+					}
 					for (j = 0; j < window_size; ++j) {
 						GASPI_CHECK(gaspi_read(segment_id,
 						                       0,
 						                       1,
 						                       segment_id,
-											   0,
+						                       0,
 						                       size,
 						                       q_id,
 						                       GASPI_BLOCK));
