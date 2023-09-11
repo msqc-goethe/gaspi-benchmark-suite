@@ -54,31 +54,62 @@ int main(int argc, char* argv[]) {
 		options.max_message_size = max_elem;
 	}
 
-	for (size = options.min_message_size; size <= options.max_message_size;
-	     size *= 2) {
-		allocate_memory((void**) &send_buffer, size * sizeof(float));
-		allocate_memory((void**) &recv_buffer, size * sizeof(float));
+	if (options.single_buffer) {
+		allocate_memory((void**) &send_buffer,
+		                options.max_message_size * sizeof(float));
+		allocate_memory((void**) &recv_buffer,
+		                options.max_message_size * sizeof(float));
+		for (size = options.min_message_size; size <= options.max_message_size;
+		     size *= 2) {
+			GASPI_CHECK(gaspi_barrier(GASPI_GROUP_ALL, GASPI_BLOCK));
 
-		GASPI_CHECK(gaspi_barrier(GASPI_GROUP_ALL, GASPI_BLOCK));
-
-		for (i = 0; i < options.iterations + options.skip; ++i) {
-			if (i >= options.skip) {
-				time = stopwatch_start();
+			for (i = 0; i < options.iterations + options.skip; ++i) {
+				if (i >= options.skip) {
+					time = stopwatch_start();
+				}
+				GASPI_CHECK(gaspi_allreduce(send_buffer,
+				                            recv_buffer,
+				                            size,
+				                            GASPI_OP_SUM,
+				                            GASPI_TYPE_FLOAT,
+				                            GASPI_GROUP_ALL,
+				                            GASPI_BLOCK));
+				if (i >= options.skip) {
+					measurements.time[i - options.skip] = stopwatch_stop(time);
+				}
 			}
-			GASPI_CHECK(gaspi_allreduce(send_buffer,
-			                            recv_buffer,
-			                            size,
-			                            GASPI_OP_SUM,
-			                            GASPI_TYPE_FLOAT,
-			                            GASPI_GROUP_ALL,
-			                            GASPI_BLOCK));
-			if (i >= options.skip) {
-				measurements.time[i - options.skip] = stopwatch_stop(time);
-			}
+			print_result_coll(my_id, num_pes, size, measurements);
 		}
-		print_result_coll(my_id, num_pes, size, measurements);
 		free_memory(send_buffer);
 		free_memory(recv_buffer);
+	}
+	else {
+		for (size = options.min_message_size; size <= options.max_message_size;
+		     size *= 2) {
+			allocate_memory((void**) &send_buffer, size * sizeof(float));
+			allocate_memory((void**) &recv_buffer, size * sizeof(float));
+
+			GASPI_CHECK(gaspi_barrier(GASPI_GROUP_ALL, GASPI_BLOCK));
+
+			for (i = 0; i < options.iterations + options.skip; ++i) {
+				if (i >= options.skip) {
+					time = stopwatch_start();
+				}
+				GASPI_CHECK(gaspi_allreduce(send_buffer,
+				                            recv_buffer,
+				                            size,
+				                            GASPI_OP_SUM,
+				                            GASPI_TYPE_FLOAT,
+				                            GASPI_GROUP_ALL,
+				                            GASPI_BLOCK));
+				if (i >= options.skip) {
+					measurements.time[i - options.skip] = stopwatch_stop(time);
+				}
+			}
+			print_result_coll(my_id, num_pes, size, measurements);
+			free_memory(send_buffer);
+			free_memory(recv_buffer);
+		}
 	}
 	free(measurements.time);
 	GASPI_CHECK(gaspi_proc_term(GASPI_BLOCK));

@@ -53,82 +53,164 @@ int main(int argc, char* argv[]) {
 	print_header(my_id);
 
 	int window_size = options.window_size;
-	for (size = options.min_message_size; size <= options.max_message_size;
-	     size *= 2) {
+	if (options.single_buffer) {
 		allocate_gaspi_memory(segment_id_send,
-		                      size * window_size * sizeof(char),
+		                      options.max_message_size * sizeof(char),
 		                      my_id == 0 ? 'a' : 'b');
 		allocate_gaspi_memory(
-		    segment_id_recv, size * window_size * sizeof(char), 'y');
+		    segment_id_recv, options.max_message_size * sizeof(char), 'y');
 		GASPI_CHECK(gaspi_segment_ptr(segment_id_recv, &ptr));
 		GASPI_CHECK(gaspi_barrier(GASPI_GROUP_ALL, GASPI_BLOCK));
-
-		if (my_id == 0) {
-			for (i = 0; i < options.iterations + options.skip; ++i) {
-				GASPI_CHECK(gaspi_barrier(q_id, GASPI_BLOCK));
-				if (i >= options.skip) {
-					time = stopwatch_start();
-				}
-				for (j = 0; j < window_size; ++j) {
-					GASPI_CHECK(gaspi_write_notify(segment_id_send,
-					                               j * size,
-					                               1,
-					                               segment_id_recv,
-					                               j * size,
-					                               size,
-					                               notification_id + j,
-					                               notification_val,
-					                               q_id,
-					                               GASPI_BLOCK));
-				}
-				GASPI_CHECK(gaspi_wait(q_id, GASPI_BLOCK));
-				GASPI_CHECK(gaspi_notify_waitsome(segment_id_recv,
-				                                  notification_id,
-				                                  window_size,
-				                                  &first,
-				                                  GASPI_BLOCK));
-				if (i >= options.skip) {
-					measurements.time[i - options.skip] = stopwatch_stop(time);
-				}
-			}
-		}
-		else if (my_id == 1) {
-			for (i = 0; i < options.iterations + options.skip; ++i) {
-				GASPI_CHECK(gaspi_barrier(q_id, GASPI_BLOCK));
-				for (j = 0; j < window_size; ++j) {
-					GASPI_CHECK(gaspi_write_notify(segment_id_send,
-					                        j * size,
-					                        0,
-					                        segment_id_recv,
-					                        j * size,
-					                        size,
-					                        notification_id + j,
-					                        notification_val,
-					                        q_id,
-					                        GASPI_BLOCK));
-				}
-				GASPI_CHECK(gaspi_wait(q_id, GASPI_BLOCK));
-				GASPI_CHECK(gaspi_notify_waitsome(segment_id_recv,
-				                                  notification_id,
-				                                  window_size,
-				                                  &first,
-				                                  GASPI_BLOCK));
-			}
-		}
-		GASPI_CHECK(gaspi_barrier(GASPI_GROUP_ALL, GASPI_BLOCK));
-		if (options.verify) {
-			check_val = my_id == 0 ? 'b' : 'a';
-			for (i = 0; i < size * window_size; ++i) {
-				if (((char*) ptr)[i] != check_val) {
-					fprintf(stderr,
-					        "Verification failed. Result is invalid!\n");
-					return EXIT_FAILURE;
+		for (size = options.min_message_size; size <= options.max_message_size;
+		     size *= 2) {
+			if (my_id == 0) {
+				for (i = 0; i < options.iterations + options.skip; ++i) {
+					GASPI_CHECK(gaspi_barrier(q_id, GASPI_BLOCK));
+					if (i >= options.skip) {
+						time = stopwatch_start();
+					}
+					for (j = 0; j < window_size; ++j) {
+						GASPI_CHECK(gaspi_write_notify(segment_id_send,
+						                               0,
+						                               1,
+						                               segment_id_recv,
+						                               0,
+						                               size,
+						                               notification_id + j,
+						                               notification_val,
+						                               q_id,
+						                               GASPI_BLOCK));
+					}
+					GASPI_CHECK(gaspi_wait(q_id, GASPI_BLOCK));
+					GASPI_CHECK(gaspi_notify_waitsome(segment_id_recv,
+					                                  notification_id,
+					                                  window_size,
+					                                  &first,
+					                                  GASPI_BLOCK));
+					if (i >= options.skip) {
+						measurements.time[i - options.skip] =
+						    stopwatch_stop(time);
+					}
 				}
 			}
+			else if (my_id == 1) {
+				for (i = 0; i < options.iterations + options.skip; ++i) {
+					GASPI_CHECK(gaspi_barrier(q_id, GASPI_BLOCK));
+					for (j = 0; j < window_size; ++j) {
+						GASPI_CHECK(gaspi_write_notify(segment_id_send,
+						                               0,
+						                               0,
+						                               segment_id_recv,
+						                               0,
+						                               size,
+						                               notification_id + j,
+						                               notification_val,
+						                               q_id,
+						                               GASPI_BLOCK));
+					}
+					GASPI_CHECK(gaspi_wait(q_id, GASPI_BLOCK));
+					GASPI_CHECK(gaspi_notify_waitsome(segment_id_recv,
+					                                  notification_id,
+					                                  window_size,
+					                                  &first,
+					                                  GASPI_BLOCK));
+				}
+			}
+			GASPI_CHECK(gaspi_barrier(GASPI_GROUP_ALL, GASPI_BLOCK));
+			if (options.verify) {
+				check_val = my_id == 0 ? 'b' : 'a';
+				for (i = 0; i < size * window_size; ++i) {
+					if (((char*) ptr)[i] != check_val) {
+						fprintf(stderr,
+						        "Verification failed. Result is invalid!\n");
+						return EXIT_FAILURE;
+					}
+				}
+			}
+			print_result(my_id, measurements, size * 2);
 		}
-		print_result(my_id, measurements, size * 2);
 		free_gaspi_memory(segment_id_send);
 		free_gaspi_memory(segment_id_recv);
+	}
+	else {
+		for (size = options.min_message_size; size <= options.max_message_size;
+		     size *= 2) {
+			allocate_gaspi_memory(segment_id_send,
+			                      size * window_size * sizeof(char),
+			                      my_id == 0 ? 'a' : 'b');
+			allocate_gaspi_memory(
+			    segment_id_recv, size * window_size * sizeof(char), 'y');
+			GASPI_CHECK(gaspi_segment_ptr(segment_id_recv, &ptr));
+			GASPI_CHECK(gaspi_barrier(GASPI_GROUP_ALL, GASPI_BLOCK));
+
+			if (my_id == 0) {
+				for (i = 0; i < options.iterations + options.skip; ++i) {
+					GASPI_CHECK(gaspi_barrier(q_id, GASPI_BLOCK));
+					if (i >= options.skip) {
+						time = stopwatch_start();
+					}
+					for (j = 0; j < window_size; ++j) {
+						GASPI_CHECK(gaspi_write_notify(segment_id_send,
+						                               j * size,
+						                               1,
+						                               segment_id_recv,
+						                               j * size,
+						                               size,
+						                               notification_id + j,
+						                               notification_val,
+						                               q_id,
+						                               GASPI_BLOCK));
+					}
+					GASPI_CHECK(gaspi_wait(q_id, GASPI_BLOCK));
+					GASPI_CHECK(gaspi_notify_waitsome(segment_id_recv,
+					                                  notification_id,
+					                                  window_size,
+					                                  &first,
+					                                  GASPI_BLOCK));
+					if (i >= options.skip) {
+						measurements.time[i - options.skip] =
+						    stopwatch_stop(time);
+					}
+				}
+			}
+			else if (my_id == 1) {
+				for (i = 0; i < options.iterations + options.skip; ++i) {
+					GASPI_CHECK(gaspi_barrier(q_id, GASPI_BLOCK));
+					for (j = 0; j < window_size; ++j) {
+						GASPI_CHECK(gaspi_write_notify(segment_id_send,
+						                               j * size,
+						                               0,
+						                               segment_id_recv,
+						                               j * size,
+						                               size,
+						                               notification_id + j,
+						                               notification_val,
+						                               q_id,
+						                               GASPI_BLOCK));
+					}
+					GASPI_CHECK(gaspi_wait(q_id, GASPI_BLOCK));
+					GASPI_CHECK(gaspi_notify_waitsome(segment_id_recv,
+					                                  notification_id,
+					                                  window_size,
+					                                  &first,
+					                                  GASPI_BLOCK));
+				}
+			}
+			GASPI_CHECK(gaspi_barrier(GASPI_GROUP_ALL, GASPI_BLOCK));
+			if (options.verify) {
+				check_val = my_id == 0 ? 'b' : 'a';
+				for (i = 0; i < size * window_size; ++i) {
+					if (((char*) ptr)[i] != check_val) {
+						fprintf(stderr,
+						        "Verification failed. Result is invalid!\n");
+						return EXIT_FAILURE;
+					}
+				}
+			}
+			print_result(my_id, measurements, size * 2);
+			free_gaspi_memory(segment_id_send);
+			free_gaspi_memory(segment_id_recv);
+		}
 	}
 	free(measurements.time);
 	GASPI_CHECK(gaspi_proc_term(GASPI_BLOCK));

@@ -5,7 +5,6 @@
 
 int main(int argc, char* argv[]) {
 	gaspi_rank_t my_id, num_pes;
-	size_t size;
 	int i, j;
 	int bo_ret = OPTIONS_OKAY;
 	struct measurements_t measurements;
@@ -49,7 +48,7 @@ int main(int argc, char* argv[]) {
 			measurements.time[i - options.skip] = stopwatch_stop(time);
 		}
 	}
-	print_result_coll(my_id, num_pes, size, measurements);
+	print_result_coll(my_id, num_pes, 0, measurements);
 	free(measurements.time);
 	GASPI_CHECK(gaspi_proc_term(GASPI_BLOCK));
 	return EXIT_SUCCESS;

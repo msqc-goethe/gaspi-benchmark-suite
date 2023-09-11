@@ -31,13 +31,13 @@ int main(int argc, char* argv[]) {
 	GASPI_CHECK(gaspi_proc_rank(&my_id));
 	GASPI_CHECK(gaspi_proc_num(&num_pes));
 
-	measurements.time = malloc(options.iterations * sizeof(double));
-	measurements.n = options.iterations;
-
 	if (num_pes > 2) {
 		fprintf(stderr, "Benchmark requires exactly two processes!\n");
 		return EXIT_FAILURE;
 	}
+
+	measurements.time = malloc(options.iterations * sizeof(double));
+	measurements.n = options.iterations;
 
 	const gaspi_segment_id_t segment_id = 0;
 	const gaspi_queue_id_t q_id = 0;

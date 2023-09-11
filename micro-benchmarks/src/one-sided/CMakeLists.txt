@@ -11,6 +11,7 @@ target_include_directories(
                        "${PROJECT_SOURCE_DIR}/micro-benchmarks/util"
 )
 target_compile_features(gbs_write_bw PRIVATE c_std_11)
+target_compile_options(gbs_write_bw PRIVATE -pedantic)
 
 add_executable(gbs_write_lat "gbs_write_lat.c")
 target_link_libraries(
@@ -21,6 +22,7 @@ target_include_directories(
                             "${PROJECT_SOURCE_DIR}/micro-benchmarks/util"
 )
 target_compile_features(gbs_write_lat PRIVATE c_std_11)
+target_compile_options(gbs_write_lat PRIVATE -pedantic)
 
 add_executable(gbs_write_bibw "gbs_write_bibw.c")
 target_link_libraries(
@@ -31,6 +33,7 @@ target_include_directories(
                             "${PROJECT_SOURCE_DIR}/micro-benchmarks/util"
 )
 target_compile_features(gbs_write_bibw PRIVATE c_std_11)
+target_compile_options(gbs_write_bibw PRIVATE -pedantic)
 
 add_executable(gbs_read_bw "gbs_read_bw.c")
 target_link_libraries(
@@ -41,6 +44,7 @@ target_include_directories(
                             "${PROJECT_SOURCE_DIR}/micro-benchmarks/util"
 )
 target_compile_features(gbs_read_bw PRIVATE c_std_11)
+target_compile_options(gbs_read_bw PRIVATE -Wall -pedantic)
 
 add_executable(gbs_read_lat "gbs_read_lat.c")
 target_link_libraries(
@@ -51,5 +55,6 @@ target_include_directories(
                             "${PROJECT_SOURCE_DIR}/micro-benchmarks/util"
 )
 target_compile_features(gbs_read_lat PRIVATE c_std_11)
+target_compile_options(gbs_read_lat PRIVATE -Wall -pedantic)
 
 install(TARGETS gbs_write_bw gbs_write_lat gbs_read_bw gbs_read_lat gbs_write_bibw RUNTIME DESTINATION bin/one-sided)

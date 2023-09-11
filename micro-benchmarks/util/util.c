@@ -26,23 +26,19 @@ int benchmark_options(int argc, char* argv[]) {
 	int option_index = 0;
 	int c;
 	char* optstring = NULL;
+
 	if (options.type == PASSIVE) {
-		optstring = "hi:w:s:e:u:vt:";
+		optstring = "hi:w:s:e:u:vbt:";
 	}
 	else if (options.type == ONESIDED) {
-		if (options.subtype == LAT) {
-			optstring = "hi:w:s:e:u:vt:";
-		}
-		else {
-			optstring = "hi:w:s:e:u:vbt:";
-		}
+		optstring = "hi:w:s:e:u:vbt:";
 	}
 	else if (options.type == ATOMIC) {
 		optstring = "hi:u:t:";
 	}
 	else if (options.type == COLLECTIVE) {
 		if (options.subtype == ALLREDUCE) {
-			optstring = "hi:w:s:e:u:vt:";
+			optstring = "hi:w:s:e:u:vbt:";
 		}
 		else if (options.subtype == BARRIER) {
 			optstring = "hi:u:t:";
