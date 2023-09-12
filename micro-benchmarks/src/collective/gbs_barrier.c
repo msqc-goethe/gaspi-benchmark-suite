@@ -5,10 +5,10 @@
 
 int main(int argc, char* argv[]) {
 	gaspi_rank_t my_id, num_pes;
-	int i, j;
+	int i;
 	int bo_ret = OPTIONS_OKAY;
 	struct measurements_t measurements;
-	double time, min_time, avg_time, max_time;
+	double time;
 
 	options.type = COLLECTIVE;
 	options.subtype = BARRIER;

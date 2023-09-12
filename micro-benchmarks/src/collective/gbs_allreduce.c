@@ -7,7 +7,7 @@ int main(int argc, char* argv[]) {
 	gaspi_rank_t my_id, num_pes;
 	gaspi_number_t max_elem;
 	size_t size;
-	int i, j;
+	int i;
 	int bo_ret = OPTIONS_OKAY;
 	float* send_buffer;
 	float* recv_buffer;
@@ -47,7 +47,7 @@ int main(int argc, char* argv[]) {
 	if (options.max_message_size > max_elem) {
 		if (my_id == 0) {
 			fprintf(stdout,
-			        "limit for allreduce is %d requested was %d\n",
+			        "limit for allreduce is %d requested was %ld\n",
 			        max_elem,
 			        options.max_message_size);
 		}

@@ -6,7 +6,7 @@
 int main(int argc, char* argv[]) {
 	gaspi_rank_t my_id, num_pes;
 	size_t size;
-	int i, j;
+	int i;
 	int bo_ret = OPTIONS_OKAY;
 	double time;
 	struct measurements_t measurements;
@@ -103,10 +103,10 @@ int main(int argc, char* argv[]) {
 						time = stopwatch_start();
 					}
 					GASPI_CHECK(gaspi_write_notify(segment_id,
-					                               j * size,
+					                               0,
 					                               1,
 					                               segment_id,
-					                               j * size,
+					                               0,
 					                               size,
 					                               notification_id,
 					                               notification_val,

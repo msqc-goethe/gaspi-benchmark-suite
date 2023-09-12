@@ -16,8 +16,6 @@ int main(int argc, char* argv[]) {
 	options.subtype = BW;
 	options.name = "gbs_write_bibw";
 
-	gaspi_config_t conf;
-
 	bo_ret = benchmark_options(argc, argv);
 
 	switch (bo_ret) {

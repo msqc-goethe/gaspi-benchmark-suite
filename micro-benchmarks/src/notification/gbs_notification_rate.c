@@ -5,7 +5,6 @@
 
 int main(int argc, char* argv[]) {
 	gaspi_rank_t my_id, num_pes;
-	size_t size;
 	int i, j;
 	int window_size;
 	int bo_ret = OPTIONS_OKAY;
