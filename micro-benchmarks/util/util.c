@@ -60,8 +60,7 @@ int benchmark_options(int argc, char* argv[]) {
 	options.format = PLAIN;
 	options.verify = 0;
 	options.single_buffer = 0;
-	options.memory_mode =
-	    options.subtype == LAT ? "single_buffer" : "multiple_buffer";
+	options.memory_mode = "multiple_buffer";
 	options.gaspi_timer = 0;
 
 	while (1) {
