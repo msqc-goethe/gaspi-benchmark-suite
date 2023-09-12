@@ -8,7 +8,7 @@ target_link_libraries(
 )
 target_include_directories(
   gbs_atomic_fadd PRIVATE "${GPI2_INCLUDE_DIRS}"
-                       "${PROJECT_SOURCE_DIR}/micro-benchmarks/util"
+                          "${PROJECT_SOURCE_DIR}/micro-benchmarks/util"
 )
 target_compile_features(gbs_atomic_fadd PRIVATE c_std_11)
 
@@ -18,7 +18,7 @@ target_link_libraries(
 )
 target_include_directories(
   gbs_atomic_cas PRIVATE "${GPI2_INCLUDE_DIRS}"
-                            "${PROJECT_SOURCE_DIR}/micro-benchmarks/util"
+                         "${PROJECT_SOURCE_DIR}/micro-benchmarks/util"
 )
 target_compile_features(gbs_atomic_cas PRIVATE c_std_11)
 

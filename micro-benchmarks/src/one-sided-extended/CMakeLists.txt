@@ -2,54 +2,29 @@ cmake_minimum_required(VERSION 3.2)
 
 find_package(GPI2 REQUIRED)
 
+function(settings target)
+  target_link_libraries(
+    ${target} PRIVATE "benchmark_utility" "${GPI2_LIBRARIES}"
+  )
+  target_include_directories(
+    ${target} PRIVATE "${GPI2_INCLUDE_DIRS}"
+                      "${PROJECT_SOURCE_DIR}/micro-benchmarks/util"
+  )
+  target_compile_features(${target} PRIVATE c_std_11)
+endfunction()
+
 add_executable(gbs_write_notify_bw "gbs_write_notify_bw.c")
-target_link_libraries(
-  gbs_write_notify_bw PRIVATE "benchmark_utility" "${GPI2_LIBRARIES}"
-)
-target_include_directories(
-  gbs_write_notify_bw PRIVATE "${GPI2_INCLUDE_DIRS}"
-                       "${PROJECT_SOURCE_DIR}/micro-benchmarks/util"
-)
-target_compile_features(gbs_write_notify_bw PRIVATE c_std_11)
-
+settings(gbs_write_notify_bw)
 add_executable(gbs_write_notify_lat "gbs_write_notify_lat.c")
-target_link_libraries(
-  gbs_write_notify_lat PRIVATE "benchmark_utility" "${GPI2_LIBRARIES}"
-)
-target_include_directories(
-  gbs_write_notify_lat PRIVATE "${GPI2_INCLUDE_DIRS}"
-                       "${PROJECT_SOURCE_DIR}/micro-benchmarks/util"
-)
-target_compile_features(gbs_write_notify_lat PRIVATE c_std_11)
-
+settings(gbs_write_notify_lat)
 add_executable(gbs_read_notify_lat "gbs_read_notify_lat.c")
-target_link_libraries(
-  gbs_read_notify_lat PRIVATE "benchmark_utility" "${GPI2_LIBRARIES}"
-)
-target_include_directories(
-  gbs_read_notify_lat PRIVATE "${GPI2_INCLUDE_DIRS}"
-                       "${PROJECT_SOURCE_DIR}/micro-benchmarks/util"
-)
-target_compile_features(gbs_read_notify_lat PRIVATE c_std_11)
-
+settings(gbs_read_notify_lat)
 add_executable(gbs_read_notify_bw "gbs_read_notify_bw.c")
-target_link_libraries(
-  gbs_read_notify_bw PRIVATE "benchmark_utility" "${GPI2_LIBRARIES}"
-)
-target_include_directories(
-  gbs_read_notify_bw PRIVATE "${GPI2_INCLUDE_DIRS}"
-                       "${PROJECT_SOURCE_DIR}/micro-benchmarks/util"
-)
-target_compile_features(gbs_read_notify_bw PRIVATE c_std_11)
-
+settings(gbs_read_notify_bw)
 add_executable(gbs_write_notify_bibw "gbs_write_notify_bibw.c")
-target_link_libraries(
-  gbs_write_notify_bibw PRIVATE "benchmark_utility" "${GPI2_LIBRARIES}"
-)
-target_include_directories(
-  gbs_write_notify_bibw PRIVATE "${GPI2_INCLUDE_DIRS}"
-                       "${PROJECT_SOURCE_DIR}/micro-benchmarks/util"
-)
-target_compile_features(gbs_write_notify_bibw PRIVATE c_std_11)
+settings(gbs_write_notify_bibw)
 
-install(TARGETS gbs_write_notify_bw gbs_write_notify_lat gbs_write_notify_bibw gbs_read_notify_bw gbs_read_notify_lat RUNTIME DESTINATION bin/one-sided-extended)
+install(TARGETS gbs_write_notify_bw gbs_write_notify_lat gbs_write_notify_bibw
+                gbs_read_notify_bw gbs_read_notify_lat
+        RUNTIME DESTINATION bin/one-sided-extended
+)
