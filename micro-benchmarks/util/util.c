@@ -305,8 +305,10 @@ void print_header(const gaspi_rank_t id) {
 		else if (options.subtype == ALLREDUCE) {
 			if (options.format == PLAIN)
 				fprintf(stdout,
-				        "%-*s%*s%*s%*s%*s%*s%*s%*s%*s\n",
+				        "%-*s%*s%*s%*s%*s%*s%*s%*s%*s%*s\n",
 				        10,
+				        "memory_mode",
+				        FIELD_WIDTH,
 				        "#elements",
 				        FIELD_WIDTH,
 				        "#ranks",
@@ -326,7 +328,8 @@ void print_header(const gaspi_rank_t id) {
 				        "std_lat");
 			else if (options.format == CSV)
 				fprintf(stdout,
-				        "elements,ranks,iterations,min_lat,max_lat,avg_lat,"
+				        "memory_mode,elements,ranks,iterations,min_lat,max_lat,"
+				        "avg_lat,"
 				        "median_lat,var_"
 				        "lat,std_"
 				        "lat\n");
@@ -499,8 +502,10 @@ void print_result_coll(const gaspi_rank_t id,
 		if (options.subtype == ALLREDUCE) {
 			if (options.format == PLAIN) {
 				fprintf(stdout,
-				        "%-*d%*d%*d%*.*f%*.*f%*.*f%*.*f%*.*f%*.*f\n",
+				        "%-*s%*d%*d%*d%*.*f%*.*f%*.*f%*.*f%*.*f%*.*f\n",
 				        10,
+				        options.memory_mode,
+				        FIELD_WIDTH,
 				        size,
 				        FIELD_WIDTH,
 				        num_pes,
@@ -527,7 +532,8 @@ void print_result_coll(const gaspi_rank_t id,
 			}
 			else if (options.format == CSV) {
 				fprintf(stdout,
-				        "%d,%d,%d,%.*f,%.*f,%.*f,%.*f,%.*f,%.*f\n",
+				        "%s,%d,%d,%d,%.*f,%.*f,%.*f,%.*f,%.*f,%.*f\n",
+				        options.memory_mode,
 				        size,
 				        num_pes,
 				        options.iterations,
