@@ -396,6 +396,7 @@ good_match_t* pairwise_align(seq_data_t* seq_data,
 
 	current_ends_t** good_ends =
 	    (current_ends_t**) malloc(sizeof(current_ends_t*) * max_threads);
+//This parallelization does not make any sense to me
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif

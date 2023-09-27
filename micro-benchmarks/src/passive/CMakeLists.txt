@@ -1,14 +1,12 @@
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.5)
 
 find_package(GPI2 REQUIRED)
+find_package(Threads REQUIRED)
 
 function(settings target)
-  target_link_libraries(
-    ${target} PRIVATE "benchmark_utility" "${GPI2_LIBRARIES}"
-  )
+  target_link_libraries(${target} PRIVATE "benchmark_utility" "GPI2::GPI2")
   target_include_directories(
-    ${target} PRIVATE "${GPI2_INCLUDE_DIRS}"
-                      "${PROJECT_SOURCE_DIR}/micro-benchmarks/util"
+    ${target} PRIVATE "${PROJECT_SOURCE_DIR}/micro-benchmarks/util"
   )
   target_compile_features(${target} PRIVATE c_std_11)
 endfunction()
