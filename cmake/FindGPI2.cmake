@@ -6,7 +6,7 @@ find_path(
 
 find_library(
   GPI2_LIBRARY
-  NAMES libGPI2.so libGPI2.a GPI2
+  NAMES libGPI-2.so libGPI2.so libGPI2.a GPI2
   PATH_SUFFIXES "lib" "lib64"
 )
 
