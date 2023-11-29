@@ -1,5 +1,5 @@
 #include "check.h"
-#include "util.h"
+//#include "util.h"
 
 int main(int argc, char* argv[]) {
 	float version = 0.0f;

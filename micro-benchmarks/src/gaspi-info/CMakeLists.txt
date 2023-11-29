@@ -5,7 +5,7 @@ find_package(Threads REQUIRED)
 
 add_executable(gbs_info "gbs_info.c")
 target_link_libraries(
-  gbs_info PRIVATE "benchmark_utility" "GPI2::GPI2" "Threads::Threads"
+  gbs_info PRIVATE "GPI2::GPI2"
 )
 target_include_directories(
   gbs_info PRIVATE "${PROJECT_SOURCE_DIR}/micro-benchmarks/util"

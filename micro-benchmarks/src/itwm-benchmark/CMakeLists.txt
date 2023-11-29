@@ -5,7 +5,7 @@ find_package(Threads REQUIRED)
 
 function(settings target)
   target_link_libraries(
-    ${target} PRIVATE "benchmark_utility" "GPI2::GPI2" "Threads::Threads"
+    ${target} PRIVATE "GPI2::GPI2" "Threads::Threads"
   )
   target_include_directories(${target} PRIVATE "include")
   target_compile_features(${target} PRIVATE c_std_11)
