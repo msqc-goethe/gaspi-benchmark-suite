@@ -251,8 +251,10 @@ void print_header(const gaspi_rank_t id) {
 		else if (options.subtype == LAT) {
 			if (options.format == PLAIN)
 				fprintf(stdout,
-				        "%-*s%*s%*s%*s%*s%*s%*s\n",
+				        "%-*s%*s%*s%*s%*s%*s%*s%*s\n",
 				        10,
+				        "memory_mode",
+				        FIELD_WIDTH,
 				        "msg_size",
 				        FIELD_WIDTH,
 				        "min_lat",
@@ -268,7 +270,8 @@ void print_header(const gaspi_rank_t id) {
 				        "std_lat");
 			else if (options.format == CSV)
 				fprintf(stdout,
-				        "msg_size,min_lat,max_lat,avg_lat,median_lat,var_lat,"
+				        "memory_mode,msg_size,min_lat,max_lat,avg_lat,median_"
+				        "lat,var_lat,"
 				        "std_lat\n");
 			else if (options.format == RAW_CSV) {
 				fprintf(stdout, "msg_size,count,lat\n");
