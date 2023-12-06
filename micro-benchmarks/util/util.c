@@ -34,7 +34,7 @@ int benchmark_options(int argc, char* argv[]) {
 		optstring = "hi:w:s:e:u:vbt:";
 	}
 	else if (options.type == ATOMIC) {
-		optstring = "hi:u:t:";
+		optstring = "hi:u:vt:";
 	}
 	else if (options.type == COLLECTIVE) {
 		if (options.subtype == ALLREDUCE) {
@@ -133,9 +133,6 @@ void print_help_message() {
 		fprintf(stdout,
 		        "\t -e [--max_message_size] arg\t Maximum message size. "
 		        "Default (1 << 22) byte.\n");
-		fprintf(stdout,
-		        "\t -v [--verify]\tCheck results of the performed "
-		        "operation.\n");
 		if (options.subtype != LAT) {
 			fprintf(stdout,
 			        "\t -b [--single-buffer]\tUse a single memory allocation "
@@ -147,7 +144,11 @@ void print_help_message() {
 		        "\t -w [--window_size] arg\tNumber of messages sent per "
 		        "iteration. Default 64.\n");
 	}
-
+	if (options.subtype != BARRIER && options.subtype == NOTIFY) {
+		fprintf(stdout,
+		        "\t -v [--verify]\tCheck results of the performed "
+		        "operation.\n");
+	}
 	fprintf(stdout,
 	        "\t -i [--iterations] arg\tNumber of iterations. Default 10.\n");
 	fprintf(stdout,
