@@ -35,6 +35,18 @@ int main(int argc, char* argv[]) {
 		return EXIT_FAILURE;
 	}
 
+	gaspi_size_t max_transfer_size;
+	GASPI_CHECK(gaspi_passive_transfer_size_max(&max_transfer_size));
+
+	if (options.max_message_size > max_transfer_size) {
+		if (my_id == 0) {
+			fprintf(stderr,
+			        "Message size was truncated to %d!\n",
+			        max_transfer_size);
+		}
+		options.max_message_size = max_transfer_size;
+	}
+
 	measurements.time = malloc(options.iterations * sizeof(double));
 	measurements.n = options.iterations;
 
