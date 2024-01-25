@@ -5,10 +5,9 @@
 
 int main(int argc, char* argv[]) {
 	gaspi_rank_t my_id, num_pes;
-	int i;
 	int bo_ret = OPTIONS_OKAY;
-	struct measurements_t measurements;
-	double time;
+	double timer = 0;
+	double t0;
 
 	options.type = COLLECTIVE;
 	options.subtype = BARRIER;
@@ -29,27 +28,31 @@ int main(int argc, char* argv[]) {
 	GASPI_CHECK(gaspi_proc_rank(&my_id));
 	GASPI_CHECK(gaspi_proc_num(&num_pes));
 
-	if (num_pes < 2) {
-		fprintf(stderr, "Benchmark requires >= 2 processes!\n");
-		return EXIT_FAILURE;
-	}
-
-	measurements.time = malloc(options.iterations * sizeof(double));
-	measurements.n = options.iterations;
-
 	print_header(my_id);
 
-	for (i = 0; i < options.iterations + options.skip; ++i) {
+	for (int i = 0; i < options.iterations + options.skip; ++i) {
 		if (i >= options.skip) {
-			time = stopwatch_start();
+			t0 = stopwatch_start();
 		}
 		GASPI_CHECK(gaspi_barrier(GASPI_GROUP_ALL, GASPI_BLOCK));
 		if (i >= options.skip) {
-			measurements.time[i - options.skip] = stopwatch_stop(time);
+			timer += stopwatch_stop(t0);
 		}
 	}
-	print_result_coll(my_id, num_pes, 0, measurements);
-	free(measurements.time);
+
+	double latency = timer / options.iterations;
+	double min_time,max_time,avg_time;
+
+	GASPI_CHECK(gaspi_allreduce(&latency,&min_time,1,GASPI_OP_MIN,GASPI_TYPE_DOUBLE,GASPI_GROUP_ALL,GASPI_BLOCK));
+	GASPI_CHECK(gaspi_allreduce(&latency,&max_time,1,GASPI_OP_MAX,GASPI_TYPE_DOUBLE,GASPI_GROUP_ALL,GASPI_BLOCK));
+	GASPI_CHECK(gaspi_allreduce(&latency,&avg_time,1,GASPI_OP_SUM,GASPI_TYPE_DOUBLE,GASPI_GROUP_ALL,GASPI_BLOCK));
+	
+	avg_time /= num_pes;
+	avg_time *= 1e-3; //us
+	min_time *= 1e-3; //us
+	max_time *= 1e-3; //us
+					  //
+	print_barrier_result(my_id,num_pes,min_time,max_time,avg_time);
 	GASPI_CHECK(gaspi_proc_term(GASPI_BLOCK));
 	return EXIT_SUCCESS;
 }

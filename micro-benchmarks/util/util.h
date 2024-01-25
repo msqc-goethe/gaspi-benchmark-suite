@@ -13,7 +13,7 @@
 #endif
 
 #ifndef FLOAT_PRECISION
-#define FLOAT_PRECISION 2
+#define FLOAT_PRECISION 4
 #endif
 
 enum options_ret_type { OPTIONS_OKAY = 0, OPTIONS_HELP, OPTIONS_BAD_USAGE };
@@ -71,14 +71,24 @@ void print_help_message(void);
 void print_result(const gaspi_rank_t id,
                   struct measurements_t timings,
                   const size_t size);
-void print_result_coll(const gaspi_rank_t id,
-                       const int num_pes,
-                       const size_t size,
-                       struct measurements_t measurements);
+void print_allreduce_result(const gaspi_rank_t i,
+                            const int num_pes,
+                            const size_t size,
+                            const double min_time,
+                            const double max_time,
+                            const double avg_time);
+void print_barrier_result(const gaspi_rank_t i,
+                          const int num_pes,
+                          const double min_time,
+                          const double max_time,
+                          const double avg_time);
 void print_atomic_lat(const gaspi_rank_t id,
                       struct measurements_t measurements);
 void print_notify_lat(const gaspi_rank_t id,
                       struct measurements_t measurements);
+void print_list_lat(const gaspi_rank_t id,
+                    struct measurements_t measurements,
+                    size_t stride_count);
 
 extern struct benchmark_options_t options;
 extern struct bad_usage_t bad_usage;
