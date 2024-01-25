@@ -41,7 +41,8 @@ int main(int argc, char* argv[]) {
 	if (options.max_message_size > max_transfer_size) {
 		if (my_id == 0) {
 			fprintf(stderr,
-			        "Message size was truncated to %d!\n",
+			        "Message size was truncated from %d to %d!\n",
+			        options.max_message_size,
 			        max_transfer_size);
 		}
 		options.max_message_size = max_transfer_size;
