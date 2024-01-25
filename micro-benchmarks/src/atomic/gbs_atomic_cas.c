@@ -73,8 +73,8 @@ int main(int argc, char* argv[]) {
 	}
 
 	if (my_id == 0 && options.verify) {
-		GASPI_CHECK(
-		    gaspi_read(segment_id, 0, 1, segment_id, 0, 1, 0, GASPI_BLOCK));
+		GASPI_CHECK(gaspi_read(
+		    segment_id, 0, 1, segment_id, 0, sizeof(size_t), 0, GASPI_BLOCK));
 		GASPI_CHECK(gaspi_wait(0, GASPI_BLOCK));
 		size_t expected_counter_val = options.iterations + options.skip;
 		size_t actual_counter_val = *((size_t*) ptr);
