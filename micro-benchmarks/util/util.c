@@ -56,6 +56,15 @@ int benchmark_options(int argc, char* argv[]) {
 	options.min_message_size = DEFAULT_MIN_MESSAGE_SIZE;
 	options.max_message_size = DEFAULT_MAX_MESSAGE_SIZE;
 	options.iterations = DEFAULT_ITERATIONS;
+	if (options.type == PASSIVE) {
+		options.max_message_size = DEFAULT_PASSIVE_MAX_MESSAGE_SIZE;
+	}
+	else if (options.subtype == ALLREDUCE) {
+		options.max_message_size = DEFAULT_ALLREDUCE_MAX_MESSAGE_SIZE;
+	}
+	else {
+		options.max_message_size = DEFAULT_MAX_MESSAGE_SIZE;
+	}
 	options.skip = DEFAULT_WARMUP_ITERATIONS;
 	options.format = PLAIN;
 	options.verify = 0;
@@ -144,7 +153,7 @@ void print_help_message() {
 		        "\t -w [--window_size] arg\tNumber of messages sent per "
 		        "iteration. Default 64.\n");
 	}
-	if (options.subtype != BARRIER && options.subtype == NOTIFY) {
+	if (options.subtype != BARRIER && options.subtype != NOTIFY) {
 		fprintf(stdout,
 		        "\t -v [--verify]\tCheck results of the performed "
 		        "operation.\n");
