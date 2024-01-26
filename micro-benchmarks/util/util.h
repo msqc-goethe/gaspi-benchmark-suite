@@ -20,7 +20,15 @@ enum options_ret_type { OPTIONS_OKAY = 0, OPTIONS_HELP, OPTIONS_BAD_USAGE };
 
 enum benchmark_type { COLLECTIVE = 0, PASSIVE, ONESIDED, ATOMIC, NOTIFY };
 
-enum benchmark_subtype { BW = 0, LAT, ALLREDUCE, BARRIER, RATE, PINGPONG };
+enum benchmark_subtype {
+	BW = 0,
+	LAT,
+	ALLREDUCE,
+	BARRIER,
+	RATE,
+	PINGPONG,
+	STRIDED
+};
 
 enum output_format { PLAIN = 0, CSV, RAW_CSV };
 
@@ -87,8 +95,8 @@ void print_atomic_lat(const gaspi_rank_t id,
 void print_notify_lat(const gaspi_rank_t id,
                       struct measurements_t measurements);
 void print_list_lat(const gaspi_rank_t id,
-                    struct measurements_t measurements,
-                    size_t stride_count);
+                    const size_t stride_count,
+                    struct measurements_t measurements);
 
 extern struct benchmark_options_t options;
 extern struct bad_usage_t bad_usage;

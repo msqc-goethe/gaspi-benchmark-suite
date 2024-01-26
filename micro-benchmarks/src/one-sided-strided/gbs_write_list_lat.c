@@ -12,7 +12,7 @@ int main(int argc, char* argv[]) {
 	struct measurements_t measurements;
 
 	options.type = ONESIDED;
-	options.subtype = LAT;
+	options.subtype = STRIDED;
 	options.name = "gbs_write_notify_lat";
 
 	bo_ret = benchmark_options(argc, argv);
@@ -70,8 +70,8 @@ int main(int argc, char* argv[]) {
 		                      sizes[segment_idx],
 		                      my_id == 0 ? 'a' : 'b');
 	}
-	
-	GASPI_CHECK(gaspi_barrier(GASPI_GROUP_ALL,GASPI_BLOCK));
+
+	GASPI_CHECK(gaspi_barrier(GASPI_GROUP_ALL, GASPI_BLOCK));
 
 	if (my_id == 0) {
 		for (i = 0; i < options.iterations + options.skip; ++i) {
@@ -109,7 +109,7 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
-	print_list_lat(my_id, measurements, stride_count);
+	print_list_lat(my_id, stride_count, measurements);
 
 	for (int i = 0; i < stride_count; ++i) {
 		free_gaspi_memory(segment_ids[i]);

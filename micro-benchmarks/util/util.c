@@ -355,6 +355,31 @@ void print_header(const gaspi_rank_t id) {
 			else if (options.format == CSV)
 				fprintf(stdout, "ranks,iterations,min_lat,max_lat,avg_lat\n");
 		}
+		else if (options.subtype == STRIDED) {
+			if (options.format == PLAIN)
+				fprintf(stdout,
+				        "%-*s%*s%*s%*s%*s%*s%*s%*s\n",
+				        10,
+				        "#segments",
+				        FIELD_WIDTH,
+				        "#iterations",
+				        FIELD_WIDTH,
+				        "min_lat",
+				        FIELD_WIDTH,
+				        "max_lat",
+				        FIELD_WIDTH,
+				        "avg_lat",
+				        FIELD_WIDTH,
+				        "median_lat",
+				        FIELD_WIDTH,
+				        "var_lat",
+				        FIELD_WIDTH,
+				        "std_lat");
+			else if (options.format == CSV)
+				fprintf(stdout,
+				        "#segments,#iterations,min_lat,max_lat,avg_lat,median_"
+				        "lat,var_lat,std_lat\n");
+		}
 		fflush(stdout);
 	}
 }
@@ -566,17 +591,19 @@ void print_allreduce_result(const gaspi_rank_t id,
 }
 
 void print_list_lat(const gaspi_rank_t id,
-                    struct measurements_t measurements,
-                    size_t stride_count) {
+                    const size_t stride_count,
+                    struct measurements_t measurements) {
 	struct statistics_t statistics;
-	int i;
 	if (id == 0) {
 		compute_statistics(measurements, &statistics, 0);
 		if (options.format == PLAIN) {
 			fprintf(stdout,
-			        "%-d%*.*f%*.*f%*.*f%*.*f%*.*f%*.*f\n",
+			        "%-*d%*d%*.*f%*.*f%*.*f%*.*f%*.*f%*.*f\n",
 			        10,
 			        stride_count,
+			        FIELD_WIDTH,
+			        options.iterations,
+			        FIELD_WIDTH,
 			        FLOAT_PRECISION,
 			        statistics.min,
 			        FIELD_WIDTH,
@@ -597,8 +624,9 @@ void print_list_lat(const gaspi_rank_t id,
 		}
 		else if (options.format == CSV) {
 			fprintf(stdout,
-			        "%d,%.*f,%.*f,%.*f,%.*f,%.*f,%.*f\n",
+			        "%d,%d,%.*f,%.*f,%.*f,%.*f,%.*f,%.*f\n",
 			        stride_count,
+			        options.iterations,
 			        FLOAT_PRECISION,
 			        statistics.min,
 			        FLOAT_PRECISION,

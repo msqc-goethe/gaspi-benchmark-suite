@@ -12,7 +12,7 @@ int main(int argc, char* argv[]) {
 	struct measurements_t measurements;
 
 	options.type = ONESIDED;
-	options.subtype = LAT;
+	options.subtype = STRIDED;
 	options.name = "gbs_write_notify_lat";
 
 	bo_ret = benchmark_options(argc, argv);
@@ -54,7 +54,7 @@ int main(int argc, char* argv[]) {
 	    malloc(stride_count * sizeof(gaspi_offset_t));
 	gaspi_offset_t* remote_offsets =
 	    malloc(stride_count * sizeof(gaspi_offset_t));
-	
+
 	const gaspi_notification_id_t notification_id = 0;
 	const gaspi_notification_t notification_val = 1;
 	const gaspi_segment_id_t notify_segment = 0;
@@ -80,17 +80,17 @@ int main(int argc, char* argv[]) {
 				time = stopwatch_start();
 			}
 			GASPI_CHECK(gaspi_write_list_notify(stride_count,
-			                             segment_ids,
-			                             local_offsets,
-			                             1,
-			                             segment_ids,
-			                             remote_offsets,
-			                             sizes,
-										 notify_segment,
-										 notification_id,
-										 notification_val,
-			                             q_id,
-			                             GASPI_BLOCK));
+			                                    segment_ids,
+			                                    local_offsets,
+			                                    1,
+			                                    segment_ids,
+			                                    remote_offsets,
+			                                    sizes,
+			                                    notify_segment,
+			                                    notification_id,
+			                                    notification_val,
+			                                    q_id,
+			                                    GASPI_BLOCK));
 			GASPI_CHECK(gaspi_wait(q_id, GASPI_BLOCK));
 			if (i >= options.skip) {
 				measurements.time[i - options.skip] = stopwatch_stop(time);
@@ -99,7 +99,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	if (my_id == 1 && options.verify) {
-		GASPI_CHECK(gaspi_notify_waitsome(0,0,1,0,GASPI_BLOCK));
+		GASPI_CHECK(gaspi_notify_waitsome(0, 0, 1, 0, GASPI_BLOCK));
 		for (int i = 0; i < stride_count; ++i) {
 			GASPI_CHECK(gaspi_segment_ptr(segment_ids[i], &ptr));
 			for (int u = 0; u < sizes[i]; ++u) {
@@ -112,7 +112,7 @@ int main(int argc, char* argv[]) {
 		}
 	}
 	GASPI_CHECK(gaspi_barrier(GASPI_GROUP_ALL, GASPI_BLOCK));
-	print_list_lat(my_id, measurements, stride_count);
+	print_list_lat(my_id, stride_count, measurements);
 	for (int i = 0; i < stride_count; ++i) {
 		free_gaspi_memory(segment_ids[i]);
 	}
