@@ -99,7 +99,8 @@ int main(int argc, char* argv[]) {
 	}
 
 	if (my_id == 1 && options.verify) {
-		GASPI_CHECK(gaspi_notify_waitsome(0, 0, 1, 0, GASPI_BLOCK));
+		gaspi_notification_id_t first;
+		GASPI_CHECK(gaspi_notify_waitsome(0, 0, 1, &first, GASPI_BLOCK));
 		for (int i = 0; i < stride_count; ++i) {
 			GASPI_CHECK(gaspi_segment_ptr(segment_ids[i], &ptr));
 			for (int u = 0; u < sizes[i]; ++u) {
