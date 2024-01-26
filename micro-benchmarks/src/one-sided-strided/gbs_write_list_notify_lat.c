@@ -57,6 +57,7 @@ int main(int argc, char* argv[]) {
 	
 	const gaspi_notification_id_t notification_id = 0;
 	const gaspi_notification_t notification_val = 1;
+	const gaspi_segment_id_t notify_segment = 0;
 	const gaspi_queue_id_t q_id = 0;
 	gaspi_pointer_t ptr;
 
@@ -85,7 +86,7 @@ int main(int argc, char* argv[]) {
 			                             segment_ids,
 			                             remote_offsets,
 			                             sizes,
-										 0,
+										 notify_segment,
 										 notification_id,
 										 notification_val,
 			                             q_id,
