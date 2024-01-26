@@ -410,7 +410,7 @@ void compute_statistics(struct measurements_t measurements,
 		}
 	}
 	else if (options.subtype == LAT || options.type == COLLECTIVE ||
-	         options.subtype == PINGPONG) {
+	         options.subtype == PINGPONG || options.subtype == STRIDED) {
 		for (i = 0; i < n; ++i) {
 			t[i] *= 1e-3; // ns to us
 		}
