@@ -78,10 +78,9 @@ int main(int argc, char* argv[]) {
 					}
 				}
 			}
-			if (options.verify) {
-				GASPI_CHECK(gaspi_barrier(GASPI_GROUP_ALL, GASPI_BLOCK));
-			}
 			if (my_id == 1 && options.verify) {
+				GASPI_CHECK(
+				    gaspi_notify_waitsome(segment_id, 0, 1, 0, GASPI_BLOCK));
 				for (i = 0; i < size; ++i) {
 					if (((char*) ptr)[i] != 'a') {
 						fprintf(stderr,
@@ -129,10 +128,12 @@ int main(int argc, char* argv[]) {
 				GASPI_CHECK(gaspi_barrier(GASPI_GROUP_ALL, GASPI_BLOCK));
 			}
 			if (my_id == 1 && options.verify) {
+				gaspi_notification_id_t id_t;
+				GASPI_CHECK(gaspi_notify_waitsome(segment_id,0,1,&id_t,GASPI_BLOCK));
 				for (i = 0; i < size * window_size; ++i) {
 					if (((char*) ptr)[i] != 'a') {
 						fprintf(stderr,
-						        "Verification failed. Result is invalid!\n");
+						        "Verification failed. Result is invalid! @index %d %c\n",i,((char*)ptr)[i]);
 						return EXIT_FAILURE;
 					}
 				}

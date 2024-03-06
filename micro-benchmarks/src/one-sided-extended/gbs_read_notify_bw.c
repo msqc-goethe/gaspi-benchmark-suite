@@ -120,6 +120,8 @@ int main(int argc, char* argv[]) {
 					}
 				}
 				if (options.verify) {
+					gaspi_notification_id_t id_t;
+					GASPI_CHECK(gaspi_notify_waitsome(segment_id,0,1,&id_t,GASPI_BLOCK));
 					for (i = 0; i < size * window_size; ++i) {
 						if (((char*) ptr)[i] != 'b') {
 							fprintf(
